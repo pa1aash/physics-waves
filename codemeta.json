@@ -1,0 +1,42 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "name": "Beta-Effect Control of Barotropic Rossby-Wave Dispersion and Zonal-Jet Instability on a Rotating Sphere",
+  "description": "A fully computational spectral study of how the latitudinal gradient of planetary vorticity governs the westward propagation, meridional structure and shear instability of large-scale barotropic waves in a rotating shallow-water fluid on a sphere.",
+  "version": "0.1.0",
+  "dateCreated": "2026-07-24",
+  "dateModified": "2026-07-24",
+  "license": "https://spdx.org/licenses/MIT.html",
+  "codeRepository": "https://github.com/pa1aash/physics-waves",
+  "programmingLanguage": "Python",
+  "runtimePlatform": "Dedalus 3",
+  "operatingSystem": ["macOS", "Linux"],
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Palaash",
+      "familyName": "Gang",
+      "@id": "ORCID_PLACEHOLDER"
+    }
+  ],
+  "copyrightHolder": {
+    "@type": "Person",
+    "givenName": "Palaash",
+    "familyName": "Gang"
+  },
+  "copyrightYear": 2026,
+  "keywords": [
+    "geophysical fluid dynamics",
+    "rotating shallow water",
+    "beta-effect",
+    "Rossby waves",
+    "Rossby-Haurwitz waves",
+    "barotropic instability",
+    "Rayleigh-Kuo criterion",
+    "spectral methods",
+    "spherical harmonics",
+    "potential vorticity",
+    "Dedalus",
+    "ERA5"
+  ]
+}
