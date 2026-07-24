@@ -1,0 +1,11 @@
+Copyright (c) 2026 Palaash Gang
+
+The data products in data/processed/, the figures in figures/, and the
+derivations in theory/ are licensed under the Creative Commons Attribution
+4.0 International License (CC BY 4.0).
+
+Full legal code: https://creativecommons.org/licenses/by/4.0/legalcode
+Human-readable summary: https://creativecommons.org/licenses/by/4.0/
+
+Source code in src/, configs/, scripts/ and tests/ is licensed separately
+under the MIT License; see LICENSE.
