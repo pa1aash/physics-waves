@@ -27,6 +27,9 @@ include = ["src*"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+# Vendored, unmodified upstream GPL-3.0 code (the Phase-0 gate reference example)
+# must never be reformatted to project style — it is kept byte-identical.
+extend-exclude = ["tests/phase0_gate/dedalus_reference"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B"]
@@ -34,3 +37,4 @@ select = ["E", "F", "W", "I", "UP", "B"]
 [tool.black]
 line-length = 100
 target-version = ["py312"]
+extend-exclude = "tests/phase0_gate/dedalus_reference"

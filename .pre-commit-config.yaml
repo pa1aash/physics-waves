@@ -6,6 +6,11 @@
 # strings. Its pattern expresses each token as a bracketed character class, so
 # this config file does not itself contain the literal strings it screens for
 # and stays clean under the whole-tree audit.
+# Vendored, unmodified upstream code (the Phase-0 gate GPL-3.0 reference example)
+# is excluded from every hook so it stays byte-identical to upstream. The
+# whole-tree audit (scripts/audit.sh check 1, via git ls-files) still scans it.
+exclude: '^tests/phase0_gate/dedalus_reference/'
+
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.6
