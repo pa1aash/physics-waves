@@ -72,3 +72,8 @@ scratch/
 tests/phase0_gate/**/snapshots/
 tests/phase0_gate/diagnostics/*.png
 tests/phase0_gate/diagnostics/*.pdf
+
+# Operational-command build/preview outputs (reproducible)
+figures/style_preview.*
+theory/derivations.pdf
+manuscript/main.pdf

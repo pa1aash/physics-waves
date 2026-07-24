@@ -18,9 +18,10 @@ from __future__ import annotations
 
 import json
 import subprocess
-from datetime import datetime, timezone
+from collections.abc import Iterable
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import cmocean
 import matplotlib as mpl
@@ -92,7 +93,9 @@ def apply_style() -> None:
             "axes.spines.right": False,
             # lines and colour cycle
             "lines.linewidth": 1.2,
-            "image.cmap": SEQUENTIAL_CMAP.name,
+            # cmocean registers its maps under a "cmo." prefix; the bare .name
+            # ("thermal") is not a valid matplotlib colormap key.
+            "image.cmap": f"cmo.{SEQUENTIAL_CMAP.name}",
             # vector PDF with embedded, editable Type 42 fonts
             "pdf.fonttype": 42,
             "ps.fonttype": 42,
@@ -134,7 +137,7 @@ def provenance_sidecar(
     sidecar = figure_path.with_suffix(figure_path.suffix + ".json")
     record = {
         "figure": figure_path.name,
-        "created_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "created_utc": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "run_ids": sorted(set(run_ids)),
         "processed_files": sorted(set(processed_files)),
         "config_hashes": dict(config_hashes or {}),

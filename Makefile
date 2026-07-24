@@ -9,8 +9,12 @@ COMMIT := bash scripts/autocommit.sh
 # the command line, e.g. `make data-ncep YEARS="2013 2014"`.
 YEARS ?= 2015 2016
 
+# Argument passthroughs for the operational commands (see docs/CLI_COMMANDS.md).
+FILE ?=
+ARGS ?=
+
 .PHONY: env lock test hooks data data-ncep data-era5 data-torch licenses \
-        audit sync clean reproduce help
+        audit sync clean reproduce help verify refcheck manuscript figure sweep
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -52,6 +56,24 @@ licenses:
 
 audit: ## run the repository compliance audit
 	bash scripts/audit.sh
+
+verify: ## run the full verification suite (audit + tests + Phase-0 gate record)
+	bash scripts/verify.sh
+
+refcheck: ## check \cite keys resolve to bib entries with live DOIs; `make refcheck FILE=x.tex`
+	python scripts/refcheck.py $(FILE)
+
+manuscript: ## build the manuscript PDF (falls back to theory/derivations.tex until L11)
+	bash scripts/build_manuscript.sh
+
+figure: ## figure pipeline (L10); preview now with `make figure ARGS=--style-preview`
+	python src/figures/make_figures.py $(ARGS)
+
+sweep:
+	@echo "NOT YET IMPLEMENTED."
+	@echo "The run-configuration system and harness arrive in Session L5;"
+	@echo "the pod sweep generator arrives in Session L7."
+	@exit 1
 
 sync: ## mirror the working tree to the compute pod
 	bash scripts/sync_pod.sh
