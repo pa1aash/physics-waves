@@ -5,6 +5,10 @@
 SHELL := /bin/bash
 COMMIT := bash scripts/autocommit.sh
 
+# NCEP/NCAR winter(s) to acquire. Never hard-coded in the fetcher: override on
+# the command line, e.g. `make data-ncep YEARS="2013 2014"`.
+YEARS ?= 2015 2016
+
 .PHONY: env lock test hooks data data-ncep data-era5 data-torch licenses \
         audit sync clean reproduce help
 
@@ -30,8 +34,8 @@ hooks: ## install the git and pre-commit hooks
 
 data: data-ncep data-era5 ## fetch the default external datasets (D1-D3)
 
-data-ncep: ## fetch NCEP/NCAR Reanalysis 1 (D3)
-	python src/data/fetch_ncep.py
+data-ncep: ## fetch NCEP/NCAR Reanalysis 1 (D3); pick winters with YEARS="2013 2014"
+	python src/data/fetch_ncep.py --years $(YEARS)
 	$(COMMIT)
 
 data-era5: ## fetch ERA5 monthly + daily fields (D1, D2)

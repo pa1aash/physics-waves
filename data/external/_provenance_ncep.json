@@ -2,6 +2,86 @@
   "citation": "Kalnay et al. (1996), Bull. Amer. Meteor. Soc. 77, 437-471",
   "dataset_id": "D3",
   "files": {
+    "hgt.2013.nc": {
+      "bytes": 84752852,
+      "data_vars": [
+        "hgt",
+        "time_bnds"
+      ],
+      "dims": {
+        "lat": 73,
+        "level": 17,
+        "lon": 144,
+        "nbnds": 2,
+        "time": 365
+      },
+      "lat": {
+        "max": 90.0,
+        "min": -90.0,
+        "units": "degrees_north"
+      },
+      "level": {
+        "max": 1000.0,
+        "min": 10.0,
+        "units": "millibar"
+      },
+      "level_of_interest": "500 hPa",
+      "lon": {
+        "max": 357.5,
+        "min": 0.0,
+        "units": "degrees_east"
+      },
+      "retrieved_utc": "2026-07-24T15:46:18Z",
+      "sha256": "57d938a92bfba3db75a4143db0e3ae83494dbe3733e61a0739bddcaada9b1ca4",
+      "status": "ok",
+      "time": {
+        "max": 1.388448e+18,
+        "min": 1.3569984e+18,
+        "units": ""
+      },
+      "url": "https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/Dailies/pressure/hgt.2013.nc",
+      "url_note": "candidate pattern: https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/Dailies/pressure/{var}.{year}.nc"
+    },
+    "hgt.2014.nc": {
+      "bytes": 84885420,
+      "data_vars": [
+        "hgt",
+        "time_bnds"
+      ],
+      "dims": {
+        "lat": 73,
+        "level": 17,
+        "lon": 144,
+        "nbnds": 2,
+        "time": 365
+      },
+      "lat": {
+        "max": 90.0,
+        "min": -90.0,
+        "units": "degrees_north"
+      },
+      "level": {
+        "max": 1000.0,
+        "min": 10.0,
+        "units": "millibar"
+      },
+      "level_of_interest": "500 hPa",
+      "lon": {
+        "max": 357.5,
+        "min": 0.0,
+        "units": "degrees_east"
+      },
+      "retrieved_utc": "2026-07-24T15:48:20Z",
+      "sha256": "3e1cf6ef52fbbadf6170410d72771bac2fa87a7bdb7206d33763d2fce117e838",
+      "status": "ok",
+      "time": {
+        "max": 1.419984e+18,
+        "min": 1.3885344e+18,
+        "units": ""
+      },
+      "url": "https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/Dailies/pressure/hgt.2014.nc",
+      "url_note": "candidate pattern: https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/Dailies/pressure/{var}.{year}.nc"
+    },
     "hgt.2015.nc": {
       "bytes": 85192630,
       "data_vars": [
@@ -80,6 +160,86 @@
         "units": ""
       },
       "url": "https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/Dailies/pressure/hgt.2016.nc",
+      "url_note": "candidate pattern: https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/Dailies/pressure/{var}.{year}.nc"
+    },
+    "uwnd.2013.nc": {
+      "bytes": 165259853,
+      "data_vars": [
+        "uwnd",
+        "time_bnds"
+      ],
+      "dims": {
+        "lat": 73,
+        "level": 17,
+        "lon": 144,
+        "nbnds": 2,
+        "time": 365
+      },
+      "lat": {
+        "max": 90.0,
+        "min": -90.0,
+        "units": "degrees_north"
+      },
+      "level": {
+        "max": 1000.0,
+        "min": 10.0,
+        "units": "millibar"
+      },
+      "level_of_interest": "250 hPa",
+      "lon": {
+        "max": 357.5,
+        "min": 0.0,
+        "units": "degrees_east"
+      },
+      "retrieved_utc": "2026-07-24T15:53:30Z",
+      "sha256": "effea491b9369fb2f71178375bca9ca62c8a218dd8b6d93596f8d5ee5fe835a1",
+      "status": "ok",
+      "time": {
+        "max": 1.388448e+18,
+        "min": 1.3569984e+18,
+        "units": ""
+      },
+      "url": "https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/Dailies/pressure/uwnd.2013.nc",
+      "url_note": "candidate pattern: https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/Dailies/pressure/{var}.{year}.nc"
+    },
+    "uwnd.2014.nc": {
+      "bytes": 163439156,
+      "data_vars": [
+        "uwnd",
+        "time_bnds"
+      ],
+      "dims": {
+        "lat": 73,
+        "level": 17,
+        "lon": 144,
+        "nbnds": 2,
+        "time": 365
+      },
+      "lat": {
+        "max": 90.0,
+        "min": -90.0,
+        "units": "degrees_north"
+      },
+      "level": {
+        "max": 1000.0,
+        "min": 10.0,
+        "units": "millibar"
+      },
+      "level_of_interest": "250 hPa",
+      "lon": {
+        "max": 357.5,
+        "min": 0.0,
+        "units": "degrees_east"
+      },
+      "retrieved_utc": "2026-07-24T15:57:05Z",
+      "sha256": "05c67e80994c0fb78ffe4812c5d87404b1a216d523d68574fc204cec11e061e6",
+      "status": "ok",
+      "time": {
+        "max": 1.419984e+18,
+        "min": 1.3885344e+18,
+        "units": ""
+      },
+      "url": "https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/Dailies/pressure/uwnd.2014.nc",
       "url_note": "candidate pattern: https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/Dailies/pressure/{var}.{year}.nc"
     },
     "uwnd.2015.nc": {
@@ -163,7 +323,7 @@
       "url_note": "candidate pattern: https://downloads.psl.noaa.gov/Datasets/ncep.reanalysis/Dailies/pressure/{var}.{year}.nc"
     }
   },
-  "last_run_utc": "2026-07-24T04:44:26Z",
+  "last_run_utc": "2026-07-24T15:57:05Z",
   "licence": "NOAA PSL, freely available; cite NOAA/OAR/ESRL PSL.",
   "source": "NCEP/NCAR Reanalysis 1 (NOAA PSL)"
 }

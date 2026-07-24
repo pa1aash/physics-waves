@@ -29,11 +29,27 @@ Any user must re-download them under the providers' own licence terms:
   `uwnd` (zonal wind; level of interest **250 hPa**). Files carry all 17
   pressure levels (10–1000 mb); the level selection is applied downstream.
 - **Spatial grid.** 2.5° global, 73 latitudes × 144 longitudes (lat +90…−90,
-  lon 0…357.5). Latitude spans both poles.
-- **Temporal coverage.** Daily; calendar years 2015 (365 days) and 2016
-  (366 days), covering the full DJF 2015/16 season.
+  lon 0…357.5, Δ = 2.5° covering the full 360°). Latitude spans both poles.
+- **Vertical.** All 17 standard pressure levels (10–1000 hPa). Both 500 hPa
+  (`hgt`, level of interest) and 250 hPa (`uwnd`, level of interest) are present
+  in every file; the selection is applied downstream.
+- **`hgt` units.** Geopotential **height** in metres (NCEP convention: the field
+  is `Z`, not the geopotential `Φ`), confirmed by the `units` attribute (`m`) and
+  by magnitude (500 hPa values ≈ 5.5 × 10³ m). This differs from ERA5, whose
+  archived variable is the geopotential `Φ` in m² s⁻² — see D1 below.
+- **Temporal coverage.** Daily. **Two contrasting DJF winters** are covered, per
+  the two-season observational design (see `docs/CONVENTIONS.md`, "Two
+  contrasting DJF seasons"): **DJF 2013/14** (ENSO-neutral, a typical background
+  state) and **DJF 2015/16** (strong El Niño, a strongly perturbed background
+  state). Files are per calendar year: 2013, 2014 and 2015 (365 days each) and
+  2016 (366 days, leap year). Each winter's Dec–Jan–Feb season is spanned by its
+  two bracketing calendar-year files. Every file's time axis is gap-free from
+  Jan 1 to Dec 31 of its year.
 - **Format.** NetCDF.
-- **Retrieved (UTC).** 2026-07-24.
+- **Retrieved (UTC).** 2015/16 files 2026-07-24 (Session 00); 2013/14 files
+  2026-07-24 (this session).
+
+DJF 2015/16 season (Session 00):
 
 | Local filename | Bytes | SHA-256 |
 |----------------|-------|---------|
@@ -42,7 +58,18 @@ Any user must re-download them under the providers' own licence terms:
 | `uwnd.2015.nc` | 156,826,090 | `4050e2bc434881dbb5f2d04b3b0c37ef45da0515f820a2857383df0829a6b0e2` |
 | `uwnd.2016.nc` | 156,746,731 | `02175bfd31e4fa487a1b3351fcd632be5840b1e9ac1be8eb031e829a3130cf81` |
 
-Machine-readable record: `_provenance_ncep.json`.
+DJF 2013/14 season (this session):
+
+| Local filename | Bytes | SHA-256 |
+|----------------|-------|---------|
+| `hgt.2013.nc`  | 84,752,852  | `57d938a92bfba3db75a4143db0e3ae83494dbe3733e61a0739bddcaada9b1ca4` |
+| `hgt.2014.nc`  | 84,885,420  | `3e1cf6ef52fbbadf6170410d72771bac2fa87a7bdb7206d33763d2fce117e838` |
+| `uwnd.2013.nc` | 165,259,853 | `effea491b9369fb2f71178375bca9ca62c8a218dd8b6d93596f8d5ee5fe835a1` |
+| `uwnd.2014.nc` | 163,439,156 | `05c67e80994c0fb78ffe4812c5d87404b1a216d523d68574fc204cec11e061e6` |
+
+The winter-2013/14 files were fetched with `make data-ncep YEARS="2013 2014"`,
+which routes the year list through a Makefile variable rather than hard-coding it
+in the fetcher. Machine-readable record: `_provenance_ncep.json`.
 
 ---
 
