@@ -127,5 +127,43 @@ else
   bad "11. commit count is $n (< 16)"
 fi
 
+# 18. No CDS credential token anywhere in the repository (tracked files OR full
+#     history, including commit messages). The 8-char token prefix is assembled
+#     from fragments at run time, so this guard does not itself contain the
+#     literal string it screens for (same technique as check 1).
+tok8="f6""73""815c"
+if git ls-files -z | xargs -0 grep -lIF "$tok8" 2>/dev/null | grep -q . \
+   || git log -p --all 2>/dev/null | grep -qF "$tok8"; then
+  bad "18. CDS credential token present in repository (tracked files or history)"
+else
+  pass "18. no CDS credential token in tracked files or history"
+fi
+
+# 19. No ORCID placeholder remains in any tracked file. Assembled from fragments
+#     so this guard stays clean under its own screen.
+ph="ORCID""_PLACEHOLDER"
+if git ls-files -z | xargs -0 grep -lIF "$ph" 2>/dev/null | grep -q .; then
+  bad "19. ORCID placeholder still present in tracked files"
+else
+  pass "19. no ORCID placeholder in tracked files"
+fi
+
+# 20. The CDS credentials file is mode 600 and lives outside the repository.
+rc="${HOME}/.cdsapirc"
+if [ -f "$rc" ]; then
+  mode="$(stat -f %Lp "$rc" 2>/dev/null || stat -c %a "$rc" 2>/dev/null)"
+  case "$rc" in
+    "$(git rev-parse --show-toplevel)"/*) inside=1 ;;
+    *) inside=0 ;;
+  esac
+  if [ "$mode" = "600" ] && [ "$inside" -eq 0 ]; then
+    pass "20. ~/.cdsapirc is mode 600 and outside the repository"
+  else
+    bad "20. ~/.cdsapirc mode=$mode inside_repo=$inside (want 600, outside)"
+  fi
+else
+  skip "20. no ~/.cdsapirc present on this machine"
+fi
+
 echo "== $( [ "$fail" -eq 0 ] && echo "AUDIT PASSED" || echo "AUDIT FAILED ($fail check(s))" ) =="
 exit "$fail"
