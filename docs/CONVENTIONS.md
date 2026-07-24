@@ -5,6 +5,19 @@ standards that govern how work is done here, in tool-neutral terms. Where it and
 `PROJECT_BLUEPRINT.md` disagree, the blueprint governs on scientific matters and
 this document governs on process.
 
+## Framing
+
+This is a **physics** paper. Mathematical depth is expected and welcome, but
+physics is the through-line, not mathematics for its own sake. Every derivation,
+diagnostic, figure and sentence must answer "what is the fluid doing, and why."
+Wherever this session writes prose — manifests, conventions, README, metadata —
+it frames choices in physical terms: mechanism, regime, scale, conservation.
+
+This directive is standing: every later session inherits it. When a choice can
+be justified either mathematically or physically, the physical justification is
+the one that is written down, and the mathematics is the machinery that serves
+it.
+
 ## Authoritative source
 
 `PROJECT_BLUEPRINT.md` is the single authoritative knowledge source. Any change
