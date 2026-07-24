@@ -203,6 +203,31 @@ Every logical change is committed and pushed immediately. Commit subjects follow
 the conventional-commit style (`chore:`, `docs:`, `feat:`, `build:`, `test:`),
 are at most 72 characters, and carry no trailers. Pushes are never batched.
 
+### Autocommit escape hatch
+
+A `PostToolUse` automation commits and pushes after edits via
+`scripts/autocommit.sh`. That helper stages **only** modifications to
+already-tracked files plus new files inside a source-directory whitelist
+(`configs`, `docs`, `src`, `tests`, `scripts`, `theory`, `.github`) — never a
+blanket `git add -A` or `git add --intent-to-add .`, which is how
+operator-supplied binaries (the literature PDFs, the Springer Nature template)
+once reached the index before those directories had gitignore rules. `data/`,
+`figures/`, `manuscript/` and `logs/` are deliberately outside the whitelist:
+anything committed from them happens only through an explicit, reviewed commit in
+a numbered session.
+
+Any session that needs exact, hand-written commit subjects and controlled
+grouping — the numbered Session 00-series multi-phase builds, for example —
+disables the automation for its duration:
+
+    touch .git/AUTOCOMMIT_OFF   # at session start
+    rm -f .git/AUTOCOMMIT_OFF   # at session end, restoring background automation
+
+`.git/AUTOCOMMIT_OFF` lives inside `.git/`, which git never tracks, so it needs
+no `.gitignore` entry (confirmed: it never appears in `git status`). A session
+that leaves the file in place at exit has failed to restore normal automation, so
+removing it is part of every session's close-out.
+
 ## Environment
 
 `environment.lock.yml` is authoritative for reproduction; `environment.yml` is
