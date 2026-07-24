@@ -1,0 +1,58 @@
+# Tooling — local only, never committed
+CLAUDE.md
+.claude/
+.remember/
+
+# Scientific data — reproducible from fetchers, never committed
+data/raw/**
+data/reference/**
+data/processed/**
+data/external/*.nc
+data/external/*.nc4
+data/external/*.grib
+data/external/*.h5
+data/external/*.hdf5
+data/external/*.zip
+*.h5
+*.hdf5
+*.nc
+*.grib
+
+# Keep the directory guides and placeholders tracked even though the binary
+# contents of these directories are ignored. See docs/CONVENTIONS.md,
+# "Data discipline" and "Authorised deviations".
+!data/raw/README.md
+!data/reference/README.md
+!data/processed/README.md
+!data/raw/.gitkeep
+!data/reference/.gitkeep
+!data/processed/.gitkeep
+
+# Environments
+.conda/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bcf
+*.run.xml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and scratch
+logs/**/*.log
+*.tmp
+scratch/
