@@ -29,10 +29,39 @@ spacing), so full sweeps run at L1 and L3 is reserved for the two reference runs
 
 | Label | Nφ × Nθ | Use | Measured wall time |
 |-------|---------|-----|--------------------|
-| L0 | 128 × 64 | Rapid iteration, debugging (local) | TBD — Session R1 |
-| L1 | 256 × 128 | Production baseline (pod) | TBD — Session R1 |
+| L0 | 128 × 64 | Rapid iteration, debugging (local) | 37 s (Phase-0 example, n=4; below) |
+| L1 | 256 × 128 | Production baseline (pod) | 110 s (Phase-0 example, n=4; below) |
 | L2 | 512 × 256 | Convergence rung (pod) | TBD — Session R1 |
 | L3 | 1024 × 512 | Reference-solution generation (pod) | TBD — Session R1 |
+
+## Phase-0 gate — first measured local timings (Session L1)
+
+The Phase-0 gate ran Dedalus's unmodified spherical shallow-water example (the
+Galewsky 2004 jet: a 15-day / 360-hour integration, `dt = 600 s`, RK222) on the
+local machine. This is the **first real compute data point** for the Session R1
+budget; the project's own runs will differ in length and physics, so these are a
+calibration, not a final budget.
+
+- **Machine.** MacBook Air, 8 cores (`hw.ncpu = 8`), Open MPI 5.0.10. No pod used.
+- **MPI correctness.** `n = 1, 2, 4` agree to ≈ 10⁻¹⁵ relative (machine
+  precision) — automatic MPI domain decomposition is sound here.
+
+| Resolution | Procs | Wall-clock | Core-hours (procs·wall/3600) |
+|------------|-------|-----------|------------------------------|
+| L0 (128 × 64) | 4 | 37 s | 0.041 |
+| L1 (256 × 128) | 4 | 110 s | 0.122 |
+
+Halving each grid dimension gives ≈ 3× speedup. Extrapolating naively (transform
+cost grows faster than `N²` and the stable timestep shrinks with grid spacing),
+each further rung up the ladder is expected to cost several times the one below;
+Session R1 measures L2/L3 on the pod directly.
+
+### Local container parity (§8, optional, non-blocking)
+
+Attempted best-effort. **Docker is not installed on this machine**, so no local
+`docker build` of the `Dockerfile` was run. Full container-parity verification is
+Session R1's job on the actual pod hardware; Apple-Silicon x86 emulation of an
+MPI-heavy image would in any case be an unreliable parity signal.
 
 ## Storage policy
 

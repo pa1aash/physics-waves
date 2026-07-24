@@ -13,15 +13,20 @@ repository cannot perform for itself.
 
 ## Manuscript
 
-- [ ] Download the Springer Nature LaTeX bundle (v3.1, December 2024 or later)
-  and unpack it into `manuscript/template/` (see that directory's README). Do
-  not transcribe it — fetch it.
+- [x] Download the Springer Nature LaTeX bundle and unpack it into
+  `manuscript/template/`. Done: the `sn-article-template/` bundle is present
+  (including `sn-jnl.cls` and the `sn-mathphys-num` bibliography style),
+  confirmed by the Session L1 preflight. It stays gitignored (operator-supplied,
+  not vendored).
 
 ## Literature
 
-- [ ] Place the reference PDFs listed in `docs/literature/README.md` into that
-  directory, named `firstauthor_year_shorttitle.pdf`. Verify each *(confirm
-  citation)* entry against its primary source.
+- [x] Place the reference PDFs listed in `docs/literature/README.md`. Done: 19
+  PDFs are present in `docs/literature/` (including the benchmark-suite sources),
+  confirmed by the Session L1 preflight; they stay gitignored (copyrighted). The
+  per-entry *(confirm citation)* verification against primary sources remains a
+  Session L4 task (the corpus-adequacy audit), and the two unobtainable
+  extension-B sources are tracked below.
 - [ ] **Two extension-B references are unobtainable** (Longuet-Higgins 1968;
   Swarztrauber & Kasahara 1985) — recorded with DOIs and mitigation in
   `docs/literature/MISSING.md`. Not blocking. Obtain the open-access substitutes

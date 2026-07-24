@@ -244,6 +244,30 @@ No experimental campaign begins until every criterion in blueprint section 9.4
 is met. This gate is not negotiable, and every downstream result inherits its
 validity from it.
 
+## Phase 0 gate
+
+The blueprint Phase-0 exit gate — running Dedalus's **unmodified** spherical
+shallow-water example and confirming it behaves as the physics demands — was
+executed and evaluated in Session L1.
+
+**Phase-0 gate: PASSED** (2026-07-25). Full evidence in `tests/phase0_gate/`
+(`GATE_RESULTS.md`): mass conserved to machine precision; total energy drift
+consistent with hyperdiffusion plus mean-to-eddy conversion; the Galewsky (2004)
+barotropic instability developing on schedule (visible roll-up over days 4–6) at
+the latitudes the pre-run Rayleigh-Kuo necessary condition identified (32–58° N).
+Every later session inherits its validity from this validated toolchain, and
+`make verify` re-checks that this record still reads PASSED.
+
+## Operational commands
+
+The project's operational surface is five tracked `make` targets, each optionally
+wrapped by a thin, gitignored editor slash command. The capability always lives
+in the Makefile target, never in the wrapper, so a plain `git clone` plus `make`
+reproduces every result without any editor or assistant. The targets are
+`make verify`, `make refcheck`, `make manuscript`, `make figure` and `make sweep`
+(the last two are stubs that fail informatively until Sessions L10 and L5/L7).
+Full contract: `docs/CLI_COMMANDS.md`.
+
 ## Uncertainty reporting
 
 No headline number is reported without an accompanying uncertainty and a named

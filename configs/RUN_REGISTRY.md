@@ -5,6 +5,12 @@ executed. Status advances from `not started` as each run completes. Row
 counts in the phase-speed and instability campaigns are provisional until the
 first L0 exploratory runs (blueprint section 8 revision notes).
 
+**Phase-0 gate.** The toolchain-validation gate (blueprint Phase 0) was executed
+on 2026-07-25 and **PASSED** — see `tests/phase0_gate/` (`GATE_RESULTS.md`). It is
+a prerequisite for every run below, not a run itself, so it carries no run ID: it
+validates that Dedalus correctly solves the rotating shallow-water instability on
+the sphere before any project run consumes compute.
+
 Sub-questions (blueprint section 3.2): **SQ1** dispersion-relation theory · **SQ2** verification and convergence · **SQ3** phase speed vs wavenumber and rotation · **SQ4** meridional structure and observational comparison · **SQ5** jet instability.
 
 | Run ID | Campaign | Purpose | Initial condition | Resolution | Varies | Measured | Sub-question | Status |
