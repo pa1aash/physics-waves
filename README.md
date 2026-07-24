@@ -123,7 +123,7 @@ Zenodo DOI: `to be assigned at release`.
             Zonal-Jet Instability on a Rotating Sphere},
   year   = {2026},
   url    = {https://github.com/pa1aash/physics-waves},
-  note   = {Manuscript in preparation}
+  note   = {ORCID 0009-0006-7448-9488; manuscript in preparation}
 }
 ```
 
@@ -136,4 +136,5 @@ and derivations in `theory/` are released under the Creative Commons Attribution
 
 ## Author
 
-Palaash Gang
+Palaash Gang — [ORCID 0009-0006-7448-9488](https://orcid.org/0009-0006-7448-9488)
+Indus International School, Pune, India

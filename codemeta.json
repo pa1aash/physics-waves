@@ -3,7 +3,7 @@
   "@type": "SoftwareSourceCode",
   "name": "Beta-Effect Control of Barotropic Rossby-Wave Dispersion and Zonal-Jet Instability on a Rotating Sphere",
   "description": "A fully computational spectral study of how the latitudinal gradient of planetary vorticity governs the westward propagation, meridional structure and shear instability of large-scale barotropic waves in a rotating shallow-water fluid on a sphere.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "dateCreated": "2026-07-24",
   "dateModified": "2026-07-24",
   "license": "https://spdx.org/licenses/MIT.html",
@@ -16,7 +16,12 @@
       "@type": "Person",
       "givenName": "Palaash",
       "familyName": "Gang",
-      "@id": "ORCID_PLACEHOLDER"
+      "@id": "https://orcid.org/0009-0006-7448-9488",
+      "email": "palaash.gang@indusschoolpune.com",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Indus International School, Pune, India"
+      }
     }
   ],
   "copyrightHolder": {

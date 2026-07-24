@@ -11,8 +11,10 @@ abstract: >-
 authors:
   - family-names: Gang
     given-names: Palaash
-    orcid: ORCID_PLACEHOLDER
-version: 0.1.0
+    orcid: "https://orcid.org/0009-0006-7448-9488"
+    affiliation: "Indus International School, Pune, India"
+    email: "palaash.gang@indusschoolpune.com"
+version: 0.2.0
 date-released: "2026-07-24"
 license: MIT
 repository-code: "https://github.com/pa1aash/physics-waves"

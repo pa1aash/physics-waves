@@ -5,8 +5,11 @@ repository cannot perform for itself.
 
 ## Identity and metadata
 
-- [ ] Supply an ORCID and replace `ORCID_PLACEHOLDER` in **`CITATION.cff`** and
-  **`codemeta.json`**.
+- [x] Supply the author ORCID and fill it into **`CITATION.cff`** and
+  **`codemeta.json`**. ORCID `0009-0006-7448-9488`; affiliation Indus
+  International School, Pune, India; corresponding email
+  `palaash.gang@indusschoolpune.com`. Full declarations in
+  `manuscript/METADATA.yaml`.
 
 ## Manuscript
 
