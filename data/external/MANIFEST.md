@@ -15,6 +15,30 @@ Any user must re-download them under the providers' own licence terms:
 - **NCEP/NCAR Reanalysis 1** is provided by NOAA PSL, Boulder, Colorado, and
   should be credited to NOAA/OAR/ESRL PSL.
 
+### Copernicus attribution (verbatim)
+
+Quoted verbatim from the *Licence to use Copernicus Products* (revision 12,
+clauses 5.1.1–5.1.3), not paraphrased. Any publication or figure derived from the
+ERA5 datasets (D1, D2) must carry the attribution and the disclaimer:
+
+> 5.1.1. Where the Licensee communicates or distributes Copernicus Products to
+> the public, the Licensee shall inform the recipients of the source by using the
+> following or any similar notice:
+> • 'Generated using Copernicus Climate Change Service information [Year]'
+>
+> 5.1.2. Where the Licensee makes or contributes to a publication or distribution
+> containing adapted or modified Copernicus Products, the Licensee shall provide
+> the following or any similar notice:
+> • 'Contains modified Copernicus Climate Change Service information [Year]'
+>
+> 5.1.3. Any such publication or distribution covered by clauses 5.1.1 and 5.1.2
+> shall state that neither the European Commission nor ECMWF is responsible for
+> any use that may be made of the Copernicus information or data it contains.
+
+Because this project computes diagnostics from ERA5, the manuscript uses the
+5.1.2 form — **"Contains modified Copernicus Climate Change Service information
+[2026]"** — together with the 5.1.3 disclaimer.
+
 ---
 
 ## D3 — NCEP/NCAR Reanalysis 1 (acquired)

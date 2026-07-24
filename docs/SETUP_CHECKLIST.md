@@ -30,20 +30,22 @@ repository cannot perform for itself.
 
 ## Data
 
-- [ ] Configure `~/.cdsapirc` for the Copernicus Climate Data Store and run
-  `make data-era5` to acquire ERA5 datasets D1 and D2. These were **deferred** in
-  Session 00 because no credentials were present. Required form:
-
-  ```
-  url: https://cds.climate.copernicus.eu/api
-  key: <PERSONAL-ACCESS-TOKEN>
-  ```
-
-  Register at <https://cds.climate.copernicus.eu>, accept the licence on both the
-  ERA5 hourly and monthly-means pressure-level dataset pages, then re-run.
-  NCEP/NCAR Reanalysis 1 (D3) has already been acquired and is a sufficient
-  fallback for every diagnostic in blueprint §7.3 — the project is **not
-  blocked**.
+- [x] Configure `~/.cdsapirc` for the Copernicus Climate Data Store
+  (`scripts/setup_cds_credentials.sh`; file written mode 600 outside the repo).
+  Both ERA5 dataset licences (hourly and monthly-means pressure levels) were
+  probed `OK` (`src/data/probe_cds_licence.py`).
+- [x] Acquire **D1** (ERA5 monthly DJF climatology 1991–2020) and **D2** (ERA5
+  daily 500 hPa geopotential, two DJF seasons 2013/14 and 2015/16) via
+  `make data-era5`. Both acquired, verified and provenance-tracked.
+- [x] Acquire **D3** (NCEP/NCAR R1) for both DJF winters —
+  `make data-ncep YEARS="2013 2014"` extended the Session-00 2015/16 pull.
+- [ ] **Rotate the Copernicus personal access token** now that acquisition is
+  complete. Re-run `scripts/setup_cds_credentials.sh <NEW-TOKEN>` with a freshly
+  issued token and revoke the old one in the CDS profile. The token lives only in
+  `~/.cdsapirc` (never in the repository).
+- [ ] *(optional)* **D4** torch-harmonics cross-check — not run this session.
+  Enable in an isolated environment with
+  `python src/data/fetch_torch_harmonics.py --include-d4` (advisory only).
 
 ## Compute
 

@@ -51,3 +51,20 @@ Sub-questions (blueprint section 3.2): **SQ1** dispersion-relation theory · **S
 | I-12 | instability | Perturbation-seed robustness — supercritical idealised jet | jet | L1 | Random seed | sigma spread across seeds | SQ5 | not started |
 | EVP-hough | evp | Hough-mode eigenfrequencies of the divergent shallow-water system, swept over Lamb's parameter and azimuthal order (authorised extension B) | — | L1 | Lamb's parameter, azimuthal order | Hough eigenfrequencies | SQ1 / SQ3 | not started |
 | EVP-jet-stability | evp | Linear stability eigenvalues about each zonal base state u-bar(phi) (authorised extension C) | jet | L1 | Base state, azimuthal order | Growth rates sigma(m), eigenmodes | SQ5 | not started |
+
+## Observational datasets (D1–D4)
+
+External reanalysis inputs used for the validation diagnostics of blueprint
+§7.3, acquired and provenance-tracked under `data/external/`. Two contrasting DJF
+seasons are used — **2013/14** (ENSO-neutral) and **2015/16** (strong El Niño) —
+across **two independent reanalyses** (ERA5 and NCEP/NCAR R1), so every
+observational diagnostic is computed twice and any spread is reported as
+observational uncertainty (see `docs/CONVENTIONS.md`, "Two contrasting DJF
+seasons").
+
+| Dataset | Description | Status | Seasons covered | §7.3 diagnostic supported | Sub-question |
+|---------|-------------|--------|-----------------|---------------------------|--------------|
+| D1 | ERA5 monthly-mean climatology (u, v, z at 250/300/500 hPa; DJF 1991–2020) | acquired | 30-yr DJF climatology | Zonal-mean jet `ū(φ)`, curvature `d²ū/dy²`, and sign of `dQ/dy = β − d²ū/dy²` (feeds I-10, EVP-jet-stability) | SQ4 / SQ5 |
+| D2 | ERA5 daily 500 hPa geopotential (two DJF seasons) | acquired | 2013/14, 2015/16 | Wave-phase tracking and dominant synoptic zonal wavenumber (k ≈ 4–6) for model comparison | SQ3 / SQ4 |
+| D3 | NCEP/NCAR R1 daily 500 hPa height + 250 hPa wind (two DJF seasons) | acquired | 2013/14, 2015/16 | Independent second-reanalysis cross-check of D1 and D2 diagnostics | SQ3 / SQ4 / SQ5 |
+| D4 | torch-harmonics spherical shallow-water cross-check | optional (not run this session) | — | Advisory independent-solver cross-check only; nothing downstream depends on it | SQ2 |
