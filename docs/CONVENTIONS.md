@@ -154,6 +154,58 @@ share of the potential-vorticity budget is absorbed by vortex stretching rather
 than by relative vorticity — the physical content of hypothesis H5, expressed as
 a curve rather than an assertion.
 
+## Observational comparison: Doppler correction
+
+The phase-speed campaign (blueprint §8.2) measures the **intrinsic** phase speed
+of Rossby waves in a resting-mean-flow configuration — there is no background
+zonal flow in those runs, so the measured `c` already is the intrinsic speed
+relative to the fluid. Observed synoptic-scale waves at 500 hPa, by contrast, are
+advected by the actual atmospheric jet, and their wavenumber spectrum (dominant
+zonal wavenumbers 4–6 in the synoptic band, both DJF seasons) describes waves
+that propagate **eastward relative to the ground**, since the mean flow's
+advection (`ū ≈ 25–40 m/s` at upper levels) is far larger than any intrinsic
+westward Rossby speed of a few m/s.
+
+These are not competing results. The physically correct comparison is
+
+    c_ground = ū + c_intrinsic
+
+Session L8 (and later, the manuscript's validation section) must **never** compare
+a raw ground-relative observed phase speed against a model-derived intrinsic phase
+speed — that comparison would appear to show wild disagreement (tens of m/s) when
+the underlying mechanism agrees. The correct procedure, to be implemented in
+`src/analysis/process_reanalysis.py`:
+
+1. Decompose the observed 500 hPa geopotential height field in
+   **wavenumber–frequency (Hayashi) space**, not with a simple high-pass time
+   filter. A high-pass filter retains eastward-propagating baroclinic
+   disturbances — a physically distinct instability mechanism with its own energy
+   source — mixed in with any westward-propagating barotropic Rossby signal. A
+   space–time spectral decomposition separates the eastward-moving and
+   westward-moving branches of the spectrum explicitly; only the westward branch,
+   if resolved, is the valid comparison target for the model's dispersion
+   relation. If no resolvable westward branch exists at 500 hPa (plausible, since
+   upper-tropospheric advection is strong enough to sweep all planetary-scale
+   signals eastward), this must be **stated as a finding**, not silently worked
+   around — it is itself informative about which level is appropriate for the
+   comparison, and 250 hPa or 300 hPa may need to be tried in addition to 500 hPa.
+2. Extract `ū` from D1 at the same pressure level and latitude band used for the
+   phase-speed measurement.
+3. Compute `c_intrinsic = c_ground − ū` (with the correct sign convention for the
+   dominant zonal wavenumber being tracked).
+4. Propagate the seasonal spread of `ū` (available from the two-season D1/D2/D3
+   acquisition) into the uncertainty on `c_intrinsic`, per blueprint §11.6 — every
+   headline number needs an uncertainty and a named source, and this is likely to
+   be the dominant source for this particular comparison.
+
+**Why the two-season design pays for itself here.** `ū` differs materially
+between the ENSO-neutral and El Niño winters. If `c_intrinsic` — after the
+correction above — agrees with the model's predicted intrinsic phase speed in
+**both** seasons despite `ū` itself differing between them, that is evidence the
+agreement reflects the underlying beta-effect mechanism rather than a coincidence
+tied to one winter's particular jet strength. This is the intended structure of
+the H5/H6 comparison figure when it is built in Session L10.
+
 ## Run identifiers
 
 Run IDs are immutable once a run has executed. The scheme follows blueprint
