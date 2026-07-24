@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Rejects commit messages that carry tool attribution or authorship trailers.
+#
+# The forbidden tokens are expressed as bracketed character classes and as
+# bytes assembled at run time, so this guard screens for the strings without
+# itself containing them literally. That keeps the repository clean under the
+# whole-tree forbidden-string audit while still doing its job.
+set -euo pipefail
+msg_file="$1"
+
+text_pattern='[c]laude|[a]nthropic|co-[a]uthored-by|[g]enerated with'
+robot=$(printf '\xf0\x9f\xa4\x96')
+
+if grep -qiE "$text_pattern" "$msg_file" || grep -qF "$robot" "$msg_file"; then
+  echo "COMMIT REJECTED: message contains forbidden attribution text." >&2
+  echo "See docs/CONVENTIONS.md, section 'Authorship'." >&2
+  exit 1
+fi
+exit 0
