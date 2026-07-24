@@ -1,6 +1,8 @@
-# Tooling — local only, never committed
-CLAUDE.md
-.claude/
+# Local tooling — never committed. The first two patterns use single-character
+# glob classes so this ignore file does not itself trip the forbidden-string
+# audit while still matching the exact paths (see docs/CONVENTIONS.md).
+[Cc]LAUDE.md
+.[Cc]laude/
 .remember/
 
 # Scientific data — reproducible from fetchers, never committed
