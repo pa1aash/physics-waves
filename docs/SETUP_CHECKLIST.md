@@ -39,10 +39,11 @@ repository cannot perform for itself.
   `make data-era5`. Both acquired, verified and provenance-tracked.
 - [x] Acquire **D3** (NCEP/NCAR R1) for both DJF winters —
   `make data-ncep YEARS="2013 2014"` extended the Session-00 2015/16 pull.
-- [ ] **Rotate the Copernicus personal access token** now that acquisition is
-  complete. Re-run `scripts/setup_cds_credentials.sh <NEW-TOKEN>` with a freshly
-  issued token and revoke the old one in the CDS profile. The token lives only in
-  `~/.cdsapirc` (never in the repository).
+- [x] **Rotate the Copernicus personal access token** now that acquisition is
+  complete. Done in Session 00c: a freshly issued token replaced the old one via
+  `scripts/setup_cds_credentials.sh`, the old token was invalidated on
+  regeneration, and the `scripts/audit.sh` check-18 guard fragment was updated to
+  the new prefix. The token lives only in `~/.cdsapirc` (never in the repository).
 - [ ] *(optional)* **D4** torch-harmonics cross-check — not run this session.
   Enable in an isolated environment with
   `python src/data/fetch_torch_harmonics.py --include-d4` (advisory only).
