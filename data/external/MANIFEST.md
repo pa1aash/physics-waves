@@ -73,11 +73,11 @@ in the fetcher. Machine-readable record: `_provenance_ncep.json`.
 
 ---
 
-## D1 — ERA5 monthly means, DJF climatology (deferred)
+## D1 — ERA5 monthly means, DJF climatology (acquired)
 
-- **Status.** Deferred in Session 00 — no `~/.cdsapirc` credentials present.
-  Run `make data-era5` after configuring credentials (see
-  `docs/SETUP_CHECKLIST.md`).
+- **Status.** Acquired this session. The Copernicus licence for the
+  monthly-means dataset was probed `OK` before download
+  (`src/data/probe_cds_licence.py`).
 - **Source.** ERA5, Copernicus Climate Change Service (C3S), Climate Data Store.
 - **Citation.** Hersbach, H., et al. (2020). The ERA5 global reanalysis.
   *Q. J. R. Meteorol. Soc.* 146(730), 1999–2049.
@@ -85,7 +85,49 @@ in the fetcher. Machine-readable record: `_provenance_ncep.json`.
   product_type `monthly_averaged_reanalysis`; variables u-component of wind,
   v-component of wind, geopotential; pressure levels 250/300/500 hPa; years
   1991–2020; months 12/01/02; time 00:00; grid 1.0° × 1.0°; NetCDF, unarchived.
-- **Target filename.** `era5_monthly_djf_1991-2020_uvz_250-300-500.nc`.
+- **Coverage.** 90 monthly-mean time steps (30 years × 3 DJF months,
+  1991-01 … 2020-12). Global 1° grid: latitude 181 points (−90…+90), longitude
+  360 points (0…359, Δ = 1°). Three pressure levels, stored descending
+  (500, 300, 250) in the archived file and reindexed to ascending
+  (250, 300, 500) at read time — note this before any level indexing downstream.
+- **Geopotential units.** The archived variable `z` is the **geopotential Φ in
+  m² s⁻²** (units attribute `m**2 s**-2`; mean |Φ| at 500 hPa = 5.39 × 10⁴
+  m² s⁻²), *not* geopotential height. See the dedicated subsection below.
+- **Physical sanity check (printed).** The DJF-mean zonal-mean zonal wind at
+  250 hPa peaks at **39.1 m s⁻¹ at 31° N** — the subtropical jet, in the
+  expected place (≈ 30° N) and within the expected 25–40 m s⁻¹ range.
+- **No all-NaN slices** in `u`, `v` or `z`.
+- **CDS request ID.** `2f6bdc56-2d57-4753-83d8-00701f9383b7`. Queue + processing
+  ≈ 80 s; download ≈ 105 s.
+- **Retrieved (UTC).** 2026-07-24T16:03:15Z.
+
+| Local filename | Bytes | SHA-256 |
+|----------------|-------|---------|
+| `era5_monthly_djf_1991-2020_uvz_250-300-500.nc` | 96,718,158 | `bf10af34cdcd3e29df78ad20b504728b0de1c44b69228e151e15ec178981e67f` |
+
+Machine-readable record: `_provenance_era5.json`.
+
+### Geopotential units — ERA5 Φ (m² s⁻²) vs NCEP Z (m)
+
+This distinction is a known trap and is recorded here explicitly because getting
+it wrong corrupts the jet and geostrophic-wind diagnostics by a factor of about
+`g = 9.80665 m s⁻²`.
+
+- **ERA5** (D1, D2): the archived geopotential variable `z` is the geopotential
+  **Φ**, in **m² s⁻²**. Confirmed two independent ways — the `units` attribute
+  reads `m**2 s**-2`, and the magnitude at 500 hPa is `⟨|z|⟩ ≈ 5.39 × 10⁴`,
+  which is `Φ`, not the height `Z ≈ 5.5 × 10³ m`. To obtain geopotential height,
+  divide by `g` exactly once: `Z = Φ / g`.
+- **NCEP/NCAR R1** (D3): the archived variable `hgt` is already the geopotential
+  **height Z**, in **metres** (`units = m`, magnitude ≈ 5.5 × 10³ m at 500 hPa).
+  It must **not** be divided by `g`.
+
+Physically the two carry the same information — Φ is the work per unit mass to
+raise a parcel to a pressure surface, and `Z = Φ/g` expresses that as a height —
+but the numerical factor differs by ~9.8. Any code that mixes the two reanalyses
+(for example, the two-season cross-check) must convert ERA5 `z` to height before
+comparing it with NCEP `hgt`. Session L8 divides ERA5 `z` by `g` **once**;
+doing so twice, or not at all, is the failure this note guards against.
 
 ---
 
