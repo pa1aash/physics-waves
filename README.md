@@ -10,10 +10,11 @@ fluid on a sphere.
 Phase 0 complete — repository initialised, environment reproducible, external
 data acquired.
 
-(Reanalysis tier: NCEP/NCAR Reanalysis 1 acquired locally; ERA5 acquisition is
-deferred until Copernicus CDS credentials are configured — see
-`docs/SETUP_CHECKLIST.md`. NCEP/NCAR is a sufficient fallback for every
-diagnostic in the plan.)
+(Reanalysis tier: both ERA5 (D1 monthly DJF climatology 1991–2020; D2 daily
+500 hPa geopotential) and NCEP/NCAR Reanalysis 1 (D3) are acquired locally and
+provenance-tracked, covering two contrasting DJF winters — 2013/14 (ENSO-neutral)
+and 2015/16 (strong El Niño). Binary data is not committed; it is reproducible
+via `make data`.)
 
 ## Abstract
 
@@ -104,8 +105,13 @@ Three tiers, following the project data architecture:
   spherical shallow-water test set; cases without closed-form solutions are
   reproduced in-house as L3 reference solutions.
 - **Tier 3 — observational reanalysis (external).** ERA5 (Copernicus Climate
-  Change Service) and, as a queue-free fallback, NCEP/NCAR Reanalysis 1
-  (NOAA PSL), used for jet-profile extraction and scale comparison only.
+  Change Service) and NCEP/NCAR Reanalysis 1 (NOAA PSL), used for jet-profile
+  extraction and scale comparison only. Each diagnostic is computed for **two
+  contrasting DJF seasons** — 2013/14 (ENSO-neutral) and 2015/16 (strong
+  El Niño) — across **both reanalyses independently**, because the beta-effect
+  the model isolates is a property of the rotating sphere and indifferent to
+  ENSO: agreement in both a neutral and a strongly perturbed winter attributes it
+  to the mechanism rather than to one season's background flow.
 
 Raw simulation output and reanalysis downloads are **not committed**. They are
 reproducible byte-for-byte via `make data` and the run configs; the fetchers,
