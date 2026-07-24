@@ -1,0 +1,44 @@
+# Conda environment specification for the physics-waves project.
+#
+# Human-editable dependency spec. The authoritative artefact for byte-level
+# reproduction is environment.lock.yml, regenerated from a solved environment.
+# Regenerate the lock on any change here and commit both together.
+#
+# Solver: Dedalus v3 (spectral, spherical harmonics, IMEX). CPU-only, MPI.
+name: pw
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12
+  # --- solver core ---
+  - dedalus                # v3 spectral PDE framework (two-sphere support)
+  - mpi4py                 # MPI bindings for parallel runs
+  - h5py=*=mpi*            # parallel HDF5 (MPI-enabled build)
+  - fftw                   # transforms backing Dedalus
+  - c-compiler             # for any source builds / Dedalus transforms
+  # --- scientific stack ---
+  - numpy
+  - scipy
+  - sympy                  # symbolic equation entry and EVP assembly
+  # --- data handling ---
+  - xarray
+  - netcdf4
+  - dask
+  - pandas
+  # --- reanalysis acquisition ---
+  - cdsapi                 # Copernicus Climate Data Store client (ERA5)
+  # --- plotting ---
+  - matplotlib
+  - cartopy
+  - cmocean                # perceptually uniform / colour-blind-safe maps
+  # --- configuration and validation ---
+  - pyyaml
+  - jsonschema
+  - tqdm
+  # --- testing and quality ---
+  - pytest
+  - pytest-cov
+  - ruff
+  - black
+  - pre-commit
