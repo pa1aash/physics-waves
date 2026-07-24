@@ -2,13 +2,26 @@
 
 D1 — ERA5 monthly means, DJF climatology (u, v, geopotential at 250/300/500 hPa,
      1991–2020, months 12/01/02). Small; retrieved synchronously.
-D2 — ERA5 daily 500 hPa geopotential for one DJF season (2015-12 … 2016-02).
-     Submitted as three monthly requests, asynchronously, so a failure costs one
-     month rather than the whole season.
+D2 — ERA5 daily 500 hPa geopotential for **two contrasting DJF seasons**
+     (2013/14, ENSO-neutral; 2015/16, strong El Niño), per the two-season
+     observational design in ``docs/CONVENTIONS.md``. Each season is submitted as
+     three monthly requests so a failure costs one month rather than a season;
+     the three monthly files of a complete season are concatenated along time
+     into one season file, and the monthly files are retained as the reproducible
+     download units.
 
 Credentials are read from ``~/.cdsapirc``, which must point at the current CDS
 endpoint ``https://cds.climate.copernicus.eu/api``. A legacy URL raises a clear
 error naming the file.
+
+The monthly requests are issued with the blocking client. cdsapi 0.7.x wraps the
+new CADS ``datapi`` backend and its ``Result`` object no longer exposes the
+``reply``/``state`` queue fields an asynchronous poll loop would need; the
+blocking client is the reliable interface and prints its own status transitions.
+Because the requests are split one-per-month, a failure still costs a single
+month, which is the robustness the split was for. Each month is retried up to
+three times with exponential backoff before it is recorded as failed; a season
+with any failed month is left un-concatenated and the gap is recorded.
 
 Behaviour matches the project fetcher contract: idempotent (verified files are
 skipped by checksum), never overwrites a verified file, and on success writes a
@@ -18,17 +31,18 @@ Usage
 -----
     python src/data/fetch_era5.py            # D1 and D2
     python src/data/fetch_era5.py --only d1  # just the monthly climatology
-    python src/data/fetch_era5.py --only d2  # just the daily season
+    python src/data/fetch_era5.py --only d2  # just the daily seasons
 """
 
 from __future__ import annotations
 
 import argparse
+import calendar
 import hashlib
 import json
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 CHUNK = 1 << 20
@@ -39,12 +53,23 @@ CHECKSUMS = EXTERNAL / "checksums.sha256"
 CDS_LOG = REPO_ROOT / "logs" / "cds_requests.log"
 CDS_ENDPOINT = "https://cds.climate.copernicus.eu/api"
 
+D1_DATASET = "reanalysis-era5-pressure-levels-monthly-means"
 D1_TARGET = "era5_monthly_djf_1991-2020_uvz_250-300-500.nc"
-D2_TARGET = "era5_daily_z500_djf_2015-2016.nc"
+
+D2_DATASET = "reanalysis-era5-pressure-levels"
+# Two contrasting DJF seasons -> (year, month) parts. Each season is Dec + Jan +
+# Feb, spanning two calendar years.
+D2_SEASONS: dict[str, list[tuple[int, int]]] = {
+    "2013-2014": [(2013, 12), (2014, 1), (2014, 2)],
+    "2015-2016": [(2015, 12), (2016, 1), (2016, 2)],
+}
+# 31 + 31 + 28 = 90 (2014 not a leap year); 31 + 31 + 29 = 91 (2016 is).
+D2_EXPECTED_STEPS = {"2013-2014": 90, "2015-2016": 91}
+D2_RETRIES = 3
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _sha256(path: Path) -> str:
@@ -106,20 +131,22 @@ def check_credentials() -> None:
         )
 
 
-def _record_success(record: dict, name: str, dataset: str, request: dict) -> None:
+def _record_file(record: dict, name: str, dataset: str, extra: dict) -> None:
+    """Checksum a downloaded/derived file and write its provenance entry."""
     path = EXTERNAL / name
     digest = _sha256(path)
     _append_checksum(path, digest)
-    record["files"][name] = {
+    entry = {
         "status": "ok",
         "dataset": dataset,
-        "request": request,
         "sha256": digest,
         "bytes": path.stat().st_size,
         "retrieved_utc": _utc_now(),
     }
+    entry.update(extra)
+    record["files"][name] = entry
     _save_provenance(record)
-    print(f"    done: {path.stat().st_size:,} bytes  sha256={digest[:16]}...")
+    print(f"    recorded {name}: {path.stat().st_size:,} bytes  sha256={digest[:16]}...")
 
 
 def _already_have(record: dict, name: str) -> bool:
@@ -131,13 +158,13 @@ def _already_have(record: dict, name: str) -> bool:
     return False
 
 
+# --------------------------------------------------------------------------- D1
 def fetch_d1(record: dict) -> None:
     import cdsapi
 
     print(f"[D1] ERA5 monthly means DJF climatology -> {D1_TARGET}")
     if _already_have(record, D1_TARGET):
         return
-    dataset = "reanalysis-era5-pressure-levels-monthly-means"
     request = {
         "product_type": ["monthly_averaged_reanalysis"],
         "variable": ["u_component_of_wind", "v_component_of_wind", "geopotential"],
@@ -150,96 +177,152 @@ def fetch_d1(record: dict) -> None:
         "download_format": "unarchived",
     }
     client = cdsapi.Client()
-    _log_request(f"D1 submit {dataset}")
-    client.retrieve(dataset, request, str(EXTERNAL / D1_TARGET))
-    _record_success(record, D1_TARGET, dataset, request)
+    _log_request(f"D1 submit {D1_DATASET}")
+    client.retrieve(D1_DATASET, request, str(EXTERNAL / D1_TARGET))
+    _record_file(record, D1_TARGET, D1_DATASET, {"request": request})
 
 
-def _d2_month_requests() -> list[tuple[str, dict]]:
-    dataset = "reanalysis-era5-pressure-levels"
-    base = {
+# --------------------------------------------------------------------------- D2
+def _days_of(year: int, month: int) -> list[str]:
+    """Day-of-month strings from calendar.monthrange (handles leap years)."""
+    n = calendar.monthrange(year, month)[1]
+    return [f"{d:02d}" for d in range(1, n + 1)]
+
+
+def _d2_month_name(year: int, month: int) -> str:
+    return f"era5_daily_z500_{year}-{month:02d}.nc"
+
+
+def _d2_season_name(season: str) -> str:
+    return f"era5_daily_z500_djf_{season}.nc"
+
+
+def _d2_request(year: int, month: int) -> dict:
+    return {
         "product_type": ["reanalysis"],
         "variable": ["geopotential"],
         "pressure_level": ["500"],
+        "year": [str(year)],
+        "month": [f"{month:02d}"],
+        "day": _days_of(year, month),
         "time": ["00:00"],
         "grid": [1.0, 1.0],
         "data_format": "netcdf",
         "download_format": "unarchived",
     }
-    months = [
-        ("2015", "12", [f"{d:02d}" for d in range(1, 32)]),
-        ("2016", "01", [f"{d:02d}" for d in range(1, 32)]),
-        ("2016", "02", [f"{d:02d}" for d in range(1, 30)]),
-    ]
-    out = []
-    for year, month, days in months:
-        req = dict(base, year=[year], month=[month], day=days)
-        out.append((dataset, req))
-    return out
+
+
+def _fetch_month(client, record: dict, year: int, month: int) -> bool:
+    """Retrieve one month of daily z500, with retry. Returns True on success."""
+    name = _d2_month_name(year, month)
+    if _already_have(record, name):
+        return True
+    target = EXTERNAL / name
+    part = target.with_suffix(target.suffix + ".part")
+    request = _d2_request(year, month)
+    start = time.time()
+    for attempt in range(1, D2_RETRIES + 1):
+        try:
+            _log_request(f"D2 submit {name} (attempt {attempt})")
+            print(f"    {name}: submitting (attempt {attempt}/{D2_RETRIES}) ...", flush=True)
+            client.retrieve(D2_DATASET, request, str(part))
+            part.replace(target)
+            _log_request(f"D2 download {name} ({int(time.time() - start)}s)")
+            print(f"    {name}: downloaded in {int(time.time() - start)}s")
+            return True
+        except Exception as err:  # noqa: BLE001 - retry then record failure
+            if part.exists():
+                part.unlink()  # never leave an unverified partial
+            backoff = 2**attempt
+            print(f"    {name}: attempt {attempt} failed ({err}); retry in {backoff}s")
+            if attempt < D2_RETRIES:
+                time.sleep(backoff)
+    print(f"    {name}: FAILED after {D2_RETRIES} attempts")
+    return False
+
+
+def _concat_season(parts: list[Path], target: Path, expected_steps: int) -> int:
+    """Concatenate monthly parts along time; assert monotonic, gap-free, sized."""
+    import numpy as np
+    import xarray as xr
+
+    ds = xr.open_mfdataset([str(p) for p in parts], combine="by_coords")
+    tname = next(
+        (c for c in list(ds.coords) + list(ds.dims) if np.issubdtype(ds[c].dtype, np.datetime64)),
+        None,
+    )
+    if tname is None:
+        raise RuntimeError(f"{target.name}: no datetime coordinate found")
+    ds = ds.sortby(tname)
+    t = ds[tname].values
+    n = int(len(t))
+    if n != expected_steps:
+        raise RuntimeError(f"{target.name}: expected {expected_steps} steps, got {n}")
+    diffs = np.diff(t)
+    if not (diffs > np.timedelta64(0, "s")).all():
+        raise RuntimeError(f"{target.name}: time axis not strictly increasing")
+    one_day = np.timedelta64(1, "D")
+    if not (diffs == one_day).all():
+        bad = [str(t[i])[:10] for i in range(len(diffs)) if diffs[i] != one_day]
+        raise RuntimeError(f"{target.name}: non-daily gap(s) near {bad}")
+    ds.load()
+    if target.exists():
+        target.unlink()
+    ds.to_netcdf(target)
+    ds.close()
+    return n
 
 
 def fetch_d2(record: dict) -> None:
-    """Fetch D2 as three monthly requests, submitted asynchronously and polled."""
     import cdsapi
 
-    print(f"[D2] ERA5 daily 500 hPa geopotential DJF 2015/16 -> {D2_TARGET}")
-    parts_dir = EXTERNAL / "_era5_z500_parts"
-    parts_dir.mkdir(parents=True, exist_ok=True)
+    print("[D2] ERA5 daily 500 hPa geopotential, two contrasting DJF seasons")
+    client = cdsapi.Client()
+    for season, months in D2_SEASONS.items():
+        print(f"  season {season}: {len(months)} monthly requests")
+        ok_parts: list[Path] = []
+        failed: list[str] = []
+        for year, month in months:
+            name = _d2_month_name(year, month)
+            if _fetch_month(client, record, year, month):
+                _record_file(
+                    record,
+                    name,
+                    D2_DATASET,
+                    {"note": "monthly download unit", "season": season},
+                )
+                ok_parts.append(EXTERNAL / name)
+            else:
+                failed.append(name)
 
-    client = cdsapi.Client(wait_until_complete=False)
-    remotes = []
-    for dataset, req in _d2_month_requests():
-        tag = f"{req['year'][0]}-{req['month'][0]}"
-        target = parts_dir / f"z500_{tag}.nc"
-        if target.exists() and target.stat().st_size > 0:
-            print(f"    part {tag} already present; skipping submit")
-            remotes.append((tag, None, target))
+        if failed:
+            print(f"  season {season}: NOT concatenating; failed months: {failed}")
+            record.setdefault("gaps", []).append(
+                {
+                    "season": season,
+                    "failed_months": failed,
+                    "note": "monthly request(s) failed; season left un-concatenated",
+                }
+            )
+            _save_provenance(record)
             continue
-        remote = client.retrieve(dataset, req)
-        rid = getattr(remote, "reply", {}).get("request_id", "unknown")
-        _log_request(f"D2 submit {tag} request_id={rid}")
-        print(f"    submitted {tag}: request_id={rid}")
-        remotes.append((tag, remote, target))
 
-    for tag, remote, target in remotes:
-        if remote is None:
-            continue
-        delay = 15
-        while True:
-            try:
-                remote.update()
-                state = remote.reply.get("state")
-            except Exception as err:  # noqa: BLE001 - report and keep polling
-                print(f"    {tag}: poll error ({err}); retrying")
-                state = None
-            if state == "completed":
-                remote.download(str(target))
-                _log_request(f"D2 download {tag} -> {target.name}")
-                print(f"    {tag}: downloaded")
-                break
-            if state == "failed":
-                raise RuntimeError(f"D2 request {tag} failed: {remote.reply}")
-            pos = remote.reply.get("request_position") if remote.reply else None
-            where = f" queue position {pos}" if pos is not None else ""
-            print(f"    {tag}: state={state}{where}; waiting {delay}s")
-            time.sleep(delay)
-            delay = min(delay * 2, 300)
-
-    _concat_d2_parts(parts_dir, EXTERNAL / D2_TARGET)
-    _record_success(record, D2_TARGET, "reanalysis-era5-pressure-levels",
-                    {"note": "three monthly requests concatenated", "levels": ["500"]})
-
-
-def _concat_d2_parts(parts_dir: Path, target: Path) -> None:
-    import xarray as xr
-
-    parts = sorted(parts_dir.glob("z500_*.nc"))
-    if not parts:
-        raise RuntimeError("no D2 monthly parts to concatenate")
-    print(f"    concatenating {len(parts)} monthly parts -> {target.name}")
-    ds = xr.open_mfdataset(parts, combine="by_coords")
-    ds.to_netcdf(target)
-    ds.close()
+        target = EXTERNAL / _d2_season_name(season)
+        steps = _concat_season(sorted(ok_parts), target, D2_EXPECTED_STEPS[season])
+        _record_file(
+            record,
+            target.name,
+            D2_DATASET,
+            {
+                "note": f"season {season} concatenation of {len(ok_parts)} monthly files",
+                "time_steps": steps,
+                "derived_from": [p.name for p in sorted(ok_parts)],
+            },
+        )
+        print(
+            f"  season {season}: concatenated {len(ok_parts)} months -> "
+            f"{target.name} ({steps} steps)"
+        )
 
 
 def main(argv: list[str] | None = None) -> int:

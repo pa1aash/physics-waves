@@ -131,16 +131,70 @@ doing so twice, or not at all, is the failure this note guards against.
 
 ---
 
-## D2 — ERA5 daily 500 hPa geopotential, one DJF season (deferred)
+## D2 — ERA5 daily 500 hPa geopotential, two contrasting DJF seasons (acquired)
 
-- **Status.** Deferred in Session 00 — no credentials present.
-- **Source / citation.** As D1.
+- **Status.** Acquired this session; licence probed `OK` before download.
+- **Source / citation.** As D1 (ERA5, C3S; Hersbach et al. 2020).
 - **Request (dataset `reanalysis-era5-pressure-levels`).** product_type
-  `reanalysis`; variable geopotential; pressure level 500 hPa; dates
-  2015-12-01 … 2016-02-29; time 00:00; grid 1.0° × 1.0°; NetCDF, unarchived.
-  Submitted as three monthly requests; CDS request IDs are logged to
-  `logs/cds_requests.log`.
-- **Target filename.** `era5_daily_z500_djf_2015-2016.nc`.
+  `reanalysis`; variable geopotential; pressure level 500 hPa; time 00:00; grid
+  1.0° × 1.0°; NetCDF, unarchived. Issued as **six monthly requests** (three per
+  season) so a failure costs one month, not a season; day lists built from
+  `calendar.monthrange` (2016 is a leap year, 2014 is not). All six succeeded;
+  **no gaps.**
+- **Seasons** (two-season design; see `docs/CONVENTIONS.md`): **DJF 2013/14**
+  (ENSO-neutral) and **DJF 2015/16** (strong El Niño).
+- **Geopotential units.** Variable `z` is the geopotential **Φ in m² s⁻²** (as
+  D1); divide by `g` once for height. See the geopotential-units subsection above.
+- **Grid.** Global 1°, latitude 181 (−90…+90), longitude 360 (0…359),
+  pressure level 500 hPa (singleton). Each monthly file's day axis is daily.
+- **Concatenation.** The three monthly files of each complete season are
+  concatenated along time into one season file, asserted strictly increasing and
+  gap-free at exactly one-day cadence, with the expected step count (90 for
+  2013/14, 91 for the 2015/16 leap-year season). The monthly files are **retained**
+  as the reproducible download units; the concatenated season files are derived.
+
+Season **DJF 2013/14** (ENSO-neutral) — monthly units and the derived season file:
+
+| Local filename | Steps | CDS request ID | Bytes | SHA-256 |
+|----------------|-------|----------------|-------|---------|
+| `era5_daily_z500_2013-12.nc` | 31 | `998f2eb2-fb77-4d6b-a153-e8ad7a5be259` | 3,096,571 | `f649fa278b530412d5171beafe2e7c18dd9d3f3a9ea3d1269c24f9dba4fe2d1a` |
+| `era5_daily_z500_2014-01.nc` | 31 | `8c876e33-b4f0-4ad8-a7e4-6bd2e3e5b788` | 3,094,051 | `83db909e9e4ee74a7786cd7d833be219dfa0a3df17a9f1bb6c0b98191930553a` |
+| `era5_daily_z500_2014-02.nc` | 28 | `a46b1195-3a22-498e-b1aa-78ca58e8c830` | 2,799,613 | `f0d4cd7ad02fb2057ae561520443ecbe6b086a40d531749539c10a2299dad7bc` |
+| `era5_daily_z500_djf_2013-2014.nc` | **90** | (derived) | 9,062,923 | `3fd2589e2da9e012059acac8e85d4ef2560d67cb18ae363a1041f1849e686f2f` |
+
+Season **DJF 2015/16** (strong El Niño) — monthly units and the derived season file:
+
+| Local filename | Steps | CDS request ID | Bytes | SHA-256 |
+|----------------|-------|----------------|-------|---------|
+| `era5_daily_z500_2015-12.nc` | 31 | `79d117ff-f568-4866-a460-7260a2689db9` | 3,087,596 | `13ca8440f8dd0afe2e9d56d19bd22e1398ed3d157859fda6b7646c985574ca60` |
+| `era5_daily_z500_2016-01.nc` | 31 | `ab238668-3ff6-41dd-818b-9b80dfc7393b` | 3,104,519 | `243cd2f0b33831acbfc0d1d3245268f4f540126ade8d8f3fe9d390ac6948efa1` |
+| `era5_daily_z500_2016-02.nc` | 29 | `da41c6dd-135d-4a3e-975a-6758e0e8e07f` | 2,901,619 | `65cb3d3ea6a5887a0265c7f40b30295d2818612355f245ccbbbc0ff08b6ceffd` |
+| `era5_daily_z500_djf_2015-2016.nc` | **91** | (derived) | 9,165,393 | `d913bd37c2c053f25ad8943d14ec12907759fab45afae42c147a9dcb479305a7` |
+
+Retrieved 2026-07-24; each monthly request cleared the CDS queue in ≈ 30–46 s.
+Machine-readable record: `_provenance_era5.json`.
+
+### Dominant zonal wavenumber sanity check (D2)
+
+The 500 hPa geopotential **height** anomaly about the seasonal mean at 50° N was
+zonally Fourier-transformed for each season. Two spectra are reported because
+they answer different physical questions:
+
+| Season | Total-transient top-3 k | Synoptic band (high-pass <~10 d) top-3 k |
+|--------|-------------------------|------------------------------------------|
+| DJF 2013/14 (neutral) | 3, 2, 4 | **4, 5, 6** |
+| DJF 2015/16 (El Niño) | 4, 3, 2 | **5, 4, 6** |
+
+The **total** transient variance is dominated by planetary scales (k ≈ 3–4),
+which is the expected mid-latitude behaviour — low-frequency planetary waves
+carry most of the variance. When the low-frequency component is removed with a
+centred 11-day high-pass, the **synoptic** storm-track band emerges with dominant
+zonal wavenumbers **k = 4–6 in both seasons**, inside the anticipated 4–7 range.
+The synoptic wavenumber is the observational quantity the idealised model is later
+compared against, and it is essentially unchanged between the neutral and the
+strongly perturbed winter — the robustness the two-season design was built to
+test. The data are therefore fit for purpose; downstream comparison (Session L)
+should use the synoptic-band wavenumber, not the raw total-variance peak.
 
 ---
 

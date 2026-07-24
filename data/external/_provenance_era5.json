@@ -5,6 +5,88 @@
     "D2"
   ],
   "files": {
+    "era5_daily_z500_2013-12.nc": {
+      "bytes": 3096571,
+      "dataset": "reanalysis-era5-pressure-levels",
+      "note": "monthly download unit",
+      "retrieved_utc": "2026-07-24T16:10:50Z",
+      "season": "2013-2014",
+      "sha256": "f649fa278b530412d5171beafe2e7c18dd9d3f3a9ea3d1269c24f9dba4fe2d1a",
+      "status": "ok"
+    },
+    "era5_daily_z500_2014-01.nc": {
+      "bytes": 3094051,
+      "dataset": "reanalysis-era5-pressure-levels",
+      "note": "monthly download unit",
+      "retrieved_utc": "2026-07-24T16:11:20Z",
+      "season": "2013-2014",
+      "sha256": "83db909e9e4ee74a7786cd7d833be219dfa0a3df17a9f1bb6c0b98191930553a",
+      "status": "ok"
+    },
+    "era5_daily_z500_2014-02.nc": {
+      "bytes": 2799613,
+      "dataset": "reanalysis-era5-pressure-levels",
+      "note": "monthly download unit",
+      "retrieved_utc": "2026-07-24T16:12:02Z",
+      "season": "2013-2014",
+      "sha256": "f0d4cd7ad02fb2057ae561520443ecbe6b086a40d531749539c10a2299dad7bc",
+      "status": "ok"
+    },
+    "era5_daily_z500_2015-12.nc": {
+      "bytes": 3087596,
+      "dataset": "reanalysis-era5-pressure-levels",
+      "note": "monthly download unit",
+      "retrieved_utc": "2026-07-24T16:12:50Z",
+      "season": "2015-2016",
+      "sha256": "13ca8440f8dd0afe2e9d56d19bd22e1398ed3d157859fda6b7646c985574ca60",
+      "status": "ok"
+    },
+    "era5_daily_z500_2016-01.nc": {
+      "bytes": 3104519,
+      "dataset": "reanalysis-era5-pressure-levels",
+      "note": "monthly download unit",
+      "retrieved_utc": "2026-07-24T16:13:29Z",
+      "season": "2015-2016",
+      "sha256": "243cd2f0b33831acbfc0d1d3245268f4f540126ade8d8f3fe9d390ac6948efa1",
+      "status": "ok"
+    },
+    "era5_daily_z500_2016-02.nc": {
+      "bytes": 2901619,
+      "dataset": "reanalysis-era5-pressure-levels",
+      "note": "monthly download unit",
+      "retrieved_utc": "2026-07-24T16:14:15Z",
+      "season": "2015-2016",
+      "sha256": "65cb3d3ea6a5887a0265c7f40b30295d2818612355f245ccbbbc0ff08b6ceffd",
+      "status": "ok"
+    },
+    "era5_daily_z500_djf_2013-2014.nc": {
+      "bytes": 9062923,
+      "dataset": "reanalysis-era5-pressure-levels",
+      "derived_from": [
+        "era5_daily_z500_2013-12.nc",
+        "era5_daily_z500_2014-01.nc",
+        "era5_daily_z500_2014-02.nc"
+      ],
+      "note": "season 2013-2014 concatenation of 3 monthly files",
+      "retrieved_utc": "2026-07-24T16:12:12Z",
+      "sha256": "3fd2589e2da9e012059acac8e85d4ef2560d67cb18ae363a1041f1849e686f2f",
+      "status": "ok",
+      "time_steps": 90
+    },
+    "era5_daily_z500_djf_2015-2016.nc": {
+      "bytes": 9165393,
+      "dataset": "reanalysis-era5-pressure-levels",
+      "derived_from": [
+        "era5_daily_z500_2015-12.nc",
+        "era5_daily_z500_2016-01.nc",
+        "era5_daily_z500_2016-02.nc"
+      ],
+      "note": "season 2015-2016 concatenation of 3 monthly files",
+      "retrieved_utc": "2026-07-24T16:14:16Z",
+      "sha256": "d913bd37c2c053f25ad8943d14ec12907759fab45afae42c147a9dcb479305a7",
+      "status": "ok",
+      "time_steps": 91
+    },
     "era5_monthly_djf_1991-2020_uvz_250-300-500.nc": {
       "bytes": 96718158,
       "dataset": "reanalysis-era5-pressure-levels-monthly-means",
@@ -74,7 +156,7 @@
       "status": "ok"
     }
   },
-  "last_run_utc": "2026-07-24T16:03:15Z",
+  "last_run_utc": "2026-07-24T16:14:16Z",
   "licence": "Copernicus Climate Change Service (C3S) Climate Data Store. ERA5 must be attributed to C3S; not redistributed via this repository.",
   "source": "ERA5, Copernicus Climate Change Service (C3S), Climate Data Store"
 }
