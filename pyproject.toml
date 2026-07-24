@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "physics-waves"
+version = "0.1.0"
+description = "Beta-effect control of barotropic Rossby-wave dispersion and zonal-jet instability on a rotating sphere: a spectral shallow-water investigation."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Palaash Gang", email = "palaashgang@gmail.com" }]
+keywords = [
+    "geophysical fluid dynamics",
+    "rotating shallow water",
+    "beta-effect",
+    "Rossby waves",
+    "barotropic instability",
+    "spectral methods",
+    "Dedalus",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]

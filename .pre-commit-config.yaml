@@ -1,0 +1,36 @@
+# Pre-commit hooks. Install with:
+#   pre-commit install
+#   pre-commit install --hook-type commit-msg
+#
+# The forbidden-attribution hook screens staged content for tool-attribution
+# strings. Its pattern expresses each token as a bracketed character class, so
+# this config file does not itself contain the literal strings it screens for
+# and stays clean under the whole-tree audit.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=2048]
+
+  - repo: local
+    hooks:
+      - id: forbidden-attribution
+        name: forbidden-attribution
+        language: pygrep
+        entry: '(?i)[c]laude|[a]nthropic|co-[a]uthored|[g]enerated with'
+        types: [text]
