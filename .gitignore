@@ -67,3 +67,8 @@ Thumbs.db
 logs/**/*.log
 *.tmp
 scratch/
+
+# Phase-0 gate: generated outputs are reproducible from the tracked scripts
+tests/phase0_gate/**/snapshots/
+tests/phase0_gate/diagnostics/*.png
+tests/phase0_gate/diagnostics/*.pdf
