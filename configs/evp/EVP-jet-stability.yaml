@@ -1,0 +1,20 @@
+# Run-config stub (Session 00). Solver-dependent values are marked
+# TBD_SESSION_L5 and finalised in Session L5. Validates against
+# configs/_schema.yaml.
+run_id: EVP-jet-stability
+campaign: evp
+description: Linear stability eigenvalues about each zonal base state u-bar(phi) (authorised
+  extension C).
+resolution: L1
+initial_condition: jet
+physical:
+  R: 6371220.0
+  Omega: 7.292e-05
+  g: 9.80616
+  H: 10000.0
+initial_condition_params:
+  base_states: TBD_SESSION_L5
+  azimuthal_orders: TBD_SESSION_L5
+  truncation: TBD_SESSION_L5
+notes: Exact growth rates sigma(m) and eigenmode structure; closes the Rayleigh-Kuo
+  'necessary but not sufficient' gap.

@@ -1,0 +1,27 @@
+# Run-config stub (Session 00). Solver-dependent values are marked
+# TBD_SESSION_L5 and finalised in Session L5. Validates against
+# configs/_schema.yaml.
+run_id: V-09
+campaign: verification
+description: Unsteady analytic solution — Lauter, Handorf & Dethloff (2005).
+resolution: L0
+initial_condition: lauter
+physical:
+  R: 6371220.0
+  Omega: 7.292e-05
+  g: 9.80616
+  H: 10000.0
+numerics:
+  timestepper: TBD_SESSION_L5
+  dt: TBD_SESSION_L5
+  dealias: 1.5
+  hyperdiffusion_order: 4
+  hyperdiffusion_coefficient: TBD_SESSION_L5
+  stop_sim_time: TBD_SESSION_L5
+outputs:
+  snapshot_cadence: TBD_SESSION_L5
+  slice_cadence: TBD_SESSION_L5
+  spectra_cadence: TBD_SESSION_L5
+  write_full_fields: false
+notes: Resolution ladder L0-L2. Time-dependent exact solution; measures error norms
+  against the analytic fields.

@@ -1,0 +1,98 @@
+# JSON Schema (Draft 2020-12) for a physics-waves run configuration.
+# Every file under configs/ (except this schema and RUN_REGISTRY.md) validates
+# against this document. Solver-dependent values that are not yet known are set
+# to the sentinel "TBD_SESSION_L5"; the tbd_number definition tolerates it so
+# that stubs remain valid documents.
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://github.com/pa1aash/physics-waves/configs/_schema.yaml"
+title: physics-waves run configuration
+type: object
+additionalProperties: false
+required: [run_id, campaign, description, resolution]
+
+$defs:
+  tbd_number:
+    description: A numeric value, or the sentinel for a value pending Session L5.
+    anyOf:
+      - type: number
+      - const: "TBD_SESSION_L5"
+  tbd_string:
+    description: A string value, or the pending-value sentinel.
+    anyOf:
+      - type: string
+
+properties:
+  run_id:
+    type: string
+    pattern: "^(V|P|I|EVP)-[A-Za-z0-9-]+$"
+  campaign:
+    enum: [verification, phase_speed, instability, evp]
+  description:
+    type: string
+  case:
+    description: Optional benchmark-case label.
+    type: [string, integer]
+  initial_condition:
+    enum:
+      - williamson_1
+      - williamson_2
+      - williamson_5
+      - williamson_6
+      - lauter
+      - galewsky
+      - single_harmonic
+      - jet
+  resolution:
+    enum: [L0, L1, L2, L3]
+  physical:
+    type: object
+    additionalProperties: false
+    required: [R, Omega, g, H]
+    properties:
+      R: {type: number, default: 6371220.0}
+      Omega: {type: number, default: 7.292e-05}
+      g: {type: number, default: 9.80616}
+      H: {type: number, default: 10000.0}
+  numerics:
+    type: object
+    additionalProperties: false
+    required:
+      - timestepper
+      - dt
+      - dealias
+      - hyperdiffusion_order
+      - hyperdiffusion_coefficient
+      - stop_sim_time
+    properties:
+      timestepper: {type: string}
+      dt: {$ref: "#/$defs/tbd_number"}
+      dealias: {type: number}
+      hyperdiffusion_order: {type: integer}
+      hyperdiffusion_coefficient: {$ref: "#/$defs/tbd_number"}
+      stop_sim_time: {$ref: "#/$defs/tbd_number"}
+  initial_condition_params:
+    type: object
+    description: Free block of case-specific parameters.
+  outputs:
+    type: object
+    additionalProperties: false
+    required: [snapshot_cadence, slice_cadence, spectra_cadence, write_full_fields]
+    properties:
+      snapshot_cadence: {$ref: "#/$defs/tbd_number"}
+      slice_cadence: {$ref: "#/$defs/tbd_number"}
+      spectra_cadence: {$ref: "#/$defs/tbd_number"}
+      write_full_fields: {type: boolean}
+  seed:
+    type: integer
+  notes:
+    type: string
+
+# Full physical/numerics/outputs blocks are required for the simulation
+# campaigns, but not for the eigenvalue-problem campaign, which has no timestep.
+allOf:
+  - if:
+      properties:
+        campaign:
+          enum: [verification, phase_speed, instability]
+    then:
+      required: [initial_condition, physical, numerics, outputs]

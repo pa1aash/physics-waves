@@ -1,0 +1,29 @@
+# Run-config stub (Session 00). Solver-dependent values are marked
+# TBD_SESSION_L5 and finalised in Session L5. Validates against
+# configs/_schema.yaml.
+run_id: I-00
+campaign: instability
+description: Galewsky, Scott & Polvani (2004) barotropic-instability anchor.
+resolution: L1
+initial_condition: galewsky
+physical:
+  R: 6371220.0
+  Omega: 7.292e-05
+  g: 9.80616
+  H: 10000.0
+numerics:
+  timestepper: TBD_SESSION_L5
+  dt: TBD_SESSION_L5
+  dealias: 1.5
+  hyperdiffusion_order: 4
+  hyperdiffusion_coefficient: TBD_SESSION_L5
+  stop_sim_time: TBD_SESSION_L5
+outputs:
+  snapshot_cadence: TBD_SESSION_L5
+  slice_cadence: TBD_SESSION_L5
+  spectra_cadence: TBD_SESSION_L5
+  write_full_fields: true
+initial_condition_params:
+  profile: galewsky_2004
+  perturbation: TBD_SESSION_L5
+notes: Resolution L1, L2. Canonical instability benchmark (authorised extension A).

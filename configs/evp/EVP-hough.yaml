@@ -1,0 +1,18 @@
+# Run-config stub (Session 00). Solver-dependent values are marked
+# TBD_SESSION_L5 and finalised in Session L5. Validates against
+# configs/_schema.yaml.
+run_id: EVP-hough
+campaign: evp
+description: Hough-mode eigenfrequencies of the divergent shallow-water system, swept
+  over Lamb's parameter and azimuthal order (authorised extension B).
+resolution: L1
+physical:
+  R: 6371220.0
+  Omega: 7.292e-05
+  g: 9.80616
+  H: 10000.0
+initial_condition_params:
+  lambs_parameter_range: TBD_SESSION_L5
+  azimuthal_orders: TBD_SESSION_L5
+  truncation: TBD_SESSION_L5
+notes: Exact analytic target alongside the nondivergent Rossby-Haurwitz prediction.
