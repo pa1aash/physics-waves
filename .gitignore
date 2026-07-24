@@ -30,6 +30,15 @@ data/external/*.zip
 !data/reference/.gitkeep
 !data/processed/.gitkeep
 
+# Operator-supplied third-party material — copyrighted, never committed, per the
+# third-party-text rule in docs/CONVENTIONS.md. Only the tracked README.md in
+# each location records what belongs there. Keeping these ignored also makes the
+# `git add -A` in scripts/autocommit.sh safe: it can never sweep a copyrighted
+# PDF or the Springer Nature class files into a data commit.
+docs/literature/*.pdf
+manuscript/template/**
+!manuscript/template/README.md
+
 # Environments
 .conda/
 .venv/
