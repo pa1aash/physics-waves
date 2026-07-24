@@ -131,7 +131,7 @@ fi
 #     history, including commit messages). The 8-char token prefix is assembled
 #     from fragments at run time, so this guard does not itself contain the
 #     literal string it screens for (same technique as check 1).
-tok8="f6""73""815c"
+tok8="17""e064""f1"
 if git ls-files -z | xargs -0 grep -lIF "$tok8" 2>/dev/null | grep -q . \
    || git log -p --all 2>/dev/null | grep -qF "$tok8"; then
   bad "18. CDS credential token present in repository (tracked files or history)"
