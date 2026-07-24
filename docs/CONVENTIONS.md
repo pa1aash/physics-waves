@@ -94,6 +94,35 @@ citation, per the blueprint reference note):
   stability EVP returns the actual growth rate and dominant wavenumber against
   which the nonlinear runs are validated.
 
+### Two contrasting DJF seasons for observational comparison
+
+The blueprint specifies a single DJF season for the observational comparison.
+DJF 2015/16 was the strongest El Niño on record: the Northern Hemisphere jet
+that winter was displaced equatorward and strengthened relative to climatology,
+and the stationary-wave pattern was correspondingly anomalous. Validating a
+zonally symmetric idealised model against one strongly perturbed season tests
+robustness against exactly the wrong thing.
+
+The observational comparison therefore uses **two contrasting DJF seasons**:
+
+- **DJF 2013/14** — ENSO-neutral, a typical background state.
+- **DJF 2015/16** — strong El Niño, a strongly perturbed background state.
+
+The 30-year monthly climatology (D1) remains the primary source for the
+zonal-mean jet `ū(φ)`, its curvature `d²ū/dy²`, and the sign structure of the
+background potential-vorticity gradient `dQ/dy = β − d²ū/dy²`. The two individual
+seasons supply wave-phase tracking and dominant-wavenumber comparison.
+
+**The physical argument for doing this.** The modelled dispersion relation
+depends on the planetary vorticity gradient, which is a property of the rotating
+sphere and is indifferent to ENSO. If the observed westward phase speed and
+dominant zonal wavenumber agree with the model in both a neutral and a strongly
+perturbed winter, the agreement is attributable to the *mechanism* rather than
+to a coincidence of one season's background flow. Both reanalyses (ERA5 and
+NCEP/NCAR R1) cover both seasons, so every observational diagnostic is computed
+twice independently; where the two reanalyses disagree, that spread is reported
+as observational uncertainty rather than concealed.
+
 ## Run identifiers
 
 Run IDs are immutable once a run has executed. The scheme follows blueprint
