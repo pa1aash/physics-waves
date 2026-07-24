@@ -22,6 +22,11 @@ repository cannot perform for itself.
 - [ ] Place the reference PDFs listed in `docs/literature/README.md` into that
   directory, named `firstauthor_year_shorttitle.pdf`. Verify each *(confirm
   citation)* entry against its primary source.
+- [ ] **Two extension-B references are unobtainable** (Longuet-Higgins 1968;
+  Swarztrauber & Kasahara 1985) — recorded with DOIs and mitigation in
+  `docs/literature/MISSING.md`. Not blocking. Obtain the open-access substitutes
+  if possible (Kasahara 1976; Paldor 2015) and flag both for the Session L4
+  corpus-adequacy audit.
 
 ## Data
 

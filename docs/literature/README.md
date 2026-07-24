@@ -30,6 +30,13 @@ verified before citation.
 | `longuethiggins_1968_laplace_tidal_eigenfunctions.pdf` | Longuet-Higgins, M. S. (1968). The eigenfunctions of Laplace's tidal equations over a sphere. *Phil. Trans. R. Soc. A* 262, 511–607. *(confirm citation)* |
 | `swarztrauber_1985_vector_harmonic_analysis.pdf` | Swarztrauber, P. N., & Kasahara, A. (1985). Vector harmonic analysis of Laplace's tidal equations. *SIAM J. Sci. Stat. Comput.* 6. *(confirm citation)* |
 
+> **`longuethiggins_1968_…` and `swarztrauber_1985_…` could not be obtained.**
+> See [`MISSING.md`](MISSING.md) for full citations, DOIs, why the project is not
+> blocked (the extension-B eigenfrequencies are derived and solved numerically,
+> not read from a table), and the open-access substitutes to chase —
+> `kasahara_1976_normal_modes_ultralong_waves.pdf` and
+> `paldor_2015_shallow_water_waves.pdf`.
+
 ## Numerical framework
 
 | Suggested filename | Citation |

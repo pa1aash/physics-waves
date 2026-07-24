@@ -123,6 +123,37 @@ NCEP/NCAR R1) cover both seasons, so every observational diagnostic is computed
 twice independently; where the two reanalyses disagree, that spread is reported
 as observational uncertainty rather than concealed.
 
+### Extension B validation — the ε → 0 limit and the missing references
+
+Two classical sources for extension B — Longuet-Higgins (1968) and Swarztrauber
+& Kasahara (1985) — could not be obtained. Both are recorded with full
+citations, DOIs and their mitigation in `docs/literature/MISSING.md`. Their
+absence does not block the project: the Hough-mode eigenfrequencies are not read
+from a published table but derived from first principles in Session L3 and solved
+numerically in Dedalus, so the validation target is internal and stronger than an
+external table would be.
+
+The physical argument that makes this validation self-contained is the `ε → 0`
+limit. Lamb's parameter can be written
+
+    ε = 4 Ω² R² / (g H) = (R / L_d)²
+
+where `L_d = √(gH) / (2Ω)` is the external deformation radius, so ε is the squared
+ratio of planetary radius to deformation radius. Physically, `ε → 0` means
+`L_d ≫ R`: the free surface behaves rigidly, columns cannot stretch, and material
+conservation of potential vorticity must be satisfied entirely by changes in
+relative vorticity. In that limit the divergent eigenfrequencies must reduce
+exactly to the nondivergent Rossby–Haurwitz result
+
+    c_ang → − 2Ω / [n(n+1)]
+
+which is precisely hypotheses H1 and H2 of the blueprint. The eigenvalue solver
+is therefore validated against a closed-form limit the project derives
+independently. Sweeping ε upward then measures how the wave slows as a growing
+share of the potential-vorticity budget is absorbed by vortex stretching rather
+than by relative vorticity — the physical content of hypothesis H5, expressed as
+a curve rather than an assertion.
+
 ## Run identifiers
 
 Run IDs are immutable once a run has executed. The scheme follows blueprint
