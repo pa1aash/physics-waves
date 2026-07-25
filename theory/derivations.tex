@@ -839,7 +839,7 @@ L_R \;\propto\; \Omega^{-1/2} .
 \end{equation}
 %
 The blueprint's phase-speed campaign sweeps $\Omega$ over a sixteen-fold range
-($0.25\,\Omega_0$ to $4\,\Omega_0$, runs P-14 through P-18), which sweeps $L_R$
+($0.25\,\Omega_0$ to $4\,\Omega_0$, runs P-08 through P-12), which sweeps $L_R$
 by a factor of $\sqrt{16} = 4$. That reframes the sweep. It is not a
 numerical-convergence exercise with $\Omega$ as a knob; it is a survey of
 planetary regime. A four-fold change in the scale at which an atmosphere
@@ -1108,9 +1108,22 @@ problem predicts.
 
 \medskip
 \noindent\emph{Physical payoff:} this converts Section~\ref{sec:rayleighkuo}'s
-necessary condition into a genuine sufficient computational test --- actual
-growth rates and eigenmode structure --- closing the ``necessary but not
-sufficient'' gap the blueprint itself flags.
+one-sided necessary condition into an actual prediction --- growth rates and
+eigenmode structure, not merely a permission to grow --- closing the gap the
+blueprint flags.
+
+\medskip
+\noindent\textbf{One caveat, stated because it is easy to overstate this
+section.} A normal-mode eigenvalue problem is \emph{not} a sufficient condition
+for stability. The linearised operator here is non-normal: its eigenfunctions
+are not orthogonal, so a superposition of individually decaying modes can
+amplify substantially before it decays. A spectrum with no growing eigenvalue
+therefore establishes asymptotic stability to infinitesimal normal-mode
+disturbances, and nothing more --- it does not exclude finite-time transient
+growth, which in shear flows can be large. What Section~\ref{sec:evp} supplies
+is the \emph{modal} growth rate, which is what hypotheses H7--H9 are about and
+what the nonlinear runs are validated against. Transient, non-modal growth is
+outside the scope of this project and is not claimed to be excluded.
 
 % =====================================================================
 \section{Instability as counter-propagating Rossby waves}
