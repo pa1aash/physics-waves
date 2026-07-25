@@ -101,3 +101,40 @@ mode-by-mode numbers at Earth's `ε`, which remain internally derived.
 
 Paldor (2015) was not obtained and is not required: with Kasahara held, nothing
 depends on it.
+
+## Session L4b — targeted acquisition attempt, and a status this file did not previously have
+
+Session L4b attempted acquisition of four closed-access papers central to the
+divergent-stability question. **None was obtained as full text.** All four were
+confirmed by Unpaywall to have `is_oa: false`, `oa_status: closed`, and **zero**
+open-access locations anywhere — Unpaywall aggregates institutional repositories,
+preprint servers and author-hosted copies, so this is close to authoritative. No
+author-hosted copy was found for Hayashi & Young either.
+
+| Paper | DOI | Full text | Abstract |
+|-------|-----|-----------|----------|
+| Ripa (1983), *J. Fluid Mech.* **126**, 463–489 | `10.1017/S0022112083000270` | **not obtained** | **obtained verbatim** from the publisher |
+| Hayashi & Young (1987), *J. Fluid Mech.* **184**, 477–504 | `10.1017/S0022112087002982` | **not obtained** | **obtained verbatim** from the publisher |
+| Longuet-Higgins (1968) | `10.1098/rsta.1968.0003` | not obtained | not obtained |
+| Swarztrauber & Kasahara (1985) | `10.1137/0906033` | not obtained | not obtained |
+
+### A third status: ABSTRACT-VERIFIED
+
+This project has until now used two statuses — READ (PDF held and opened) and
+IDENTIFIER-ONLY (DOI verified, nothing else). Session L4b needs a third, because
+for Ripa (1983) and Hayashi & Young (1987) the **publisher's own verbatim
+abstract** was obtained and it states the papers' central results explicitly
+enough to answer the question the session was convened for.
+
+**ABSTRACT-VERIFIED** means: the abstract was read from the publisher's page, and
+any claim drawn from it is a claim the abstract itself makes. It does **not**
+license page-precise or equation-precise pointers, which remain unavailable for
+both papers. Every use of these two references in
+`DIVERGENT_STABILITY_DECISION.md` is marked accordingly.
+
+That distinction matters here more than usual: the decision memo's central
+finding rests on Ripa's two stability conditions, and those conditions are stated
+in his abstract in words rather than in symbols. The reconstruction of them into
+the project's own notation is therefore **the project's reading of an abstract**,
+not a transcription of a displayed equation, and is flagged as such wherever it
+appears.
