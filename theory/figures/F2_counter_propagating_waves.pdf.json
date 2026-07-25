@@ -1,6 +1,6 @@
 {
   "config_hashes": {},
-  "created_utc": "2026-07-25T07:33:47Z",
+  "created_utc": "2026-07-25T09:20:40Z",
   "extra": {
     "anchors": "section 10 (counter-propagating Rossby waves)",
     "data": "none -- schematic, drawn from the derivation only",
@@ -8,7 +8,7 @@
     "source": "theory/figures/make_schematics.py"
   },
   "figure": "F2_counter_propagating_waves.pdf",
-  "git_commit": "b12eaa7f516ee597e0f9f40114ed4a54b254af34",
+  "git_commit": "46c5e0d4853caa8361d0d76bc5937d146f5c37fa",
   "processed_files": [],
   "run_ids": []
 }
