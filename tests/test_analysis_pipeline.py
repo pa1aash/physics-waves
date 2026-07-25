@@ -784,3 +784,111 @@ def test_a_circle_where_the_mode_is_absent_is_refused_not_fitted():
     at_equator = compare_run("P-17", latitude_deg=0.0)
     assert not at_equator.mode_present
     assert any("MODE ABSENT" in note for note in at_equator.notes)
+
+
+# --------------------------------------------------------------------------- #
+# Part 7 — necessary, sufficient, actual
+# --------------------------------------------------------------------------- #
+
+# Session L5's five-rung shear ladder, exactly as `docs/SOLVER_CORE_RESULTS.md` §6
+# reports it: (S, Rayleigh-Kuo permits, Ripa certifies, m*, sigma).
+L5_SHEAR_LADDER = [
+    (0.05, False, True, None, None),
+    (0.10, True, False, None, None),
+    (0.25, True, False, 7, 3.52e-6),
+    (0.50, True, False, 7, 9.45e-6),
+    (1.00, True, False, 6, 2.07e-5),
+]
+
+
+@pytest.mark.parametrize("shear,permits,certifies,m_star,sigma", L5_SHEAR_LADDER)
+def test_shear_ladder_reproduces_session_l5(shear, permits, certifies, m_star, sigma):
+    """**Regression lock.** Session L5's ladder, rung by rung.
+
+    Each rung carries three independent verdicts — a necessary criterion, a
+    sufficient one, and a solved eigenvalue — and all three have to come back
+    unchanged. The two lowest rungs assert an *absence*: no growing mode, which is
+    the harder claim to keep true under refactoring, since a spurious eigenvalue
+    slipping past the resolution-doubling filter would break it.
+    """
+    from src.analysis.stability_evp import evaluate_shear
+
+    row = evaluate_shear(shear)
+    assert row.rayleigh_kuo_permits is permits
+    assert row.ripa_certifies_stable is certifies
+    assert row.m_star == m_star
+    if sigma is None:
+        assert not row.actually_grows
+    else:
+        assert row.sigma_max_s == pytest.approx(sigma, rel=0.01)
+
+
+def test_the_three_regimes_appear_in_the_right_order():
+    """Certified stable, then permitted-but-quiet, then growing — never out of order.
+
+    A rung that were "certified stable" while also growing, or "growing" below the
+    necessary threshold, would mean one of the three calculations contradicts
+    another. Nothing in the code enforces this ordering, so asserting it is a real
+    consistency check across the three independent criteria.
+    """
+    from src.analysis.stability_evp import sweep_shear_ladder
+
+    rows = sweep_shear_ladder()
+    verdicts = [r.verdict for r in rows]
+    assert verdicts == [
+        "certified stable",
+        "permitted, not growing",
+        "growing",
+        "growing",
+        "growing",
+    ]
+    for row in rows:
+        assert not (row.ripa_certifies_stable and row.actually_grows)
+        assert not (row.actually_grows and not row.rayleigh_kuo_permits)
+
+
+def test_ripa_and_rayleigh_kuo_share_a_threshold_for_this_jet_family():
+    """The sufficient and necessary thresholds coincide here, and the reason matters.
+
+    Ripa's condition (ii) — gravity-wave criticality — is satisfied with a margin of
+    order fifty for every jet in this family, so it never binds; condition (i) then
+    fails exactly where ``dQ/dy`` first reverses, which is Rayleigh-Kuo's condition.
+    Session L5's ladder made them look like different thresholds (0.05 and 0.0728)
+    because 0.05 was the largest rung tested, not a boundary. Recording the
+    coincidence, and its cause, is worth more than an extra number.
+    """
+    from src.analysis.stability_evp import locate_thresholds
+
+    thresholds = locate_thresholds(bracket=(0.14, 0.18), tolerance=0.02)
+    assert thresholds.rayleigh_kuo_S == pytest.approx(0.0728, abs=1e-3)
+    assert thresholds.ripa_S == pytest.approx(thresholds.rayleigh_kuo_S, abs=1e-9)
+    assert any("coincides" in note for note in thresholds.notes)
+
+
+def test_growth_onset_lies_inside_the_bracket_session_l5_reported():
+    """The refined onset must fall where Session L5 said it was, between 0.10 and 0.25.
+
+    Session L5 could only bracket the onset, because its ladder had rungs at 0.10
+    and 0.25 and nothing between. Bisection narrows it, and the narrowed value has
+    to be consistent with the bracket rather than merely plausible — otherwise the
+    refinement would be contradicting the result it claims to refine.
+    """
+    from src.analysis.stability_evp import locate_thresholds
+
+    thresholds = locate_thresholds(bracket=(0.10, 0.25), tolerance=0.01)
+    assert 0.10 < thresholds.growth_onset_S < 0.25
+    assert thresholds.growth_onset_S == pytest.approx(0.158, abs=0.01)
+    assert thresholds.permitted_but_stable_width > 0.05
+
+
+def test_stability_evp_refuses_a_truncation_its_quadrature_cannot_integrate():
+    """Too high a truncation used to produce NaNs and fail in the eigensolver.
+
+    The failure surfaced as an opaque complaint about infs from inside SciPy, three
+    call levels away from the cause. A truncation beyond what the fixed quadrature
+    can integrate exactly is now refused where it is introduced.
+    """
+    from src.solver import evp_stability as es
+
+    with pytest.raises(ValueError, match="quadrature points"):
+        es.stability_evp(4, 700, es.solid_body_profile(40.0), RADIUS_EARTH, OMEGA_EARTH)

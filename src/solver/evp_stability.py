@@ -113,6 +113,13 @@ def stability_evp(
     ``W`` looks singular at the poles and is not: for any jet of compact support
     ``dQ/dphi -> 2 Omega cos(phi)`` there, and the cosines cancel.
     """
+    if nq < 2 * nmax:
+        raise ValueError(
+            f"truncation nmax={nmax} needs at least {2 * nmax} quadrature points to integrate "
+            f"the products P_n' P_n exactly, but nq={nq}. Raise nq. Left unchecked this "
+            "silently produces a non-finite matrix and the eigensolver fails downstream "
+            "with an unrelated-looking error about infs."
+        )
     mu, w = roots_legendre(nq)
     lat = np.arcsin(mu)
     cos = np.cos(lat)
