@@ -18,6 +18,43 @@ be justified either mathematically or physically, the physical justification is
 the one that is written down, and the mathematics is the machinery that serves
 it.
 
+## Theoretical framework: the spine
+
+The entire physics of this project is a corollary of one statement — material
+conservation of potential vorticity on a rotating, curved surface,
+
+    Dq/Dt = 0,     q = (ζ + f) / h
+
+A fluid column conserves `q` as it moves. Displace it poleward and `f` grows, so
+`ζ` must fall to compensate — the induced circulation this demands is what
+propagates a Rossby wave westward relative to the fluid. Curve a zonal jet so
+that its own vorticity gradient locally cancels the planetary one, and `q` can no
+longer act as a single-signed restoring agent across the jet — that loss of
+monotonicity is what permits instability. **These are not two topics. They are
+one mechanism examined in two regimes.**
+
+Every section of the theory, and every later section of the manuscript that
+inherits from it, must be written so that a reader finishes it understanding what
+the fluid is physically doing, with the mathematics in service of that
+understanding rather than standing in for it. Mathematical depth is expected and
+required — spherical differential geometry, eigenvalue problems, asymptotic
+limits — but each piece of formalism is introduced because the physics demands
+it, and its physical payoff is stated in words immediately after it is derived.
+
+The worked form of this framework is `theory/derivations.tex`, whose twelve
+sections build from Kelvin's circulation theorem to the counter-propagating
+Rossby-wave picture of instability, and whose closing statement is the sentence
+the manuscript is organised around: *the wave-propagation mechanism and the
+instability mechanism are the same physics, viewed as one interface versus two.*
+Every equation presented there as established carries a corresponding executable
+check under `theory/sympy_checks/`, whose recorded verdicts live in
+`theory/sympy_checks/output/`.
+
+**Sign-off.** `theory/derivations.tex` is operator-authored physics with
+computational assistance, never the reverse. It does not become ground truth for
+any later session until `theory/DERIVATION_REVIEW.md` has been read and
+explicitly approved by the operator.
+
 ## Authoritative source
 
 `PROJECT_BLUEPRINT.md` is the single authoritative knowledge source. Any change
