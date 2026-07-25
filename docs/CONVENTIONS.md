@@ -367,8 +367,9 @@ satisfy a hard constraint of this repository.
    data licence file points to the CC BY 4.0 legal code rather than transcribing
    it; the full text is fetched via `make licenses` before the Zenodo deposit.
 4. **The literature pool CSVs are exempt from the blanket attribution screen.**
-   `docs/literature/CANDIDATE_POOL.csv` and `VERIFIED_POOL.csv` hold
-   machine-retrieved bibliographic metadata. Several real researchers in this
+   `docs/literature/CANDIDATE_POOL.csv`, `VERIFIED_POOL.csv` and the
+   `manuscript/references.bib` generated from them hold machine-retrieved
+   bibliographic metadata. Several real researchers in this
    field carry a given name that collides with one of the screened tokens, and a
    blunt case-insensitive match cannot tell a person's name from a tool byline.
    Corrupting third-party author names to satisfy a guard would be worse than

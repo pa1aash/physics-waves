@@ -138,6 +138,22 @@ VENUE_OK = [
     r"journal of marine research",
     r"communications in computational physics",
     r"astrophysical journal",
+    # Applied-mathematics outlets that publish spherical-flow stability work. Added
+    # after the first pass silently dropped Skiba & Perez-Garcia (2004) and
+    # Constantin & Germain (2022) -- the two strongest prior-art hits for the
+    # project's own stability claim -- purely because their venues were absent.
+    r"numerical methods for partial differential equations",
+    r"archive for rational mechanics and analysis",
+    r"journal of mathematical fluid mechanics",
+    r"nonlinearity",
+    r"dynamics of partial differential equations",
+    r"journal of nonlinear science",
+    r"studies in applied mathematics",
+    r"geophysical and astrophysical fluid dynamics",
+    r"journal of mathematical sciences",
+    r"nonlinear processes in geophysics",
+    r"quarterly of applied mathematics",
+    r"theoretical and computational fluid dynamics",
 ]
 
 # --- hard off-domain exclusions ----------------------------------------------
@@ -200,6 +216,21 @@ def main() -> int:
         if r["read_status"] == "READ" or r["query_id"] == "A1":
             r["selected_for_bib"] = "yes"
             r["selection_reason"] = "ANCHOR: PDF held or cited directly by the theory"
+            n_anchor += 1
+            continue
+
+        # Rows from a TARGETED query -- the Step 1 critique's named deliverables
+        # (T*) and the Step 5/7 gap-fills (G*) -- are forced in. They were
+        # retrieved BY NAME for a stated reason, so the venue whitelist must not
+        # veto them. It nearly did: Skiba & Perez-Garcia (2004), the single most
+        # important prior-art hit for fragment b1, appeared in "Numerical Methods
+        # for Partial Differential Equations", and Constantin & Germain (2022) in
+        # "Archive for Rational Mechanics and Analysis" -- neither on the list.
+        # A whitelist that silently drops the papers that narrow your own novelty
+        # claim is worse than no whitelist.
+        if r["query_id"].startswith(("T", "G")):
+            r["selected_for_bib"] = "yes"
+            r["selection_reason"] = f"TARGETED retrieval ({r['query_id']}): {r['area'][:60]}"
             n_anchor += 1
             continue
 

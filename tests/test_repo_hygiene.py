@@ -40,23 +40,78 @@ def _tracked_files() -> list[Path]:
 
 
 def _check_ignore(pathspec: str) -> int:
-    return subprocess.run(
-        ["git", "-C", str(REPO), "check-ignore", pathspec]
-    ).returncode
+    return subprocess.run(["git", "-C", str(REPO), "check-ignore", pathspec]).returncode
+
+
+# The two literature pool CSVs are machine-retrieved bibliographic metadata and
+# legitimately carry third-party author names, several of which collide with a
+# screened token. They are exempt from the blanket scan and covered instead by
+# ``test_pool_csvs_clean_outside_authors_column`` below, which is the narrower
+# check. See docs/CONVENTIONS.md, authorised deviation 4.
+POOL_CSVS = {
+    "docs/literature/CANDIDATE_POOL.csv",
+    "docs/literature/VERIFIED_POOL.csv",
+}
+
+# Generated from the pools above, so it inherits their author names.
+GENERATED_BIB = "manuscript/references.bib"
 
 
 def test_no_forbidden_strings_in_tracked_files():
     offenders: dict[str, list[str]] = {}
     tokens = [t.lower() for t in FORBIDDEN]
     for path in _tracked_files():
+        rel = str(path.relative_to(REPO))
+        if rel in POOL_CSVS or rel == GENERATED_BIB:
+            continue
         try:
             text = path.read_text(errors="ignore").lower()
         except (OSError, UnicodeDecodeError):
             continue
         hits = [t for t in tokens if t in text]
         if hits:
-            offenders[str(path.relative_to(REPO))] = hits
+            offenders[rel] = hits
     assert not offenders, f"forbidden attribution strings found: {offenders}"
+
+
+def test_pool_csvs_clean_outside_authors_column():
+    """A screened token may appear in the pool CSVs only as part of an author name.
+
+    Anywhere else in those files -- a title, a venue, a query string -- would be a
+    real finding, so the exemption above is bounded by column, not just by path.
+    """
+    import csv
+
+    tokens = [t.lower() for t in FORBIDDEN]
+    offenders: dict[str, list[str]] = {}
+    for rel in sorted(POOL_CSVS):
+        path = REPO / rel
+        if not path.exists():
+            continue
+        with path.open(newline="", encoding="utf-8") as fh:
+            for lineno, row in enumerate(csv.DictReader(fh), start=2):
+                for column, value in row.items():
+                    if column == "authors" or not value:
+                        continue
+                    if any(tok in value.lower() for tok in tokens):
+                        offenders.setdefault(rel, []).append(f"line {lineno} column {column}")
+    assert not offenders, f"forbidden token outside authors column: {offenders}"
+
+
+def test_generated_bib_clean_outside_author_field():
+    """A screened token may appear in references.bib only inside an author field."""
+    path = REPO / GENERATED_BIB
+    if not path.exists():
+        return
+    tokens = [t.lower() for t in FORBIDDEN]
+    bad: list[str] = []
+    for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        stripped = line.lstrip()
+        if stripped.startswith("%") or stripped.startswith("author"):
+            continue
+        if any(tok in line.lower() for tok in tokens):
+            bad.append(f"line {lineno}")
+    assert not bad, f"forbidden token outside author field in {GENERATED_BIB}: {bad}"
 
 
 def test_tooling_md_ignored():

@@ -26,7 +26,7 @@ echo "== physics-waves repository audit =="
 #    researchers in this field carry a given name that collides with one of the
 #    screened tokens. The blunt pattern cannot tell a person's name from a tool
 #    byline. See docs/CONVENTIONS.md, authorised deviation 4.
-pool_re='^docs/literature/(CANDIDATE|VERIFIED)_POOL\.csv$'
+pool_re='^(docs/literature/(CANDIDATE|VERIFIED)_POOL\.csv|manuscript/references\.bib)$'
 offenders="$(git ls-files -z | grep -zEv "$pool_re" | xargs -0 grep -riEl "$pat" 2>/dev/null || true)"
 if [ -n "$offenders" ]; then
   bad "1. forbidden strings present in tracked files"
@@ -39,6 +39,23 @@ fi
 #     column. Anywhere else in those files -- title, venue, query string -- is a
 #     real finding. Column 3 is `authors` in both files.
 pool_bad=""
+# manuscript/references.bib is generated from these CSVs, so it inherits the same
+# author names and the same bounded exemption: the token may appear only inside an
+# `author = {...}` field.
+if [ -f manuscript/references.bib ]; then
+  bibhits="$(python3 - manuscript/references.bib <<'PY_EOF'
+import re, sys
+txt = open(sys.argv[1], encoding="utf-8").read()
+pat = re.compile(r"[c]laude|[a]nthropic|co-[a]uthored|[g]enerated with", re.I)
+bad = []
+for i, line in enumerate(txt.splitlines(), start=1):
+    if pat.search(line) and not re.match(r"\s*author\s*=", line) and not line.lstrip().startswith("%"):
+        bad.append(f"line {i}")
+print("; ".join(bad))
+PY_EOF
+)"
+  [ -n "$bibhits" ] && pool_bad="$pool_bad manuscript/references.bib:[$bibhits]"
+fi
 for f in docs/literature/CANDIDATE_POOL.csv docs/literature/VERIFIED_POOL.csv; do
   [ -f "$f" ] || continue
   hits="$(python3 - "$f" <<'PY_EOF'
@@ -56,7 +73,7 @@ PY_EOF
   [ -n "$hits" ] && pool_bad="$pool_bad $f:[$hits]"
 done
 if [ -z "$pool_bad" ]; then
-  pass "1b. pool CSVs carry forbidden tokens only in the authors column"
+  pass "1b. pool CSVs and references.bib carry tokens only in author fields"
 else
   bad "1b. forbidden token outside authors column:$pool_bad"
 fi
@@ -356,6 +373,86 @@ if [ -f "$rev" ]; then
   fi
 else
   bad "33. $rev missing"
+fi
+
+# 34. The bibliography exists and carries at least 60 entries.
+bib="manuscript/references.bib"
+if [ -f "$bib" ]; then
+  nbib="$(grep -cE '^@[a-zA-Z]+\{' "$bib")"
+  if [ "$nbib" -ge 60 ]; then
+    pass "34. references.bib has $nbib entries (>= 60)"
+  else
+    bad "34. references.bib has only $nbib entries (< 60)"
+  fi
+else
+  bad "34. $bib missing"
+fi
+
+# 35. Every bibliography entry carries a resolvable identifier. A DOI normally;
+#     a stable archive URL for the two Journal of Marine Research papers, which
+#     predate DOI registration and are the origin of the result this paper tests.
+if [ -f "$bib" ]; then
+  gap="$(python3 - "$bib" <<'PY_EOF'
+import re, sys
+txt = open(sys.argv[1], encoding="utf-8").read()
+bad = [k for k, b in re.findall(r"@\w+\{([^,]+),(.*?)\n\}", txt, re.S)
+       if not re.search(r"\bdoi\s*=", b) and not re.search(r"\burl\s*=", b)]
+print(" ".join(bad))
+PY_EOF
+)"
+  if [ -z "$gap" ]; then
+    pass "35. every references.bib entry has a doi (or archive url for pre-DOI)"
+  else
+    bad "35. bib entries with no identifier:$gap"
+  fi
+fi
+
+# 36. Every \cite key in the manuscript drafts resolves to a bib entry.
+if [ -f "$bib" ] && ls manuscript/drafts/*.tex >/dev/null 2>&1; then
+  miss="$(python3 - "$bib" <<'PY_EOF'
+import glob, re, sys
+txt = open(sys.argv[1], encoding="utf-8").read()
+keys = set(re.findall(r"@\w+\{([^,]+),", txt))
+C = re.compile(r"\\cite[a-zA-Z]*\*?(?:\[[^\]]*\])*\{([^}]*)\}")
+bad = set()
+for f in glob.glob("manuscript/drafts/*.tex"):
+    t = open(f, encoding="utf-8").read()
+    for m in C.finditer(t):
+        for k in m.group(1).split(","):
+            k = k.strip()
+            if k and k not in keys:
+                bad.add(k)
+print(" ".join(sorted(bad)))
+PY_EOF
+)"
+  if [ -z "$miss" ]; then
+    pass "36. every draft cite key resolves to a bib entry"
+  else
+    bad "36. unresolved cite keys:$miss"
+  fi
+else
+  skip "36. no bibliography or no drafts yet"
+fi
+
+# 37. The gap statement and the dialectic challenge both exist, and the gap
+#     statement references the challenge -- so the narrowed novelty claim cannot
+#     be read without the evidence that narrowed it.
+gs="docs/literature/GAP_STATEMENT.md"
+dc="docs/literature/DIALECTIC_CHALLENGE.md"
+if [ -f "$gs" ] && [ -f "$dc" ] && grep -q "DIALECTIC_CHALLENGE" "$gs"; then
+  pass "37. gap statement and dialectic challenge exist and are cross-referenced"
+else
+  bad "37. gap statement / dialectic challenge missing or not cross-referenced"
+fi
+
+# 38. The literature review carries the exact sign-off closing statement.
+lr="docs/literature/LITERATURE_REVIEW.md"
+if [ -f "$lr" ] \
+   && grep -q "THIS DOCUMENT REQUIRES OPERATOR SIGN-OFF BEFORE SESSION L11 MAY BEGIN" "$lr" \
+   && grep -q "APPROVED BY THE OPERATOR" "$lr"; then
+  pass "38. LITERATURE_REVIEW.md carries the sign-off closing statement"
+else
+  bad "38. LITERATURE_REVIEW.md missing or lacks the sign-off statement"
 fi
 
 echo "== $( [ "$fail" -eq 0 ] && echo "AUDIT PASSED" || echo "AUDIT FAILED ($fail check(s))" ) =="

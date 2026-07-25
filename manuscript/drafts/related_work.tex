@@ -1,0 +1,189 @@
+% manuscript/drafts/related_work.tex
+%
+% Session L4, Step 13 draft. Organised by the theory areas of the Step 2 query
+% matrix, so coverage is auditable against docs/literature/QUERY_MATRIX.md.
+%
+% Precise detail is drawn from docs/literature/ANCHOR_NOTES.md, which records page
+% and equation pointers for every paper actually read, and marks which papers were
+% verified by identifier only. Nothing page-precise is claimed from an unread paper.
+
+\section{Related work}
+\label{sec:related}
+
+\subsection{Rossby-wave dispersion on a sphere}
+
+The westward propagation of large-scale atmospheric disturbances as a consequence
+of the latitudinal variation of the Coriolis parameter is due to
+\citet{rossby1939}, who obtained it on a tangent plane, and to Haurwitz, who
+extended it first to disturbances of finite lateral extent and then to the sphere,
+where the closed form $c_{\mathrm{ang}} = -2\Omega/[n(n+1)]$ for a spherical
+harmonic of degree $n$ replaces the plane-wave result $c = -\beta/k^2$. The
+spherical solutions are exact steadily propagating solutions of the nonlinear
+nondivergent barotropic vorticity equation, which is what made them attractive as
+model test cases.
+
+That attractiveness has a limit which this paper takes seriously.
+\citet{thuburn2000} integrated Rossby--Haurwitz waves in four independent
+high-resolution shallow-water models and established two things that bear directly
+on any campaign measuring their phase speed. First, the shallow-water
+Rossby--Haurwitz wave --- unlike its nondivergent counterpart --- generates
+small-scale structure and therefore sustains a potential-enstrophy cascade, so its
+numerical solution depends on the dissipation coefficient, and the appropriate
+coefficient depends on the flow. Second, and contrary to the belief on which the
+standard test case was built, the zonal-wavenumber-4 wave is dynamically unstable
+and breaks down when perturbed, with exponential growth on an e-folding time of
+order a day. \citet{lynch2009} approaches the same question from the resonant-triad
+direction.
+
+The stability of Rossby--Haurwitz waves has since been treated with increasing
+rigour: \citet{skiba2004} computed the structure and growth rates of unstable modes
+to the Rossby--Haurwitz wave, \citet{skiba2008,skiba2024} developed the linear and
+nonlinear instability theory on the sphere, and \citet{constantin2022} gave a
+rigorous treatment of stratospheric planetary flows from the Euler-equation
+perspective.
+
+\subsection{The divergent correction: Laplace's tidal equations and Hough modes}
+
+Retaining the free surface converts the nondivergent vorticity problem into
+Laplace's tidal equations, whose eigenfunctions on a sphere were computed by
+\citet{longuethiggins1968} as a function of Lamb's parameter, and recast in vector
+harmonic form by \citet{swarztrauber1985}. \citet{kasahara1976} reviews the
+construction and states the branch structure explicitly: the horizontal parts of
+the normal modes are Hough harmonics, carrying zonal velocity, meridional velocity
+and geopotential height together, and they fall into three families of distinct
+frequency --- eastward- and westward-propagating gravity waves, and
+westward-propagating rotational waves of Rossby--Haurwitz type.
+
+Two remarks on how this paper uses that body of work. The dependence of the
+rotational-branch frequencies on Lamb's parameter --- equivalently, the departure
+from the nondivergent $-2\Omega/[n(n+1)]$ as the deformation radius shrinks
+relative to the planetary radius --- is classical, and is not claimed here as a new
+result. What this paper does with it is narrower: it uses the closed-form
+$\varepsilon \to 0$ limit as the validation target for its own eigenvalue solver,
+so that the analytic reference is one the study derives and checks internally
+rather than a table transcribed from elsewhere. Of the three classical sources,
+only \citet{kasahara1976} was available to us in full; \citet{longuethiggins1968}
+and \citet{swarztrauber1985} are cited on the strength of their bibliographic
+records, and no page-precise claim is made from either.
+
+\subsection{Barotropic instability of a zonal jet}
+
+\citet{kuo1949} established the necessary condition for instability of a
+two-dimensional nondivergent barotropic flow: a growing normal mode requires a
+critical point at which the gradient of absolute vorticity $\beta - \bar u_{yy}$
+vanishes, so that the background gradient changes sign somewhere in the domain. He
+is explicit about the limits of that result, noting that dynamic stability analysis
+indicates only the possibility of development and that the mechanism of the
+disturbance must be studied separately.
+
+\citet{bretherton1966} generalised the constraint and supplied its physical
+reading. His integrated eddy potential-vorticity flux relation shows that a growing
+normal mode requires the background potential-vorticity gradient to take both
+signs, recovering for a wider class of flows the result Charney and Stern had
+proved for a special case; and his observation that a discontinuity in the
+background field is mathematically equivalent to a delta function in potential
+vorticity is what allows the interface idealisation used later in this paper to be
+exact for piecewise-constant $Q$ rather than merely illustrative. His main result
+concerns the critical layer: a growing mode of a general zonal flow must have one,
+and it carries a down-gradient potential-vorticity flux that does not vanish as the
+growth rate does.
+
+For the divergent shallow-water system the stability theory is different, and
+\citet{ripa1983} is the reference: general stability conditions for zonal flows in
+a one-layer model on the beta-plane or the sphere. \citet{hayashi1987} treat
+stable and unstable shear modes of rotating parallel flows in shallow water, and
+\citet{knessl1992} the stability of rotating shear flows in the same system.
+This paper's own stability analysis is nondivergent, and
+\S\ref{sec:discussion} states the consequence rather than leaving it implicit.
+
+\subsection{Counter-propagating Rossby waves}
+
+\citet{bretherton1966} showed that development in a flow with two distinct
+potential-vorticity gradients is the interaction of two Rossby waves propagating on
+them; \citet{hoskins1985} developed the potential-vorticity-inversion framework
+that makes the ``wind field attributable to'' each wave a well-defined object, and
+named the counter-propagating picture. \citet{heifetz1999} gave the quantitative
+form for Rayleigh's constant-shear strip, tracking the two edge waves' amplitudes
+and phases explicitly and showing that the growing normal mode is the phase-locked
+configuration: growth occurs when the northern wave lies less than half a
+wavelength west of the southern one. Their dispersion relation and the constants
+that follow from it --- a short-wave cutoff at nondimensional wavenumber
+$K_{\mathrm c} \approx 1.28$, a most-unstable $K_{\max} \approx 0.8$ corresponding
+to a wavelength about eight times the vorticity-strip width, and a peak growth rate
+of about twenty per cent of the shear --- are the external check on the
+two-interface reduction used in this paper.
+
+Their framing should be adopted along with their algebra. \citet{heifetz1999} offer
+the counter-propagating description because, in their words, it provides a useful
+pedagogical framework, having found the normal-mode explanation --- that the waves
+grow because a complex phase speed is required for the boundary conditions to be
+satisfiable --- unsatisfying. The one-interface/two-interface identification in this
+paper is exposition in the same spirit, not a new mechanism.
+
+\subsection{The Rhines scale and jet formation}
+
+\citet{rhines1975} showed that on a beta-plane the upscale cascade of
+two-dimensional turbulence is arrested near a wavenumber
+$k_\beta = (\beta/2U)^{1/2}$, set only by the root-mean-square particle speed and
+$\beta$, and that the cascade generates zonal flow by itself. Two features of that
+result constrain how it may be used. The arrest is anisotropic --- the restoring
+term acts only on meridional motion, so energy accumulates in zonally elongated
+structures --- and the alternating-jet end state is reached in the homogeneous case,
+Rhines noting that when energy is spatially intermittent the cascade may be halted
+instead by the spreading of energy about space, with the zonal end state probably
+not achieved. \citet{vallis1993} reach the same $O(\sqrt{U/\beta})$ transition
+scale from the weakly nonlinear interaction of Rossby waves, and emphasise that
+differential rotation produces anisotropy directly rather than merely inhibiting
+the cascade; they also note that the particular form of the scale is not crucial to
+their argument, which is the basis for treating its numerical factor as
+convention-dependent.
+
+This paper uses the Rhines scale for one purpose only: because
+$\beta \propto \Omega$, sweeping the rotation rate sweeps $L_{\mathrm R}$, which
+reframes the rotation sweep as a question about planetary regime. It does not treat
+$L_{\mathrm R}$ as a jet-spacing law, a stronger claim than either
+\citet{rhines1975} or \citet{vallis1993} supports.
+
+\subsection{Benchmarks, reference solutions and the numerical framework}
+
+\citet{williamson1992} proposed the standard test set for shallow-water
+approximations in spherical geometry that the field still uses, with pseudospectral
+reference solutions supplied by \citet{jakobchien1995}. Its limitations are
+documented by its users: \citet{galewsky2004} record that widespread use revealed
+problems severely limiting the suite's practical utility --- the early cases being
+idealised to the point of being unrepresentative, the later ones carrying
+unexpected subtleties --- and propose in its place a barotropically unstable
+mid-latitude jet, analytically specified, whose evolution exercises both the fast
+gravity-wave and slow balanced parts of the shallow-water system. That test case
+has since become a de facto acceptance test: the great majority of the work citing
+it is discretisation development --- finite-volume, discontinuous-Galerkin,
+icosahedral and cubed-sphere, radial-basis-function and semi-Lagrangian schemes ---
+rather than analysis of the jet's own dynamics. \citet{lauter2005} supply an
+unsteady analytic solution of the spherical shallow-water equations, which this
+paper adopts as an additional verification case complementing the steady one.
+
+The solver is Dedalus \citep{burns2020}, a spectral framework for partial
+differential equations, using the spherical basis and tensor calculus of
+\citet{vasil2019}. Both are used as documented; no numerical development is claimed
+here.
+
+\subsection{Observations}
+
+The comparison against observation uses two independent reanalyses, ERA5
+\citep{hersbach2020} and the NCEP/NCAR reanalysis \citep{kalnay1996}, so that the
+spread between them can be reported as observational uncertainty rather than
+concealed by choosing one. The diagnostic is a space--time spectral decomposition
+of geopotential height, which separates eastward- and westward-propagating branches
+explicitly --- necessary here because the observed extratropical troposphere is
+dominated by eastward-moving baroclinic disturbances that a single-layer barotropic
+model does not represent, and a simple temporal high-pass filter would retain them
+mixed in with any westward barotropic signal.
+
+Two points of honesty about this comparison. Correcting an observed
+ground-relative phase speed for advection by the mean flow before comparing it with
+an intrinsic theoretical prediction is standard practice, not a contribution;
+omitting it would be an error, and performing it earns no credit. And the
+comparison is bounded to scales rather than trajectories: agreement is sought in
+dominant zonal wavenumber and in the order of magnitude of drift speed, with
+disagreement in detail expected from the baroclinicity, vertical structure and
+forcing that the model omits.

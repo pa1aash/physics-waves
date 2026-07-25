@@ -13,10 +13,11 @@
 # legitimately contain third-party author names, and several real researchers in
 # this field carry a given name that collides with one of the screened tokens.
 # The pygrep guard cannot distinguish a person's name from a tool byline, so the
-# two data files are excluded here and covered instead by audit check 1b, which
-# screens them for the forbidden tokens OUTSIDE the authors column. Same
-# technique as authorised deviation 1: guards must not contain what they screen.
-exclude: '^(tests/phase0_gate/dedalus_reference/|docs/literature/(CANDIDATE|VERIFIED)_POOL\.csv$)'
+# data files are excluded here -- along with manuscript/references.bib, which is
+# generated from them -- and covered instead by audit check 1b, which screens them
+# for the forbidden tokens OUTSIDE the author field. Same technique as authorised
+# deviation 1: guards must not contain what they screen.
+exclude: '^(tests/phase0_gate/dedalus_reference/|docs/literature/(CANDIDATE|VERIFIED)_POOL\.csv$|manuscript/references\.bib$)'
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit

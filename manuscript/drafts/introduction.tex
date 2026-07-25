@@ -1,0 +1,192 @@
+% manuscript/drafts/introduction.tex
+%
+% Session L4, Step 13 draft. Session L11 refines and integrates this into the
+% Springer Nature manuscript. Substantively complete, not submission-ready.
+%
+% Every factual claim traces to docs/literature/CLAIM_MAP.md. Every citation key
+% resolves to manuscript/references.bib, whose entries all carry a DOI verified
+% against the Crossref work record during Session L4.
+%
+% Physics-first framing (docs/CONVENTIONS.md): mechanism and regime are the
+% through-line; the mathematics serves the physical statement, never replaces it.
+
+\section{Introduction}
+\label{sec:intro}
+
+\subsection{One conservation law, two regimes}
+
+A column of fluid on a rotating planet carries a label it cannot change. Its
+potential vorticity,
+%
+\begin{equation}
+q = \frac{\zeta + f}{h},
+\label{eq:intro-pv}
+\end{equation}
+%
+combining the column's own spin $\zeta$, the spin $f = 2\Omega\sin\varphi$ it has
+merely by sitting on a rotating sphere, and its depth $h$, is materially
+conserved: $\mathrm{D}q/\mathrm{D}t = 0$. Two older statements, divided into one
+another, give this immediately. Kelvin's circulation theorem fixes
+$(\zeta+f)\,\delta A$ for a material column of cross-section $\delta A$; mass
+conservation fixes $h\,\delta A$; the unknown area cancels.
+
+Almost everything in the large-scale atmosphere that this paper is concerned with
+follows from that single statement, and it follows in two regimes that are usually
+treated separately.
+
+Push a column poleward and the planetary vorticity it feels increases. If the free
+surface is stiff, so the column cannot stretch, its relative vorticity must fall
+by exactly as much. A chain of such displacements therefore acquires an
+alternating vorticity pattern whose inverted flow field sits a quarter wavelength
+out of phase with the displacement itself --- and a quarter-phase forcing
+translates a pattern rather than amplifying it. The disturbance propagates, and it
+propagates westward, unconditionally. This is the Rossby wave, and on a sphere its
+angular phase speed takes the closed form $c_{\mathrm{ang}} = -2\Omega/[n(n+1)]$
+for a mode of total degree $n$.
+
+Now curve a zonal jet sharply enough that its own vorticity gradient locally
+cancels the planetary one. The background potential vorticity is no longer
+monotonic in latitude, a displaced column no longer always finds more $q$ ahead of
+it, and the restoring mechanism loses its single sign. What was a wave becomes an
+instability, drawing energy from the shear rather than riding on it. The formal
+statement of the loss is the Rayleigh--Kuo criterion \citep{kuo1949}: a growing
+normal mode requires the background potential-vorticity gradient to change sign
+somewhere in the domain.
+
+These are not two subjects. \citet{bretherton1966} showed that wave development in
+a flow with two distinct potential-vorticity gradients is the interaction of two
+Rossby waves propagating on them, an idea named and developed as
+counter-propagating Rossby waves by \citet{hoskins1985} and given quantitative
+form for the barotropic shear layer by \citet{heifetz1999}. In that picture the
+wave and the instability are the same mechanism seen at one potential-vorticity
+interface and at two: a single interface supports an edge wave that propagates; two
+interfaces of opposite sign each sit in the other's induced flow, and if they can
+hold a fixed relative phase against the shear between them, each amplifies the
+other. This paper is organised around that identification, which we adopt as
+exposition rather than claim as new.
+
+\subsection{What is actually hard about testing this}
+
+The theory above is old and secure. What is not secure, and what this paper
+addresses, is the quality of the numerical evidence usually brought to bear on it.
+
+Three difficulties recur.
+
+First, the analytic target is only asymptotically correct. The Rossby--Haurwitz
+speed $-2\Omega/[n(n+1)]$ is the nondivergent result. A real shallow-water layer
+has a finite deformation radius $L_{\mathrm d} = \sqrt{gH}/2\Omega$, so a column
+can stretch, and part of the potential-vorticity budget that would have gone into
+relative vorticity goes into stretching instead. The restoring agent is diluted
+and the wave slows. The relevant parameter is Lamb's parameter
+$\varepsilon = 4\Omega^2R^2/(gH) = (R/L_{\mathrm d})^2$, and for Earth-like values
+$\varepsilon \approx 8.8$: the planet is about three deformation radii across, so
+this is not a small correction. The eigenstructure of the divergent problem is
+classical --- it is the content of Laplace's tidal equations, whose
+eigenfunctions were computed by \citet{longuethiggins1968}, treated in vector
+harmonic form by \citet{swarztrauber1985}, and reviewed with the three-family
+branch structure made explicit by \citet{kasahara1976} --- but a solver that
+compares itself against the nondivergent formula while integrating the divergent
+system is comparing against the wrong number.
+
+Second, the instability criterion is one-sided. Rayleigh--Kuo forbids growth when
+the potential-vorticity gradient does not change sign, but when it does change
+sign the criterion says nothing about whether anything grows, how fast, or at
+which zonal wavenumber. \citet{kuo1949} says so himself: dynamic stability
+analysis ``can only give some indication of the possibility for the development of
+some disturbances.'' Converting the prohibition into a prediction requires solving
+an eigenvalue problem, which is standard --- on the plane since
+\citet{kuo1949}, on the sphere in the sustained programme of
+\citet{skiba2004,skiba2008,skiba2024} and in the rigorous treatments of
+\citet{constantin2022}.
+
+Third, the canonical test cases are less innocent than they look.
+\citet{williamson1992} proposed the standard shallow-water suite that the field
+still uses, with reference solutions from \citet{jakobchien1995}, and its
+zonal-wavenumber-4 Rossby--Haurwitz case was chosen because that wave was believed
+stable. \citet{thuburn2000} showed it is not: the shallow-water
+wavenumber-4 Rossby--Haurwitz wave is dynamically unstable, breaks down if
+perturbed, and --- unlike the nondivergent case --- develops a potential-enstrophy
+cascade to small scales, with the outcome depending on the dissipation
+coefficient. \citet{galewsky2004} made the parallel point about the suite as a
+whole, that its later cases carry ``unexpected subtleties which render them less
+useful than originally thought'', and proposed a barotropically unstable jet as a
+replacement. A study that initialises Rossby--Haurwitz modes and measures their
+phase speed must therefore state its measurement window, not assume a steady
+solution.
+
+\subsection{Contributions}
+
+This paper does not contribute new theory. It contributes a controlled,
+separately verified numerical isolation of the beta effect as a single independent
+variable, spanning the range from linear wave propagation to nonlinear shear
+instability in one model and one framework, with quantified numerical uncertainty
+and an explicit closure against reanalysis. Specifically:
+
+\begin{enumerate}
+\item \textbf{One mechanism carried across two regimes with one solver.} The wave
+      results and the instability results are produced by the same code, the same
+      conventions and the same uncertainty budget, so they are commensurable. The
+      literature treats the two regimes in largely separate bodies of work; the
+      contribution here is integration, not discovery.
+
+\item \textbf{Rotation rate as a genuine free parameter.} $\Omega$ is swept over a
+      sixteen-fold range, $0.25\,\Omega_0$ to $4\,\Omega_0$, turning a fixed
+      physical constant into an independent variable. This allows
+      $c_{\mathrm{ang}} \propto \Omega$ for the wave, $L_{\mathrm R} \propto
+      \Omega^{-1/2}$ for the Rhines scale \citep{rhines1975,vallis1993}, and the
+      stabilisation of a fixed jet by increasing $\Omega$ to be tested rather than
+      assumed.
+
+\item \textbf{Verification reported separately from validation.} Convergence
+      against analytic solutions \citep{williamson1992,lauter2005}, discretisation
+      error from a resolution ladder, hyperdiffusion-sensitivity brackets and
+      timestep sensitivity are reported as their own activity, distinct from
+      comparison against observation.
+
+\item \textbf{One narrow observational question with an answer either way.}
+      Whether a westward-propagating barotropic branch is separable at all in a
+      space--time spectral decomposition of reanalysis geopotential height
+      \citep{hersbach2020,kalnay1996}, at which level, and with the spread between
+      two independent reanalyses carried as observational uncertainty. If no such
+      branch is resolvable, that is itself a finding about which level the
+      comparison belongs at.
+\end{enumerate}
+
+\subsection{What is not claimed}
+
+Stating this plainly is better than having a referee state it. No new equation,
+mechanism or wave type is proposed. The numerical framework is Dedalus
+\citep{burns2020} on the spherical basis of \citet{vasil2019}, used as documented.
+This is not the first spherical barotropic-instability eigenvalue calculation
+\citep{skiba2004,skiba2008}; not the first quantification of divergent
+Rossby-mode dispersion \citep{longuethiggins1968,kasahara1976}; not a new
+observational diagnostic, since both the space--time decomposition and the
+correction of an observed ground-relative phase speed for advection by the mean
+flow before comparison with an intrinsic prediction are standard; and not the
+counter-propagating-wave picture, which is \citet{bretherton1966}'s, named by
+\citet{hoskins1985} and presented by \citet{heifetz1999} explicitly as a
+pedagogical framework.
+
+Three limitations are stated here rather than deferred. The stability analysis is
+posed for the \emph{nondivergent} barotropic potential-vorticity equation, while
+the nonlinear runs integrate the divergent shallow-water system whose deformation
+radius is comparable to the jet width; growth rates are therefore nondivergent
+modal growth rates, and \citet{ripa1983} gives the general stability conditions a
+fully divergent treatment would need. A normal-mode spectrum is not a stability
+proof: the linearised operator is non-normal, so an all-real spectrum establishes
+asymptotic stability to infinitesimal normal-mode disturbances and does not
+exclude finite-time transient growth. And the model carries one degree of freedom
+in the vertical, so it cannot represent baroclinic conversion --- which matters
+directly for the observational comparison, since the observed extratropical
+troposphere is dominated by eastward-propagating baroclinic disturbances that this
+system does not describe.
+
+\subsection{Organisation}
+
+Section~\ref{sec:related} places the work in the literature by theory area.
+Section~\ref{sec:theory} derives the framework from
+$\mathrm{D}q/\mathrm{D}t = 0$, in both regimes. Section~\ref{sec:methods} describes
+the solver, the resolution ladder and the verification protocol.
+Section~\ref{sec:results} reports the wave campaign, the instability campaign and
+the observational closure. Section~\ref{sec:discussion} returns to the planetary
+regime question the rotation sweep opens.
