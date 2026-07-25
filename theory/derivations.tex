@@ -1,6 +1,1463 @@
-% derivations.tex -- full mathematical framework for the project (blueprint sec. 4).
-% Governing equations in vector-invariant form, geometry on the sphere, both
-% linearisations (dispersion relation and barotropic instability), and the
-% tabulated analytic targets.
+% derivations.tex -- the theoretical backbone of the project.
 %
-% Stub. Populated in the theory workstream (blueprint phase 1).
+% Standalone document with its own preamble. Session L11 folds it into the
+% Springer Nature manuscript class; until then it compiles on its own.
+%
+% Every equation presented here as established has a corresponding executable
+% check under theory/sympy_checks/, whose recorded verdict lives in
+% theory/sympy_checks/output/. Where a script and this document would disagree,
+% neither is silently adjusted: the discrepancy is carried into
+% theory/DERIVATION_REVIEW.md for operator judgement.
+
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=30mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage[round,authoryear]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+% DOI link that survives the parenthesis and angle-bracket characters used by
+% the AMS and AGU legacy DOI schemes.
+\newcommand{\doilink}[1]{\href{https://doi.org/#1}{\nolinkurl{#1}}}
+% File and script paths: \nolinkurl permits line breaks at "/" and "_", which
+% bare \texttt does not, so long repository paths do not overflow the measure.
+\newcommand{\file}[1]{\texttt{\nolinkurl{#1}}}
+\setlength{\emergencystretch}{3em}
+
+\newcommand{\D}{\mathrm{D}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\uvec}{\boldsymbol{u}}
+\newcommand{\kvec}{\hat{\boldsymbol{k}}}
+\newcommand{\grad}{\boldsymbol{\nabla}}
+\newcommand{\Ro}{\mathrm{Ro}}
+
+\title{Potential vorticity on a rotating sphere:\\
+wave propagation and shear instability as one mechanism}
+\author{Palaash Gang}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+The entire physics of this project is a corollary of one statement: material
+conservation of potential vorticity on a rotating, curved surface,
+$\D q/\D t = 0$ with $q = (\zeta+f)/h$. A fluid column carries $q$ as a label.
+Displace it poleward and the planetary vorticity $f$ it feels grows, so its
+relative vorticity $\zeta$ must fall to compensate; the circulation that
+compensation demands is what carries a Rossby wave westward relative to the
+fluid. Curve a zonal jet sharply enough that its own vorticity gradient locally
+cancels the planetary one, and $q$ can no longer act as a single-signed
+restoring agent across the jet; that loss of monotonicity is what permits
+instability. These are not two topics. They are one mechanism examined in two
+regimes, and the closing section makes the identification explicit: the wave and
+the instability are the same physics, seen as one potential-vorticity interface
+versus two.
+\end{abstract}
+
+\tableofcontents
+
+% =====================================================================
+\section{Physical setting and governing principle}
+\label{sec:setting}
+
+\subsection{The model and what it stands for}
+
+The system studied throughout is the rotating shallow-water system on a sphere
+of radius $R$ turning at rate $\Omega$: a single layer of homogeneous,
+incompressible, inviscid fluid of thickness $h(\lambda,\varphi,t)$ with a free
+upper surface, hydrostatic in the vertical and with horizontal velocity
+independent of height. Here $\lambda$ is longitude and $\varphi$ latitude.
+
+This is not a model of the atmosphere's vertical structure, and it is not
+offered as one. It is a model of the \emph{barotropic response} of a stably
+stratified layer: the depth-independent part of the horizontal flow, whose
+dynamics are governed by horizontal advection of vorticity and by the stretching
+and squashing of vortex columns. The free surface stands in for the vertical
+displacement of an interior isopycnal or isentropic surface, and the layer depth
+$h$ stands in for the mass between two such surfaces. That correspondence is why
+a single-layer calculation can say something about a stratified atmosphere at
+all, and it is also the boundary of what this project claims: nothing here
+describes baroclinic conversion, which requires at least two degrees of freedom
+in the vertical.
+
+\subsection{The governing principle, before any coordinates}
+
+The organising principle is stated once, physically, before any coordinate
+machinery appears, because a reader should understand \emph{why} the quantity is
+conserved before seeing it written in spherical coordinates.
+
+Consider a material column of fluid: a small cylinder of cross-sectional area
+$\delta A$ and height $h$, whose boundary is made of fluid particles and which
+therefore deforms with the flow. Two conservation statements apply to it.
+
+\emph{First}, Kelvin's circulation theorem. For a barotropic, inviscid fluid
+under conservative body forces, the circulation of the \emph{absolute} velocity
+around any material circuit is constant following the motion. Applying Stokes's
+theorem to the circuit bounding $\delta A$, the absolute circulation is the flux
+of absolute vorticity through it, so
+%
+\begin{equation}
+\frac{\D}{\D t}\Big[ (\zeta + f)\,\delta A \Big] = 0 ,
+\label{eq:kelvin}
+\end{equation}
+%
+where $\zeta$ is the vertical component of relative vorticity and
+$f = 2\Omega\sin\varphi$ is the planetary vorticity --- the vertical component of
+twice the rotation vector, that is, the vorticity the fluid already has by
+virtue of sitting on a rotating planet.
+
+\emph{Second}, mass conservation. The column's mass $\rho\, h\, \delta A$ is
+constant and $\rho$ is constant, so
+%
+\begin{equation}
+\frac{\D}{\D t}\Big[ h \,\delta A \Big] = 0 .
+\label{eq:masscolumn}
+\end{equation}
+
+Dividing \eqref{eq:kelvin} by \eqref{eq:masscolumn} eliminates the unknown area
+$\delta A$ and leaves
+%
+\begin{equation}
+\boxed{\;\frac{\D q}{\D t} = 0 , \qquad q \equiv \frac{\zeta + f}{h}\;}
+\label{eq:pv}
+\end{equation}
+%
+the material conservation of \emph{potential vorticity}. The name is apt: $q$
+measures the vorticity a column would have if it were brought to unit depth,
+so it is the vorticity the column has \emph{in potential}, held partly in its
+rotation and partly in its stretching.
+
+Three consequences are worth having in mind from the outset, because every later
+section is one of them worked out.
+
+\begin{enumerate}
+\item \textbf{$q$ is a material label.} A column can be stretched, squashed,
+strained and advected, but it cannot change its $q$. Any change in $f$ it
+experiences must be paid for out of $\zeta$ or out of $h$.
+\item \textbf{Displacement costs vorticity.} Moving poleward raises $f$. If $h$
+is held fixed --- if the surface is stiff --- then $\zeta$ must fall by exactly
+the same amount. This is the restoring mechanism of Section~\ref{sec:rest}.
+\item \textbf{Monotonicity of the background $q$ is what makes it restoring.} If
+the background $q$ increases poleward everywhere, a displaced column always
+acquires a compensating vorticity of the same sign, and the disturbance
+propagates. If the background $q$ has an extremum in the interior, that is no
+longer true, and the disturbance can grow. This is
+Section~\ref{sec:rayleighkuo}.
+\end{enumerate}
+
+\medskip
+\noindent\emph{Physical payoff:} everything that follows is a consequence of one
+conservation law, not a list of separate results.
+
+% =====================================================================
+\section{The rotating sphere as a curved manifold}
+\label{sec:geometry}
+
+The sphere is curved, and that is a physical fact, not a notational
+inconvenience. A column travelling due east holds its heading yet is
+continuously changing direction in the ambient space; the momentum equations
+must account for that turning. The differential geometry introduced here is
+exactly the bookkeeping this forces, and nothing more --- it is developed
+because the physics demands it, not pursued for its own sake. Its payoff is that
+it lets us say ``westward'' and ``the beta effect'' and mean physical statements
+rather than accidents of a coordinate choice.
+
+\subsection{Metric}
+
+Arc length on the sphere is
+%
+\begin{equation}
+\dd s^2 = R^2\,\dd\varphi^2 + R^2\cos^2\!\varphi\;\dd\lambda^2 ,
+\label{eq:metric}
+\end{equation}
+%
+so with $x^1 = \lambda$, $x^2 = \varphi$ the metric tensor is diagonal,
+$g_{\lambda\lambda} = R^2\cos^2\!\varphi$, $g_{\varphi\varphi} = R^2$, and
+$\sqrt{g} = R^2\cos\varphi$. The single factor $\cos\varphi$ is the whole story:
+latitude circles shrink toward the poles, and every metric term below traces
+back to that.
+
+Throughout we use \emph{physical} (orthonormal) velocity components,
+%
+\begin{equation}
+u = R\cos\varphi\,\frac{\D\lambda}{\D t}, \qquad
+v = R\,\frac{\D\varphi}{\D t} ,
+\label{eq:physcomp}
+\end{equation}
+%
+which are the eastward and northward speeds an observer would measure, in
+metres per second, at the point in question.
+
+\subsection{Christoffel symbols}
+
+From \eqref{eq:metric}, the connection coefficients
+$\Gamma^k_{\;ij} = \tfrac12 g^{kl}(\partial_i g_{jl} + \partial_j g_{il} -
+\partial_l g_{ij})$ have exactly two independent non-zero components,
+%
+\begin{equation}
+\Gamma^{\lambda}_{\;\lambda\varphi} = \Gamma^{\lambda}_{\;\varphi\lambda}
+   = -\tan\varphi ,
+\qquad
+\Gamma^{\varphi}_{\;\lambda\lambda} = \sin\varphi\cos\varphi ,
+\label{eq:christoffel}
+\end{equation}
+%
+all others vanishing. These are the standard values for the $2$-sphere, written
+in latitude rather than colatitude; \file{check_christoffel_symbols.py}
+derives them from \eqref{eq:metric} and independently reproduces them by
+transporting the published colatitude forms through $\varphi = \pi/2 - \theta$.
+
+\subsection{What the symbols do}
+
+The covariant material derivative of the velocity generates, in physical
+components, the two familiar \emph{metric terms}
+%
+\begin{equation}
+\Big(\frac{\D u}{\D t}\Big)_{\!\text{covariant}}
+ = \frac{\D u}{\D t} - \frac{u v \tan\varphi}{R},
+\qquad
+\Big(\frac{\D v}{\D t}\Big)_{\!\text{covariant}}
+ = \frac{\D v}{\D t} + \frac{u^2 \tan\varphi}{R} ,
+\label{eq:metricterms}
+\end{equation}
+%
+where on the right $\D/\D t = \partial_t + (u/R\cos\varphi)\partial_\lambda +
+(v/R)\partial_\varphi$. The second term in each is the apparent force a column
+feels because its local east and north directions rotate as it moves --- the
+same effect that makes a great circle look curved on a Mercator chart.
+
+The differential operators needed below follow from $\sqrt{g}$ in the standard
+way, and in physical components read
+%
+\begin{align}
+\grad\!\cdot\uvec &= \frac{1}{R\cos\varphi}
+   \left[\frac{\partial u}{\partial\lambda}
+       + \frac{\partial (v\cos\varphi)}{\partial\varphi}\right],
+\label{eq:div}\\[2pt]
+\zeta \;=\; \kvec\cdot\grad\!\times\uvec &= \frac{1}{R\cos\varphi}
+   \left[\frac{\partial v}{\partial\lambda}
+       - \frac{\partial (u\cos\varphi)}{\partial\varphi}\right],
+\label{eq:curl}\\[2pt]
+\nabla^2 \psi &= \frac{1}{R^2\cos^2\!\varphi}
+      \frac{\partial^2\psi}{\partial\lambda^2}
+   + \frac{1}{R^2\cos\varphi}\frac{\partial}{\partial\varphi}
+     \left(\cos\varphi\,\frac{\partial\psi}{\partial\varphi}\right).
+\label{eq:lap}
+\end{align}
+
+The eigenfunctions of \eqref{eq:lap} are the surface spherical harmonics
+$Y_n^m(\lambda,\varphi) = P_n^m(\sin\varphi)\,e^{i m\lambda}$, with
+%
+\begin{equation}
+\nabla^2 Y_n^m = -\frac{n(n+1)}{R^2}\, Y_n^m .
+\label{eq:lapeig}
+\end{equation}
+%
+The quantity $n(n+1)/R^2$ is the squared total wavenumber of a mode on a sphere
+of radius $R$ --- the spherical replacement for a plane wave's $k^2 + l^2$. Modes
+of the same degree $n$ share a horizontal scale however that scale is divided
+between the zonal and meridional directions, and this is the reason the phase
+speed derived in Section~\ref{sec:rest} depends on $n$ alone.
+
+\medskip
+\noindent\emph{Physical payoff:} the metric is why ``westward'' and ``the beta
+effect'' are not artefacts of a coordinate choice but real consequences of the
+sphere's curvature. The factor $\cos\varphi$ in \eqref{eq:metric} is the same
+factor that appears in $\beta$, and Section~\ref{sec:rest} shows the two cancel
+exactly.
+
+% =====================================================================
+\section{The shallow-water equations and potential vorticity on the sphere}
+\label{sec:swe}
+
+\subsection{Vector-invariant momentum and continuity}
+
+Written in vector-invariant form --- the form in which the rotational and
+kinetic contributions are separated and no metric term appears explicitly,
+because the vorticity carries them --- the inviscid shallow-water momentum
+equation over a flat bottom is
+%
+\begin{equation}
+\frac{\partial\uvec}{\partial t}
+ + (\zeta + f)\,\kvec\times\uvec
+ + \grad\!\left(g h + \tfrac12|\uvec|^2\right) = 0 ,
+\label{eq:mom}
+\end{equation}
+%
+and mass conservation for the free-surface height is
+%
+\begin{equation}
+\frac{\partial h}{\partial t} + \grad\!\cdot(h\uvec) = 0 .
+\label{eq:cont}
+\end{equation}
+
+In the physical components \eqref{eq:physcomp}, with
+$B \equiv g h + \tfrac12(u^2+v^2)$ the Bernoulli function, these are
+%
+\begin{align}
+\frac{\partial u}{\partial t} - (\zeta+f)\,v
+  + \frac{1}{R\cos\varphi}\frac{\partial B}{\partial\lambda} &= 0 ,
+\label{eq:momu}\\
+\frac{\partial v}{\partial t} + (\zeta+f)\,u
+  + \frac{1}{R}\frac{\partial B}{\partial\varphi} &= 0 ,
+\label{eq:momv}\\
+\frac{\partial h}{\partial t} + \frac{1}{R\cos\varphi}
+  \left[\frac{\partial (h u)}{\partial\lambda}
+      + \frac{\partial (h v\cos\varphi)}{\partial\varphi}\right] &= 0 ,
+\label{eq:conth}
+\end{align}
+%
+with $\zeta$ given by \eqref{eq:curl}. The metric terms
+\eqref{eq:metricterms} are not absent; they have been absorbed into $\zeta$ and
+into $\grad B$, which is precisely the economy the vector-invariant form buys.
+
+\subsection{Vorticity}
+
+Taking $\kvec\cdot\grad\times$ of \eqref{eq:mom}, the gradient term drops and the
+identity $\kvec\cdot\grad\times(A\,\kvec\times\uvec) = \grad\!\cdot(A\uvec)$
+turns the Coriolis term into a flux divergence:
+%
+\begin{equation}
+\frac{\partial \zeta}{\partial t}
+ + \grad\!\cdot\big[(\zeta+f)\,\uvec\big] = 0 .
+\label{eq:vort}
+\end{equation}
+%
+This is already a strong statement: absolute vorticity obeys a conservation law
+in flux form, so the only way to change the absolute vorticity of a region is to
+carry it across the boundary. Expanding the divergence and using
+$\D f/\D t = v\,\partial f/\partial y$ gives the advective form
+%
+\begin{equation}
+\frac{\D(\zeta+f)}{\D t} = -(\zeta+f)\,\grad\!\cdot\uvec .
+\label{eq:vortadv}
+\end{equation}
+
+\subsection{The reduction to $\D q/\D t = 0$}
+
+Continuity \eqref{eq:cont} in advective form is
+$\D h/\D t = -h\,\grad\!\cdot\uvec$, so the divergence can be eliminated between
+the two:
+%
+\begin{equation}
+\frac{1}{\zeta+f}\frac{\D(\zeta+f)}{\D t} = \frac{1}{h}\frac{\D h}{\D t}
+\qquad\Longrightarrow\qquad
+\frac{\D}{\D t}\!\left(\frac{\zeta+f}{h}\right) = 0 ,
+\label{eq:pvsphere}
+\end{equation}
+%
+recovering \eqref{eq:pv} on the sphere, rigorously, using the operators
+\eqref{eq:div}--\eqref{eq:curl} of Section~\ref{sec:geometry}.
+
+It is worth recording the reduction in the sharper form that
+\file{check_pv_conservation.py} verifies symbolically. Let $\boldsymbol{M}$
+denote the residual of the momentum equations \eqref{eq:momu}--\eqref{eq:momv}
+and $C$ the residual of \eqref{eq:conth}, for \emph{arbitrary} fields $u,v,h$
+not assumed to satisfy anything. Then the exact algebraic identity
+%
+\begin{equation}
+h\,\frac{\D q}{\D t}
+ \;=\; \kvec\cdot\grad\!\times\boldsymbol{M} \;-\; q\,C
+\label{eq:pvidentity}
+\end{equation}
+%
+holds identically on the sphere. Setting $\boldsymbol{M}=0$ and $C=0$ --- that
+is, imposing the equations of motion --- gives \eqref{eq:pvsphere} with no
+residual term left over. The physical content of \eqref{eq:pvidentity} is that
+potential-vorticity conservation is not an extra assumption bolted onto the
+shallow-water system: it is what the curl of the momentum equation and the
+continuity equation say jointly, and nothing else.
+
+\medskip
+\noindent\emph{Physical payoff:} \eqref{eq:pvsphere} is the equation every later
+section is an application of.
+
+% =====================================================================
+\section{Nondimensionalisation}
+\label{sec:nondim}
+
+Two numbers control everything that follows, and their physical meanings must be
+established before they are used.
+
+Scale lengths by $R$, time by $(2\Omega)^{-1}$, velocity by a characteristic
+speed $U$, and depth by a mean $H$. Two combinations appear:
+%
+\begin{equation}
+\Ro \equiv \frac{U}{2\Omega R} ,
+\qquad
+\varepsilon \equiv \frac{4\Omega^2R^2}{gH} = \left(\frac{R}{L_d}\right)^{\!2} ,
+\qquad
+L_d \equiv \frac{\sqrt{gH}}{2\Omega} .
+\label{eq:numbers}
+\end{equation}
+%
+The first is the Rossby number; the second is Lamb's parameter, the reciprocal
+of the Burger number, and it is the squared ratio of the planetary radius to the
+external deformation radius $L_d$.
+
+Writing $h = H\,(1 + \Ro\,\varepsilon\,\eta)$ --- the scaling that makes the
+pressure gradient balance the Coriolis force at leading order --- the
+nondimensional system is
+%
+\begin{align}
+\frac{\partial\uvec}{\partial t}
+  + \big(\Ro\,\zeta + \sin\varphi\big)\,\kvec\times\uvec
+  + \Ro\,\grad\big(\tfrac12|\uvec|^2\big) + \grad\eta &= 0 ,
+\label{eq:ndmom}\\[2pt]
+\varepsilon\,\frac{\partial\eta}{\partial t}
+  + \grad\!\cdot\Big[\big(1 + \Ro\,\varepsilon\,\eta\big)\uvec\Big] &= 0 ,
+\label{eq:ndcont}
+\end{align}
+%
+with all symbols now nondimensional, and the potential vorticity
+%
+\begin{equation}
+q = \frac{\Ro\,\zeta + \sin\varphi}{1 + \Ro\,\varepsilon\,\eta} .
+\label{eq:ndpv}
+\end{equation}
+
+\paragraph{What $\Ro$ controls.} The Rossby number sets the relative importance
+of the fluid's own vorticity against the planetary background. It multiplies
+$\zeta$ in \eqref{eq:ndpv}: when $\Ro \ll 1$ the potential-vorticity budget is
+dominated by $f$, and the flow's own circulation is a perturbation to the
+planet's. All the wave calculations of Sections~\ref{sec:rest}
+and~\ref{sec:hough} are the $\Ro \to 0$ limit.
+
+\paragraph{What $\varepsilon$ controls.} Lamb's parameter appears in exactly one
+place, and it is the informative place: in \eqref{eq:ndcont} it multiplies the
+surface-height tendency. It therefore measures how ``stiff'' the free surface is
+against stretching --- how much of the potential-vorticity budget stretching can
+absorb, versus how much must be carried by changes in relative vorticity. Read
+the limits directly off \eqref{eq:ndcont}:
+%
+\begin{itemize}
+\item $\varepsilon \to 0$ ($L_d \gg R$): the surface tendency drops out of the
+continuity equation altogether, forcing $\grad\!\cdot\uvec \to 0$. The surface
+behaves rigidly, columns cannot stretch, and \emph{every} change in $f$ a
+displaced column experiences must be paid for out of $\zeta$. This is the
+nondivergent limit, and it is where Section~\ref{sec:rest} lives.
+\item $\varepsilon$ large ($L_d \ll R$): the surface is compliant, columns
+stretch readily, and a growing share of the potential-vorticity budget is
+satisfied by stretching rather than by relative vorticity. The restoring
+mechanism is diluted and the wave slows.
+\end{itemize}
+%
+For Earth-like values ($\Omega = 7.292\times10^{-5}\,\mathrm{s^{-1}}$,
+$R = 6.371\times10^{6}\,\mathrm{m}$, $g = 9.806\,\mathrm{m\,s^{-2}}$,
+$H = 10\,\mathrm{km}$) one finds $\varepsilon \approx 8.80$, i.e.
+$R/L_d \approx 2.97$: the planet is about three deformation radii across, so
+the divergent correction is not a small perturbation and should be measurable.
+
+\medskip
+\noindent\emph{Physical payoff:} $\varepsilon$ is the single number that governs
+the transition explored in Section~\ref{sec:hough}, and its physical meaning ---
+the compliance of the free surface against vortex stretching --- is fixed here
+before it is used.
+
+% =====================================================================
+\section{Linearisation I: waves on a state of rest}
+\label{sec:rest}
+
+\subsection{The nondivergent barotropic vorticity equation}
+
+Take $\varepsilon\to 0$, so $\grad\!\cdot\uvec = 0$ and the flow derives from a
+streamfunction, $\uvec = \kvec\times\grad\psi$, with
+%
+\begin{equation}
+u = -\frac{1}{R}\frac{\partial\psi}{\partial\varphi},
+\qquad
+v = \frac{1}{R\cos\varphi}\frac{\partial\psi}{\partial\lambda},
+\qquad
+\zeta = \nabla^2\psi .
+\label{eq:streamfn}
+\end{equation}
+%
+Equation \eqref{eq:pvsphere} with $h$ constant reduces to material conservation
+of \emph{absolute} vorticity, $\D(\zeta+f)/\D t = 0$. Linearising about a state
+of rest --- discarding $\uvec\!\cdot\!\grad\zeta$, which is quadratic in the
+disturbance --- leaves only the advection of planetary vorticity by the
+disturbance's own meridional velocity:
+%
+\begin{equation}
+\frac{\partial (\nabla^2\psi)}{\partial t}
+ + \frac{2\Omega}{R^2}\frac{\partial\psi}{\partial\lambda} = 0 .
+\label{eq:bve}
+\end{equation}
+
+The step from $v\,\partial f/\partial y$ to $(2\Omega/R^2)\,\partial_\lambda\psi$
+is worth pausing on, because it is where the sphere earns its keep. The
+planetary vorticity gradient is
+%
+\begin{equation}
+\beta \equiv \frac{\partial f}{\partial y}
+ = \frac{1}{R}\frac{\partial}{\partial\varphi}\big(2\Omega\sin\varphi\big)
+ = \frac{2\Omega\cos\varphi}{R} ,
+\label{eq:beta}
+\end{equation}
+%
+and $v$ carries a factor $1/\cos\varphi$ from the metric \eqref{eq:streamfn}.
+The two factors of $\cos\varphi$ cancel \emph{exactly}. This cancellation is the
+reason the spherical phase speed below depends on the mode's degree alone and
+carries no residual latitude dependence --- on a $\beta$-plane, where $\beta$ is
+frozen at one latitude, that exactness is lost.
+
+\subsection{Dispersion relation}
+
+Substituting a spherical-harmonic normal mode
+$\psi = \hat\psi\,P_n^m(\sin\varphi)\,e^{i(m\lambda - \omega t)}$ into
+\eqref{eq:bve} and using \eqref{eq:lapeig} gives, after cancelling the common
+factor,
+%
+\begin{equation}
+\omega\, \frac{n(n+1)}{R^2} + \frac{2\Omega m}{R^2} = 0
+\qquad\Longrightarrow\qquad
+\boxed{\;c_{\mathrm{ang}} \equiv \frac{\omega}{m}
+      = -\,\frac{2\Omega}{n(n+1)}\;}
+\label{eq:rh}
+\end{equation}
+%
+the Rossby--Haurwitz angular phase speed \citep{rossby1939,haurwitz1940b}. The
+corresponding zonal phase speed at latitude $\varphi$ is
+%
+\begin{equation}
+c = c_{\mathrm{ang}}\,R\cos\varphi = -\,\frac{2\Omega R\cos\varphi}{n(n+1)} .
+\label{eq:rhzonal}
+\end{equation}
+
+\subsection{Why westward, and why that is not a convention}
+
+The sign in \eqref{eq:rh} is negative for every $n \ge 1$ and every $m$, and it
+is derived, not chosen. The argument is short enough to give in full, and it is
+the mechanism the whole project rests on.
+
+Let a chain of fluid columns along a latitude circle be displaced meridionally by
+$\eta(x) = \eta_0\sin kx$, with $x$ eastward and $\eta$ positive northward.
+Conservation of $q$ with the depth held fixed --- the $\varepsilon\to0$
+condition --- means the column's absolute vorticity is unchanged, so the
+relative vorticity it acquires exactly offsets the planetary vorticity it has
+gained:
+%
+\begin{equation}
+\zeta' = -\beta\,\eta = -\beta\eta_0\sin kx .
+\label{eq:zetaeta}
+\end{equation}
+%
+Columns displaced northward turn anticyclonically; columns displaced southward
+turn cyclonically. Inverting $\zeta' = \partial_x^2\psi'$ for this sinusoid gives
+$\psi' = (\beta\eta_0/k^2)\sin kx$, and hence a meridional velocity
+%
+\begin{equation}
+v' = \frac{\partial\psi'}{\partial x} = \frac{\beta\eta_0}{k}\cos kx ,
+\label{eq:vinduced}
+\end{equation}
+%
+which is a quarter wavelength out of phase with the displacement. That
+quadrature is the crux: a velocity \emph{in} phase with the displacement would
+make the pattern grow or decay in place, whereas a velocity in quadrature makes
+it translate. Imposing the kinematic condition $\partial\eta/\partial t = v'$ on
+$\eta = \eta_0\sin k(x - ct)$ gives
+%
+\begin{equation}
+c = -\frac{\beta}{k^2} \;<\; 0 .
+\label{eq:betaplane}
+\end{equation}
+%
+Both $\beta$ and $k^2$ are positive, so $c$ is negative unconditionally. Reading
+the mechanism off the algebra: the induced circulation pushes fluid northward
+just \emph{west} of each northward crest and southward just west of each
+southward trough, so the whole pattern is rebuilt one step to the west at each
+instant. Nothing propagates east.
+
+Equation \eqref{eq:betaplane} and the spherical result \eqref{eq:rhzonal} are the
+same statement: substituting $\beta = 2\Omega\cos\varphi/R$ from \eqref{eq:beta}
+and the spherical total wavenumber $K^2 = n(n+1)/R^2$ from \eqref{eq:lapeig}
+into $c = -\beta/K^2$ returns \eqref{eq:rhzonal} identically.
+
+\medskip
+\noindent\emph{Physical payoff:} \eqref{eq:rh} is hypotheses H1 and H2 of the
+project blueprint, and it is the nondivergent reference point against which
+Section~\ref{sec:hough} measures a real physical departure.
+
+% =====================================================================
+\section{Linearisation II: the divergent correction --- Laplace's tidal
+equations and Hough modes}
+\label{sec:hough}
+
+\subsection{Keeping the free surface}
+
+Section~\ref{sec:rest} threw the free surface away. Restoring it changes the
+physics, not merely the arithmetic. A column may now change its depth, so
+material conservation of $q = (\zeta+f)/h$ no longer forces the entire change in
+$f$ onto $\zeta$: part of it is absorbed by vortex stretching. The restoring
+agent is diluted, and the wave must slow. Lamb's parameter $\varepsilon$ from
+\eqref{eq:numbers} measures precisely how much of the budget the surface can
+take.
+
+Linearising \eqref{eq:momu}--\eqref{eq:conth} about rest with mean depth $H$,
+writing $\eta$ for the surface displacement, and nondimensionalising as in
+Section~\ref{sec:nondim} with $\tau = 2\Omega t$ and $\mu = \sin\varphi$, the
+system becomes Laplace's tidal equations,
+%
+\begin{align}
+\frac{\partial U}{\partial \tau} - \mu V
+  &= -\frac{1}{\sqrt{1-\mu^2}}\frac{\partial N}{\partial\lambda} ,
+\label{eq:lte1}\\
+\frac{\partial V}{\partial \tau} + \mu U
+  &= -\sqrt{1-\mu^2}\;\frac{\partial N}{\partial\mu} ,
+\label{eq:lte2}\\
+\varepsilon\,\frac{\partial N}{\partial \tau}
+  &+ \frac{1}{\sqrt{1-\mu^2}}\frac{\partial U}{\partial\lambda}
+   + \frac{\partial}{\partial\mu}\Big[\sqrt{1-\mu^2}\,V\Big] = 0 ,
+\label{eq:lte3}
+\end{align}
+%
+where $U, V, N$ are the nondimensional eastward velocity, northward velocity and
+surface height. The classical formulation and its eigenstructure are due to
+\citet{longuethiggins1968}, with the vector-harmonic treatment of
+\citet{swarztrauber1985}; the derivation here does not depend on either, since
+the validation target is the internal $\varepsilon\to0$ limit rather than an
+external published table (see Section~\ref{sec:hough:limit}).
+
+Note where $\varepsilon$ sits: it multiplies $\partial N/\partial\tau$ in
+\eqref{eq:lte3} and appears nowhere else. That single placement is the whole
+physical content of the parameter.
+
+\subsection{The eigenvalue problem, in a form that can be solved}
+
+Eliminating $U$ and $V$ from \eqref{eq:lte1}--\eqref{eq:lte3} for a normal mode
+$\propto e^{i(m\lambda - \sigma\tau)}$ yields the classical second-order
+Laplace tidal equation for $N(\mu)$, which is a \emph{nonlinear} eigenvalue
+problem in $\sigma$ and carries a coordinate singularity wherever
+$\mu^2 = \sigma^2$. Both features make it awkward numerically and neither is
+physical. We therefore keep the system in the vorticity--divergence--height
+variables, in which it is linear in $\sigma$ and regular everywhere.
+
+Writing $\zeta$, $\delta = \grad\!\cdot\uvec$ and $\eta$ and using the exact
+operator identities
+%
+\begin{align}
+\frac{\partial\zeta}{\partial t} &= -\grad\!\cdot(f\uvec) , &
+\frac{\partial\delta}{\partial t} &=
+  \kvec\cdot\grad\!\times(f\uvec) - g\nabla^2\eta , &
+\frac{\partial\eta}{\partial t} &= -H\delta ,
+\label{eq:zdh}
+\end{align}
+%
+and expanding each field in surface spherical harmonics of fixed order $m$,
+$\Lambda_n \equiv n(n+1)$, gives the linear eigenvalue problem
+%
+\begin{equation}
+\frac{\dd}{\dd\tau}\!
+\begin{pmatrix}\zeta_n\\ \delta_n\\ \tilde\eta_n\end{pmatrix}
+=
+\begin{pmatrix}
+ i m/\Lambda_n & -B & 0\\
+ B & i m/\Lambda_n & \Lambda_n/\sqrt{\varepsilon}\\
+ 0 & -1/\sqrt{\varepsilon} & 0
+\end{pmatrix}
+\begin{pmatrix}\zeta_n\\ \delta_n\\ \tilde\eta_n\end{pmatrix},
+\qquad
+B = M - D\,\Lambda^{-1} ,
+\label{eq:houghevp}
+\end{equation}
+%
+with $\tilde\eta = \eta/(H\sqrt\varepsilon)$ a rescaling that keeps the matrix
+well conditioned, and with the two Legendre coupling matrices
+%
+\begin{equation}
+M_{nn'} = \big\langle P_n, \mu P_{n'}\big\rangle ,
+\qquad
+D_{nn'} = \Big\langle P_n, (1-\mu^2)\,\tfrac{\dd P_{n'}}{\dd\mu}\Big\rangle ,
+\label{eq:legmat}
+\end{equation}
+%
+both tridiagonal, since $\mu$ and $(1-\mu^2)\dd/\dd\mu$ couple degree $n$ only to
+$n\pm1$. This is the specification Session~L5's \file{evp_hough.py}
+implements.
+
+\subsection{The $\varepsilon\to0$ limit, in closed form}
+\label{sec:hough:limit}
+
+Setting $\delta = \tilde\eta = 0$ in \eqref{eq:houghevp} --- which is exactly
+what $\varepsilon\to0$ enforces, since \eqref{eq:ndcont} then forbids the surface
+from storing any divergence --- leaves the diagonal system
+$\dd\zeta_n/\dd\tau = (im/\Lambda_n)\zeta_n$, whose eigenvalues are
+%
+\begin{equation}
+\sigma \;\longrightarrow\; -\,\frac{m}{n(n+1)}
+\qquad\text{i.e.}\qquad
+c_{\mathrm{ang}} = 2\Omega\,\frac{\sigma}{m}
+ \;\longrightarrow\; -\,\frac{2\Omega}{n(n+1)} ,
+\label{eq:limit}
+\end{equation}
+%
+recovering \eqref{eq:rh} exactly. This is the project's validation target for
+extension~B, and it is stronger than an external table would be: a table
+supplies a handful of numbers, whereas \eqref{eq:limit} is a closed form the
+project derives independently, against which the full dispersion curve and
+eigenmode structure can be checked at the project's own resolution and
+parameters.
+
+The approach to that limit is first order in $\varepsilon$.
+\file{check_hough_epsilon_limit.py} solves \eqref{eq:houghevp} across
+$\varepsilon \in [10^{-6}, 10^{-2}]$ and fits the log--log convergence rate,
+obtaining $1.0000$ to four figures for every degree and order tested. First
+order is what the physics predicts: the fraction of the potential-vorticity
+budget the surface can absorb is proportional to its compliance, and the
+compliance is $\varepsilon$ itself.
+
+\subsection{What the free surface actually does, at Earth's $\varepsilon$}
+
+At $\varepsilon \approx 8.80$ the correction is large, and it is a statement
+about the mechanism rather than a residual error. Solving \eqref{eq:houghevp}
+and following each Rossby branch by continuation from small $\varepsilon$ gives,
+for example, at $m=1$: the $n=2$ mode slowed by $40\%$, $n=3$ by $28\%$, $n=5$
+by $13\%$, $n=8$ by $6\%$. Every mode is slowed, and the fractional slowing
+falls as $n$ rises.
+
+The trend is the physics stated plainly. A large-scale mode has a horizontal
+scale comparable to $L_d$, so the surface deflection needed to balance its flow
+is a substantial fraction of the layer depth and a substantial share of the
+potential-vorticity budget goes into stretching. A small-scale mode has a scale
+far below $L_d$, the surface barely deflects, and the flow is effectively
+nondivergent: it behaves as Section~\ref{sec:rest} says it should.
+
+\medskip
+\noindent\emph{Physical payoff:} this is hypothesis H5, expressed as what it
+actually is --- a statement about how a free surface changes the restoring
+mechanism --- rather than as a quantified departure from a reference curve. It
+is also the single strongest upgrade available to this project: an exact,
+internally validated target for how the free surface changes wave dispersion.
+
+% =====================================================================
+\section{The Rhines scale}
+\label{sec:rhines}
+
+\subsection{Where the linear theory stops}
+
+Sections~\ref{sec:rest} and~\ref{sec:hough} discarded $\uvec\!\cdot\!\grad\zeta$
+as quadratic. That term does not stay small. Its role is to move energy between
+scales, and on a $\beta$-plane it competes directly with the linear restoring
+term. The scale at which the two balance is where the character of the flow
+changes.
+
+Estimate both terms for a flow of characteristic speed $U$ and length $L$. The
+relative vorticity is $\zeta \sim U/L$, so the nonlinear advection of vorticity
+scales as
+%
+\begin{equation}
+|\uvec\!\cdot\!\grad\zeta| \sim \frac{U^2}{L^2} ,
+\qquad\text{while}\qquad
+|\beta v| \sim \beta U .
+\label{eq:rhinesscaling}
+\end{equation}
+%
+Equating them gives the \emph{Rhines scale}
+%
+\begin{equation}
+\boxed{\;L_R \sim \sqrt{\frac{U}{\beta}}\;}
+\label{eq:rhines}
+\end{equation}
+%
+which \citet{rhines1975} obtained as an arrest wavenumber
+$k_\beta = (\beta/2U)^{1/2}$, i.e. $L_R = (2U/\beta)^{1/2}$ with the factor of
+two made explicit. \citet{vallis1993} reach the same transition scale
+$O(\sqrt{U/\beta})$ from the weakly nonlinear interaction of Rossby waves and
+show that it is the anisotropy of that interaction, not the isotropic arrest
+alone, that produces jets.
+
+\subsection{What it means physically}
+
+The identical balance can be read as a competition of rates. Two-dimensional
+turbulence cascades energy \emph{upscale}, so eddies grow. As they grow, the
+Rossby-wave frequency $\omega = \beta k_x/K^2$ available at their scale rises
+relative to their eddy turnover rate $UK$. Once wave propagation is faster than
+eddy turnover, a disturbance disperses as a wave before the nonlinearity can
+reorganise it, and the upscale cascade is arrested. That happens at
+$K \sim \sqrt{\beta/U}$, which is \eqref{eq:rhines} again.
+
+Crucially, the arrest is \emph{anisotropic}. The restoring term $\beta v$ acts
+only on meridional motion; a purely zonal flow has $v = 0$ and feels no
+restoring force at all. So the cascade is halted in the meridional direction
+while remaining free in the zonal one, and the energy piles up in zonally
+elongated structures. This is why $L_R$ separates isotropic turbulence from
+planetary banding: it is the scale at which the beta effect starts vetoing
+meridional rearrangement but not zonal.
+
+\subsection{Consequence for the rotation-rate campaign}
+
+Because $\beta = 2\Omega\cos\varphi/R$ is proportional to $\Omega$,
+\eqref{eq:rhines} gives
+%
+\begin{equation}
+L_R \;\propto\; \Omega^{-1/2} .
+\label{eq:rhinesomega}
+\end{equation}
+%
+The blueprint's phase-speed campaign sweeps $\Omega$ over a sixteen-fold range
+($0.25\,\Omega_0$ to $4\,\Omega_0$, runs P-14 through P-18), which sweeps $L_R$
+by a factor of $\sqrt{16} = 4$. That reframes the sweep. It is not a
+numerical-convergence exercise with $\Omega$ as a knob; it is a survey of
+planetary regime. A four-fold change in the scale at which an atmosphere
+organises itself is the difference between a few broad jets and many narrow
+ones, which is the difference between a terrestrial banding pattern and a Jovian
+one.
+
+\medskip
+\noindent\emph{Physical payoff:} this gives the discussion section somewhere real
+to go --- Jovian banding, slowly rotating worlds --- rather than trailing into
+generic future work.
+
+% =====================================================================
+\section{Instability of a zonal jet: the Rayleigh--Kuo criterion}
+\label{sec:rayleighkuo}
+
+\subsection{Linearisation about a zonal base state}
+
+Now linearise about a zonal flow $\bar u(\varphi)$ rather than about rest. Its
+relative vorticity and the background absolute vorticity are
+%
+\begin{equation}
+\bar\zeta = -\frac{1}{R\cos\varphi}
+   \frac{\dd(\bar u\cos\varphi)}{\dd\varphi} ,
+\qquad
+Q(\varphi) = \bar\zeta + f = \bar\zeta + 2\Omega\sin\varphi ,
+\label{eq:basestate}
+\end{equation}
+%
+so the background potential-vorticity gradient on the sphere is
+%
+\begin{equation}
+\frac{\dd Q}{\dd y} = \frac{1}{R}\frac{\dd Q}{\dd\varphi}
+= \underbrace{\frac{2\Omega\cos\varphi}{R}}_{\textstyle \beta}
+ \;-\; \frac{1}{R}\frac{\dd}{\dd\varphi}\!
+   \left[\frac{1}{R\cos\varphi}
+   \frac{\dd(\bar u\cos\varphi)}{\dd\varphi}\right] .
+\label{eq:dQdy}
+\end{equation}
+%
+On a flat plane the second term collapses to $\dd^2\bar u/\dd y^2$ and
+\eqref{eq:dQdy} becomes the familiar $\beta - \bar u_{yy}$. On the sphere it does
+not: the $\cos\varphi$ factors from the metric \eqref{eq:metric} survive and the
+curvature term is not a bare second derivative. This is the first of the two
+places the sphere enters, and it is quantitative rather than structural --- it
+changes \emph{where} the criterion is met, not \emph{whether} the argument works.
+
+The linearised potential-vorticity equation for a disturbance streamfunction
+$\psi'$ is then
+%
+\begin{equation}
+\frac{\partial\zeta'}{\partial t}
+ + \bar u_a\,\frac{\partial\zeta'}{\partial\lambda}
+ + \frac{1}{R^2\cos\varphi}\frac{\dd Q}{\dd\varphi}\,
+   \frac{\partial\psi'}{\partial\lambda} = 0 ,
+\qquad
+\bar u_a \equiv \frac{\bar u}{R\cos\varphi} ,
+\label{eq:linpv}
+\end{equation}
+%
+where $\bar u_a$ is the base flow's \emph{angular} velocity. On a sphere the
+natural phase speed is angular, because a wave of fixed zonal wavenumber sweeps
+out equal angles, not equal distances, at different latitudes.
+
+\subsection{The necessary condition}
+
+Substitute the normal mode
+$\psi' = \Psi(\varphi)\,e^{i m(\lambda - c_a t)}$, with $c_a = c_r + i c_i$ the
+complex angular phase speed. Dividing out the common factor $i m$ gives the
+governing ordinary differential equation
+%
+\begin{equation}
+\big(\bar u_a - c_a\big)\,\mathcal{L}_m\Psi
+ + \frac{1}{R^2\cos\varphi}\frac{\dd Q}{\dd\varphi}\,\Psi = 0 ,
+\label{eq:evp}
+\end{equation}
+%
+where $\mathcal{L}_m$ is the spherical Laplacian \eqref{eq:lap} at zonal order
+$m$,
+%
+\begin{equation}
+\mathcal{L}_m\Psi = \frac{1}{R^2\cos\varphi}
+   \frac{\dd}{\dd\varphi}\!\left(\cos\varphi\,\frac{\dd\Psi}{\dd\varphi}\right)
+ - \frac{m^2}{R^2\cos^2\!\varphi}\,\Psi .
+\label{eq:Lm}
+\end{equation}
+
+Multiply \eqref{eq:evp} by $\Psi^{*}$, divide by $(\bar u_a - c_a)$, and
+integrate over latitude with the sphere's own measure $\cos\varphi\,\dd\varphi$.
+The left-hand term is handled by the pointwise identity
+%
+\begin{equation}
+\Psi^{*}\mathcal{L}_m\Psi\,\cos\varphi
+= \frac{1}{R^2}\left\{
+  \frac{\dd}{\dd\varphi}\Big[\cos\varphi\,\Psi^{*}\Psi_\varphi\Big]
+  - \cos\varphi\,|\Psi_\varphi|^2
+  - \frac{m^2|\Psi|^2}{\cos\varphi}\right\} .
+\label{eq:byparts}
+\end{equation}
+%
+This is the second place the sphere enters, and here it changes nothing
+structural. Regularity of $\Psi$ at both poles makes the exact-derivative term
+integrate to zero --- exactly the role that no-normal-flow walls play in the
+flat-channel argument --- and the two remaining terms are manifestly real and
+non-negative. Hence
+%
+\begin{equation}
+\mathcal{A} \equiv \int \Psi^{*}\mathcal{L}_m\Psi\,\cos\varphi\,\dd\varphi
+\qquad\text{is real and negative.}
+\label{eq:Areal}
+\end{equation}
+
+But \eqref{eq:evp} also gives
+$\mathcal{L}_m\Psi = -\,\big(\dd Q/\dd\varphi\big)\Psi
+/\big[R^2\cos\varphi\,(\bar u_a - c_a)\big]$, so, the $\cos\varphi$ cancelling,
+%
+\begin{equation}
+\mathcal{A} = -\frac{1}{R^2}\int
+  \frac{\dd Q}{\dd\varphi}\,
+  \frac{|\Psi|^2}{\bar u_a - c_a}\,\dd\varphi .
+\label{eq:Asecond}
+\end{equation}
+%
+Since $\mathcal{A}$ is real, the imaginary part of the right-hand side must
+vanish. Using
+$\operatorname{Im}\big[(\bar u_a - c_a)^{-1}\big]
+ = c_i/|\bar u_a - c_a|^2$,
+%
+\begin{equation}
+c_i \int \frac{\dd Q}{\dd\varphi}\,
+   \frac{|\Psi|^2}{|\bar u_a - c_a|^2}\,\dd\varphi = 0 .
+\label{eq:rk}
+\end{equation}
+%
+The weight $|\Psi|^2/|\bar u_a - c_a|^2$ is non-negative and not identically
+zero. Therefore, for a growing mode ($c_i \neq 0$), the integral can vanish only
+if $\dd Q/\dd\varphi$ --- equivalently $\dd Q/\dd y$ --- \textbf{changes sign
+somewhere in the domain}. This is the Rayleigh--Kuo criterion \citep{kuo1949},
+in the form adapted to the sphere.
+
+The assumptions used are exactly these, and no others: the base flow is real and
+zonal; $\Psi$ is regular at both poles; $\Psi$ is not identically zero; the
+integrals converge.
+
+\subsection{Necessary, not sufficient}
+
+\textbf{This is a necessary condition, not a sufficient one.} A base state
+satisfying it may still be perfectly stable. The argument above establishes only
+that a growing mode \emph{requires} a sign change; it says nothing about whether
+any growing mode exists, what its growth rate would be, or at which zonal
+wavenumber it would appear. Read as a prohibition it is powerful --- no sign
+change, no instability, full stop, which is hypothesis H7 of the blueprint and
+the strongest test in the set because it forbids rather than fits. Read as a
+prediction of instability it says nothing at all.
+
+Section~\ref{sec:evp} is what converts it into an actual computational test.
+
+\medskip
+\noindent\emph{Physical payoff:} this is the diagnostic already used
+predictively in the project's Phase-0 gate, which identified $32$--$58^\circ$N as
+the band where the Galewsky jet meets the criterion, before any simulation was
+run --- closing the loop between an analytic criterion and an observed outcome.
+
+% =====================================================================
+\section{The linear stability eigenvalue problem}
+\label{sec:evp}
+
+\subsection{Statement of the problem}
+
+Equation \eqref{eq:evp} is already an eigenvalue problem; it needs only to be
+posed as one. Rearranged,
+%
+\begin{equation}
+\underbrace{\left[\bar u_a\,\mathcal{L}_m
+  + \frac{1}{R^2\cos\varphi}\frac{\dd Q}{\dd\varphi}\right]}_{\textstyle \mathcal{A}_m}
+  \Psi
+\;=\; c_a \underbrace{\mathcal{L}_m}_{\textstyle \mathcal{B}_m}\Psi ,
+\label{eq:genevp}
+\end{equation}
+%
+a generalised eigenvalue problem for the complex angular phase speed $c_a$ at
+each zonal wavenumber $m$. The growth rate of the mode is
+%
+\begin{equation}
+\sigma(m) = m\,\operatorname{Im}(c_a) ,
+\label{eq:growth}
+\end{equation}
+%
+in inverse seconds, and its eigenfunction $\Psi(\varphi)$ is the meridional
+structure the instability will take.
+
+\subsection{Regularity, discretisation, and the critical layer}
+
+\paragraph{Boundary conditions.} There are no boundaries. The sphere is closed,
+and what replaces boundary conditions is \emph{regularity at the poles}: $\Psi$
+must be single-valued and finite as $\varphi \to \pm\pi/2$, which for $m \neq 0$
+requires $\Psi \to 0$ there. The clean way to impose this is not to impose it at
+all but to expand $\Psi$ in surface spherical harmonics of order $m$,
+%
+\begin{equation}
+\Psi(\varphi) = \sum_{n=m}^{N} a_n\,P_n^m(\sin\varphi) ,
+\label{eq:expansion}
+\end{equation}
+%
+since every basis function is regular at the poles by construction. In this
+basis $\mathcal{B}_m$ is diagonal, $(\mathcal{B}_m)_{nn} = -\Lambda_n/R^2$, and
+$\mathcal{A}_m$ requires only the two multiplication matrices
+$\langle P_{n'}, \bar u_a P_n\rangle$ and
+$\langle P_{n'}, W P_n\rangle$ with
+$W \equiv (\dd Q/\dd\varphi)/(R^2\cos\varphi)$, both computed by Gauss--Legendre
+quadrature in $\mu = \sin\varphi$. Note that $W$ is regular at the poles despite
+appearances, because $\dd Q/\dd\varphi \to 2\Omega\cos\varphi$ there for any jet
+of compact support.
+
+\paragraph{The critical layer.} Where $\bar u_a(\varphi_c) = c_r$, the
+coefficient of the highest derivative in \eqref{eq:evp} vanishes. Physically
+this is the latitude at which the base flow's angular velocity matches the
+mode's --- where a fluid column and the wave pattern travel together, so the
+column feels a steady rather than an oscillating forcing and can be displaced
+without limit. For a genuinely growing mode $c_i \neq 0$ and
+$\bar u_a - c_a$ never vanishes on the real axis, so the operator is regular and
+the discretisation is unproblematic. For a \emph{neutral} mode the singularity is
+real, one of the two solutions acquires a logarithmic branch point, and the
+resolution requires either the viscous indentation of \citet{kuo1949} or an
+explicit contour deformation. \citet{bretherton1966} showed that this is not a
+technicality peripheral to instability but central to it: a critical layer must
+be present for a growing normal mode of a general zonal flow, and it carries a
+down-gradient flux of potential vorticity that cannot vanish as the growth rate
+does.
+
+\paragraph{Spurious modes.} A finite discretisation of a problem with a
+continuous spectrum always produces eigenvalues that are artefacts of the grid,
+and for a barotropic jet these masquerade as weakly growing modes. The filter is
+resolution doubling: solve at truncation $N$ and at $2N$ and retain only those
+eigenvalues that do not move. \file{check_rayleigh_kuo.py} applies exactly
+this test at $N = 240$ and $N = 480$ and finds a clean separation --- growth
+rates for $m \le 8$ agree to better than $2\times10^{-4}$ relative, while for
+$m \ge 9$ they move by $10^{-3}$ or more and are discarded.
+
+\subsection{What it delivers, on the Galewsky jet}
+
+Solving \eqref{eq:genevp} for the Galewsky jet gives a resolved unstable band
+$1 \le m \le 8$ peaking at
+%
+\begin{equation}
+m^{*} = 6 , \qquad
+\sigma(m^{*}) = 2.07\times10^{-5}\ \mathrm{s^{-1}},
+\qquad
+\text{$e$-folding time } 0.56\ \text{days} .
+\label{eq:galewskygrowth}
+\end{equation}
+%
+By contrast, solid-body rotation --- whose $\dd Q/\dd y = 2(\Omega + U_0/R)
+\cos\varphi$ has no sign change --- yields a spectrum that is real to machine
+precision at every $m$ tested. The two results together are the content of the
+previous section's caveat: the criterion forbids, but only the solved eigenvalue
+problem predicts.
+
+\medskip
+\noindent\emph{Physical payoff:} this converts Section~\ref{sec:rayleighkuo}'s
+necessary condition into a genuine sufficient computational test --- actual
+growth rates and eigenmode structure --- closing the ``necessary but not
+sufficient'' gap the blueprint itself flags.
+
+% =====================================================================
+\section{Instability as counter-propagating Rossby waves}
+\label{sec:crw}
+
+This section is the physical heart of the argument. Everything before it has
+been either a wave calculation or an instability calculation. Here the two
+become the same calculation.
+
+\subsection{An edge wave is Section~\ref{sec:rest} on one line}
+
+Suppose the background potential-vorticity gradient is not spread smoothly over
+latitude but concentrated at a single line $y = y_1$, so that
+$\dd Q/\dd y = \Delta_1\,\delta(y - y_1)$. This is not an evasion: as
+\citet{bretherton1966} pointed out, a discontinuity in the background field is
+mathematically equivalent to a delta function in potential vorticity, so the
+idealisation is exact for piecewise-constant $Q$.
+
+A meridional displacement $\eta_1$ of that line carries a potential-vorticity
+anomaly $q' = -\Delta_1\eta_1$, exactly as in \eqref{eq:zetaeta}. Inverting for
+the streamfunction --- ``PV inversion'' in the sense of
+\citet{hoskins1985} --- gives a flow that decays away from the line,
+%
+\begin{equation}
+\psi'(y) = -\frac{q'}{2k}\,e^{-k|y-y_1|}\,e^{ikx} ,
+\label{eq:edgeinversion}
+\end{equation}
+%
+and the induced meridional velocity at the line itself is again in quadrature
+with the displacement. The result is a wave confined to the interface, with
+phase speed
+%
+\begin{equation}
+c_1 = \bar u(y_1) - \frac{\Delta_1}{2k} .
+\label{eq:edgespeed}
+\end{equation}
+%
+The second term is the intrinsic propagation: to the \emph{left} of the local
+potential-vorticity gradient, westward when $Q$ increases poleward, and
+inversely proportional to $k$ --- the interface analogue of the $-\beta/k^2$ of
+\eqref{eq:betaplane}. An edge wave is the Section~\ref{sec:rest} mechanism
+restricted to one line.
+
+\subsection{Two interfaces, and why they can lock}
+
+Now put two such interfaces at $y = \pm b$ with jumps $\Delta_1$, $\Delta_2$ and
+local base flows $\bar u_1$, $\bar u_2$. Each wave's inverted flow field
+\eqref{eq:edgeinversion} reaches the other, attenuated by $e^{-2kb}$. With
+$\gamma_j \equiv \Delta_j/2k$ and $c_j \equiv \bar u_j - \gamma_j$ the isolated
+edge-wave speeds, the coupled system reduces to
+%
+\begin{equation}
+\boxed{\;\big(c_1 - c\big)\big(c_2 - c\big)
+ = \gamma_1\gamma_2\,e^{-4kb}\;}
+\label{eq:crw}
+\end{equation}
+%
+with solutions
+%
+\begin{equation}
+c = \tfrac12(c_1 + c_2) \pm
+  \sqrt{\tfrac14(c_1-c_2)^2 + \gamma_1\gamma_2\,e^{-4kb}} .
+\label{eq:crwroots}
+\end{equation}
+
+Read \eqref{eq:crwroots} physically. Growth requires the discriminant to be
+negative. The first term is a square and cannot help, so instability requires
+%
+\begin{equation}
+\gamma_1\gamma_2 < 0
+\qquad\Longleftrightarrow\qquad
+\Delta_1 \ \text{and}\ \Delta_2 \ \text{of opposite sign} .
+\label{eq:oppositesign}
+\end{equation}
+%
+That is the Rayleigh--Kuo sign change of Section~\ref{sec:rayleighkuo}, arrived
+at from an entirely different direction: not as an integral identity but as a
+condition for two waves to be able to hold station against each other. And once
+the sign condition is met, the second requirement is that the coupling
+$|\gamma_1\gamma_2|e^{-4kb}$ be large enough to overcome the differential
+propagation $\tfrac12|c_1 - c_2|$. This is \emph{phase-locking}: the two edge
+waves counter-propagate --- one westward relative to its local flow, one eastward
+--- and the shear between them tries to tear them apart. If their intrinsic
+counter-propagation exactly offsets the differential advection, they sit at a
+fixed relative phase, and at that phase each wave's meridional velocity advects
+potential vorticity into the other's crests and troughs, amplifying it. Each
+feeds the other and the pair grows exponentially.
+
+\citet{heifetz1999} give the quantitative form of this picture for Rayleigh's
+constant-shear strip, tracking the amplitudes and phases of the two waves
+explicitly and showing that the growing normal mode is the phase-locked
+configuration. Their treatment makes the phase dependence unmistakable: growth
+occurs when the northern wave lies less than half a wavelength west of the
+southern one, and the pair attenuates when the displacement is the other way.
+
+The window in which both conditions hold is bounded on both sides, and both
+bounds are physical:
+%
+\begin{itemize}
+\item \textbf{Short-wave cutoff.} The coupling carries $e^{-2kb}$. A wave much
+shorter than the interface separation induces a flow that has decayed to nothing
+before it reaches the other interface, so the two waves cannot feel each other
+at all.
+\item \textbf{Long-wave cutoff.} The intrinsic speeds $\gamma_j \propto 1/k$
+diverge as $k\to0$. Very long waves counter-propagate too fast to be held at a
+fixed relative phase by the coupling.
+\end{itemize}
+
+For Rayleigh's strip, \eqref{eq:crw} reduces exactly to the published
+nondimensional dispersion relation
+$C = \pm(2K)^{-1}\sqrt{(K-1)^2 - e^{-2K}}$ with $K = 2kb$, and returns the
+published numbers: a cutoff at $K_c = 1.2785$ where $K_c - 1 = e^{-K_c}$, an
+optimum at $K_m = 0.7968$, and a peak growth rate equal to $0.2012$ times the
+shear. This is the external validation of the model --- it is an exact reduction
+for piecewise-constant potential vorticity, not a cartoon fitted after the fact.
+
+\subsection{What the toy model does and does not predict}
+
+The toy model fixes the mechanism, the sign requirement \eqref{eq:oppositesign},
+the existence of both cutoffs, and the \emph{scaling} of the preferred
+wavenumber,
+%
+\begin{equation}
+m^{*} \;=\; \frac{K_m\,R\cos\varphi_j}{2\,b_{\mathrm{eff}}} ,
+\qquad K_m \approx 0.80 .
+\label{eq:mstar}
+\end{equation}
+
+It does not fix $b_{\mathrm{eff}}$ for a jet whose potential-vorticity gradient
+reverses smoothly over a band rather than jumping at a line, and this must be
+stated plainly rather than glossed. For the Galewsky jet, $\dd Q/\dd\varphi$
+changes sign four times ($32.2^\circ$, $39.8^\circ$, $49.8^\circ$,
+$58.2^\circ$N), giving two reversed-gradient bands flanking a positive core.
+Taking $b_{\mathrm{eff}}$ as half the separation between the band centres
+($1001$~km) gives $m^{*} \approx 1.8$, against the $m^{*} = 6$ that the solved
+eigenvalue problem \eqref{eq:galewskygrowth} returns. The two disagree by a
+factor of about three, and the disagreement is reported rather than tuned away.
+Two reasons are identifiable, both physical: concentrating each gradient into a
+delta function maximises the long-range reach of the inverted flow and so biases
+the optimum toward longer waves than a distributed gradient supports; and the
+Galewsky jet has \emph{three} gradient regions rather than two, so a
+two-interface reduction omits one interacting wave entirely.
+
+The standing claims of this section are therefore the mechanism, the sign
+requirement, the two cutoffs and the scaling --- not the absolute value of
+$m^{*}$, which Section~\ref{sec:evp} supplies.
+
+\subsection{The identification}
+
+\begin{quote}
+\textbf{The wave-propagation mechanism of Section~\ref{sec:rest} and the
+instability mechanism of Sections~\ref{sec:rayleighkuo}--\ref{sec:evp} are the
+same physics, viewed as one potential-vorticity interface versus two.}
+\end{quote}
+
+One interface: a displaced column acquires compensating vorticity, the induced
+flow is in quadrature with the displacement, and the pattern propagates. Two
+interfaces of opposite sign: each does the same thing, but each also sits in the
+other's induced flow, and if they can phase-lock, the quadrature that made a
+single wave propagate becomes, for the pair, an in-phase forcing that makes both
+grow. Nothing new has been added between the two cases except a second
+interface.
+
+\medskip
+\noindent\emph{Physical payoff:} this is what makes the paper physics-led rather
+than a pair of loosely related numerical campaigns.
+
+% =====================================================================
+\section{The Galewsky-type unstable jet and its balanced initial condition}
+\label{sec:galewsky}
+
+\subsection{The jet}
+
+The canonical anchor of the instability campaign is the barotropic-instability
+test case of \citet{galewsky2004}: a compactly supported, infinitely
+differentiable mid-latitude jet,
+%
+\begin{equation}
+\bar u(\varphi) =
+\begin{cases}
+\dfrac{u_{\max}}{e_n}\,
+ \exp\!\left[\dfrac{1}{(\varphi-\varphi_0)(\varphi-\varphi_1)}\right],
+ & \varphi_0 < \varphi < \varphi_1,\\[8pt]
+0, & \text{otherwise},
+\end{cases}
+\label{eq:galewskyjet}
+\end{equation}
+%
+with $e_n = \exp[-4/(\varphi_1-\varphi_0)^2]$ chosen so the peak speed is
+$u_{\max}$, and with $u_{\max} = 80\ \mathrm{m\,s^{-1}}$,
+$\varphi_0 = \pi/7$, $\varphi_1 = \pi/2 - \varphi_0$. The compact support is not
+cosmetic: because every derivative vanishes at the edges, $\dd Q/\dd y$ from
+\eqref{eq:dQdy} tends smoothly to $\beta$ outside the jet and the reversal is
+confined to the jet's flanks, with no spurious edge structure to contaminate the
+stability analysis.
+
+\subsection{The balanced height field}
+
+A jet imposed on a resting height field is not a solution of anything; it
+radiates gravity waves immediately and the instability one then measures is
+contaminated by that transient. The initial condition must be \emph{balanced}:
+the height field must be the one whose pressure gradient supports the given jet.
+For a zonal flow on a sphere the balance is the gradient-wind relation, obtained
+by setting $\partial_t = 0$ and $u = \bar u(\varphi)$, $v = 0$ in
+\eqref{eq:momv}:
+%
+\begin{equation}
+\frac{1}{R}\frac{\dd (g h)}{\dd\varphi}
+ = -\,\bar u(\varphi)\left[f + \frac{\bar u(\varphi)\tan\varphi}{R}\right] ,
+\label{eq:gradwind}
+\end{equation}
+%
+the two terms on the right being the Coriolis force on the zonal flow and the
+centripetal requirement of following a latitude circle --- the metric term
+\eqref{eq:metricterms} in its physical guise. Integrating meridionally,
+%
+\begin{equation}
+g h(\varphi) = g h_0 - \int^{\varphi}
+  R\,\bar u(\varphi')\left[f(\varphi')
+  + \frac{\bar u(\varphi')\tan\varphi'}{R}\right]\dd\varphi' ,
+\label{eq:balint}
+\end{equation}
+%
+with $h_0$ fixed by requiring a prescribed global mean depth (here $10$~km).
+
+An equivalent construction, which is what a spectral solver naturally does,
+solves the divergence of the balance relation as a two-dimensional linear
+boundary-value problem for $h$ subject to a mean constraint, rather than
+integrating \eqref{eq:balint} in one dimension. The two agree to numerical
+precision; the project's own comparison of the published construction against
+the shipped Dedalus reference implementation is recorded in
+\file{tests/phase0_gate/galewsky_comparison.md}, which also identifies the
+one genuine difference between them --- the dissipation operator, $\nabla^2$
+viscosity in the published case against $\nabla^4$ hyperdiffusion in the
+spectral one --- and its consequence, a small shift in instability onset time
+that is expected and is not a failure.
+
+\subsection{The perturbation}
+
+The balanced jet is a steady solution and will sit there indefinitely. Growth is
+seeded by adding a localised, deliberately \emph{unbalanced} height bump,
+%
+\begin{equation}
+h'(\lambda,\varphi) = \hat h\,\cos\varphi\;
+  e^{-(\lambda/\alpha)^2}\;
+  e^{-[(\varphi_2-\varphi)/\beta_p]^2} ,
+\label{eq:pert}
+\end{equation}
+%
+with $\hat h = 120$~m, $\varphi_2 = \pi/4$, $\alpha = 1/3$, $\beta_p = 1/15$.
+Being localised in longitude, it projects onto a broad range of zonal
+wavenumbers, so it excites whichever mode \eqref{eq:genevp} says grows fastest
+rather than presupposing one; the $\cos\varphi$ factor keeps it well behaved at
+the poles.
+
+This section is the analytic groundwork for Session~L5's
+\file{initial_conditions/galewsky.py} (run I-00).
+
+% =====================================================================
+\section{Summary: hypotheses to equations}
+\label{sec:summary}
+
+Each blueprint hypothesis is mapped to the numbered equation that predicts it and
+to the observation that would falsify it.
+
+\begin{longtable}{@{}p{0.05\textwidth}p{0.30\textwidth}p{0.13\textwidth}p{0.42\textwidth}@{}}
+\toprule
+\textbf{ID} & \textbf{Prediction} & \textbf{Equation} & \textbf{Falsified by} \\
+\midrule
+\endhead
+H1 & All initialised modes propagate westward, without exception
+   & \eqref{eq:rh}, \eqref{eq:betaplane}
+   & Any resolved eastward-propagating barotropic mode. The sign in
+     \eqref{eq:betaplane} is unconditional, so a single counter-example
+     falsifies the mechanism, not merely the coefficient. \\
+H2 & Angular phase speed $\propto 1/[n(n+1)]$ at fixed $\Omega$
+   & \eqref{eq:rh}
+   & Systematic departure from linearity in $1/[n(n+1)]$ beyond stated
+     uncertainty at well-resolved $n$. \\
+H3 & Angular phase speed $\propto \Omega$ at fixed $n$
+   & \eqref{eq:rh}
+   & Nonlinear or saturating dependence on $\Omega$. \\
+H4 & Measured speeds agree with $-2\Omega/[n(n+1)]$ to a few per cent at low $n$
+   & \eqref{eq:rh}
+   & Agreement worse than the quantified numerical uncertainty. \\
+H5 & Departure from the nondivergent prediction grows as the wave scale
+     approaches $L_d$
+   & \eqref{eq:houghevp}, \eqref{eq:limit}
+   & No systematic dependence on Burger number; or a measured departure that
+     does not converge to zero as $\varepsilon\to0$ at first order. \\
+H6 & Benchmark error decays spectrally with resolution
+   & --- (numerical, not predicted here)
+   & Algebraic convergence, indicating an implementation error. \\
+H7 & Jets failing the Rayleigh--Kuo condition remain stable
+   & \eqref{eq:dQdy}, \eqref{eq:rk}
+   & Growth in a run whose base state has no sign change in $\dd Q/\dd y$.
+     This is a prohibition, so any single violation falsifies it. \\
+H8 & Growth rate increases with supercriticality above threshold
+   & \eqref{eq:genevp}, \eqref{eq:growth}
+   & No systematic relation between shear and growth rate. \\
+H9 & Increasing $\Omega$ at fixed jet shape stabilises the flow
+   & \eqref{eq:dQdy}, \eqref{eq:genevp}
+   & Growth rate independent of, or increasing with, $\Omega$. Physically,
+     raising $\Omega$ raises $\beta$ and so makes the curvature term in
+     \eqref{eq:dQdy} less able to reverse the sign. \\
+H10 & Model dominant zonal wavenumber is of the same order as observed
+   & \eqref{eq:genevp}, \eqref{eq:mstar}
+   & Order-of-magnitude disagreement in wavenumber. \\
+\bottomrule
+\end{longtable}
+
+\noindent
+Two entries deserve a note. H6 is a statement about the numerical method, not
+about the physics, and is deliberately not derived here. H10 is supported by two
+independent routes --- the solved eigenvalue problem \eqref{eq:genevp} and the
+counter-propagating-wave scaling \eqref{eq:mstar} --- which currently disagree by
+a factor of about three for the Galewsky jet; Section~\ref{sec:crw} states why,
+and the eigenvalue problem is the one to be trusted.
+
+% =====================================================================
+\begin{thebibliography}{99}
+
+\bibitem[Bretherton(1966)]{bretherton1966}
+Bretherton, F.~P. (1966).
+Critical layer instability in baroclinic flows.
+\emph{Quarterly Journal of the Royal Meteorological Society}, \textbf{92}(393),
+325--334. \doilink{10.1002/qj.49709239302}
+
+\bibitem[Galewsky et al.(2004)]{galewsky2004}
+Galewsky, J., Scott, R.~K., \& Polvani, L.~M. (2004).
+An initial-value problem for testing numerical models of the global
+shallow-water equations.
+\emph{Tellus A}, \textbf{56}(5), 429--440.
+\doilink{10.3402/tellusa.v56i5.14436}
+
+\bibitem[Haurwitz(1940)]{haurwitz1940b}
+Haurwitz, B. (1940).
+The motion of atmospheric disturbances on the spherical earth.
+\emph{Journal of Marine Research}, \textbf{3}(3), 254--267.
+(Pre-DOI; archived by Yale University Library, EliScholar.)
+
+\bibitem[Heifetz et al.(1999)]{heifetz1999}
+Heifetz, E., Bishop, C.~H., \& Alpert, P. (1999).
+Counter-propagating Rossby waves in the barotropic Rayleigh model of shear
+instability.
+\emph{Quarterly Journal of the Royal Meteorological Society}, \textbf{125}(560),
+2835--2853. \doilink{10.1002/qj.49712556004}
+
+\bibitem[Hoskins et al.(1985)]{hoskins1985}
+Hoskins, B.~J., McIntyre, M.~E., \& Robertson, A.~W. (1985).
+On the use and significance of isentropic potential vorticity maps.
+\emph{Quarterly Journal of the Royal Meteorological Society}, \textbf{111}(470),
+877--946. \doilink{10.1002/qj.49711147002}
+
+\bibitem[Kuo(1949)]{kuo1949}
+Kuo, H.-L. (1949).
+Dynamic instability of two-dimensional nondivergent flow in a barotropic
+atmosphere.
+\emph{Journal of Meteorology}, \textbf{6}(2), 105--122.
+\doilink{10.1175/1520-0469(1949)006<0105:DIOTDN>2.0.CO;2}
+
+\bibitem[Longuet-Higgins(1968)]{longuethiggins1968}
+Longuet-Higgins, M.~S. (1968).
+The eigenfunctions of Laplace's tidal equations over a sphere.
+\emph{Philosophical Transactions of the Royal Society A}, \textbf{262}(1132),
+511--607. \doilink{10.1098/rsta.1968.0003}
+
+\bibitem[Rhines(1975)]{rhines1975}
+Rhines, P.~B. (1975).
+Waves and turbulence on a beta-plane.
+\emph{Journal of Fluid Mechanics}, \textbf{69}(3), 417--443.
+\doilink{10.1017/S0022112075001504}
+
+\bibitem[Rossby(1939)]{rossby1939}
+Rossby, C.-G., and collaborators (1939).
+Relation between variations in the intensity of the zonal circulation of the
+atmosphere and the displacements of the semi-permanent centers of action.
+\emph{Journal of Marine Research}, \textbf{2}(1), 38--55.
+(Pre-DOI; archived by Yale University Library, EliScholar.)
+
+\bibitem[Swarztrauber \& Kasahara(1985)]{swarztrauber1985}
+Swarztrauber, P.~N., \& Kasahara, A. (1985).
+The vector harmonic analysis of Laplace's tidal equations.
+\emph{SIAM Journal on Scientific and Statistical Computing}, \textbf{6}(2),
+464--491. \doilink{10.1137/0906033}
+
+\bibitem[Vallis \& Maltrud(1993)]{vallis1993}
+Vallis, G.~K., \& Maltrud, M.~E. (1993).
+Generation of mean flows and jets on a beta plane and over topography.
+\emph{Journal of Physical Oceanography}, \textbf{23}(7), 1346--1362.
+\doilink{10.1175/1520-0485(1993)023<1346:GOMFAJ>2.0.CO;2}
+
+\end{thebibliography}
+
+\end{document}
