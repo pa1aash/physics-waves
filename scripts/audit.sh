@@ -225,5 +225,31 @@ else
   skip "29. make not available in this environment"
 fi
 
+# 30. Every derivation-verification script has a recorded verdict.
+#     theory/derivations.tex may present nothing as established without a check
+#     under theory/sympy_checks/ that actually ran, so an orphaned script — or a
+#     stale one whose output was never regenerated — is a real finding.
+if [ -d theory/sympy_checks ]; then
+  cov_ok=1; missing=""
+  shopt -s nullglob
+  for f in theory/sympy_checks/check_*.py; do
+    out="theory/sympy_checks/output/$(basename "${f%.py}").txt"
+    if [ ! -f "$out" ]; then
+      cov_ok=0; missing="$missing $(basename "$f"):no-output"
+    elif ! grep -qE '^VERDICT: (VERIFIED|MISMATCH)$' "$out"; then
+      cov_ok=0; missing="$missing $(basename "$f"):no-verdict"
+    fi
+  done
+  shopt -u nullglob
+  if [ "$cov_ok" -eq 1 ]; then
+    n="$(ls theory/sympy_checks/check_*.py 2>/dev/null | wc -l | tr -d ' ')"
+    pass "30. all $n derivation checks have a recorded verdict"
+  else
+    bad "30. derivation-check coverage:$missing"
+  fi
+else
+  skip "30. theory/sympy_checks not present"
+fi
+
 echo "== $( [ "$fail" -eq 0 ] && echo "AUDIT PASSED" || echo "AUDIT FAILED ($fail check(s))" ) =="
 exit "$fail"
