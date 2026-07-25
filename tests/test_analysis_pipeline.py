@@ -672,3 +672,115 @@ def test_the_same_mode_gives_the_same_angular_speed_on_two_different_circles():
         fit = fit_phase_speed(diagram.values, diagram.time_s, wavenumber=2)
         speeds.append(fit.c_angular_rad_s)
     assert speeds[0] == pytest.approx(speeds[1], rel=0.005)
+
+
+# --------------------------------------------------------------------------- #
+# Part 6 — measured vs nondivergent vs Hough
+# --------------------------------------------------------------------------- #
+
+# Session L5's by-hand result for the (m, n) = (2, 4) mode of run P-17, and the
+# tolerances this session locks it in at. The measured and Hough slowings are
+# pinned to a tenth of a percentage point each, and their agreement — the headline
+# number — to a tenth of a percentage point.
+L5_MEASURED_SLOWING = -0.1572
+L5_HOUGH_SLOWING = -0.1577
+L5_AGREEMENT_PP = 0.05
+SLOWING_TOLERANCE = 0.001
+
+
+@pytestmark_runs
+def test_hough_comparison_reproduces_session_l5_by_hand_result():
+    """**Regression lock.** The unplanned finding of Session L5, made routine.
+
+    Session L5 measured the ``(m, n) = (2, 4)`` mode of P-17 at 15.72% slower than
+    the nondivergent Rossby-Haurwitz prediction, and solved the divergent Hough
+    eigenvalue independently at 15.77%. Those two numbers come from a nonlinear
+    time integration and from a linear eigenvalue problem respectively, so their
+    agreement is evidence about the physics rather than about the code — and it is
+    precisely the kind of result that a later refactor of a fitter could move
+    without anyone noticing. This test is what stops that.
+    """
+    from src.analysis.hough import compare_run
+
+    result = compare_run("P-17")
+    assert (result.wavenumber_m, result.degree_n) == (2, 4)
+    assert result.lambs_parameter == pytest.approx(8.8044, rel=1e-3)
+    assert result.measured_vs_nondivergent == pytest.approx(
+        L5_MEASURED_SLOWING, abs=SLOWING_TOLERANCE
+    )
+    assert result.hough_vs_nondivergent == pytest.approx(L5_HOUGH_SLOWING, abs=SLOWING_TOLERANCE)
+    assert result.agreement_percentage_points == pytest.approx(L5_AGREEMENT_PP, abs=0.1)
+    assert result.aliasing_risk == "none"
+
+
+@pytestmark_runs
+def test_the_wave_is_westward_and_slowed_not_speeded():
+    """Both the measurement and the eigenvalue must be westward, and both slower.
+
+    The free surface can only dilute the restoring mechanism, so a divergent wave
+    is *always* slower than its nondivergent counterpart. A positive slowing would
+    be unphysical rather than merely surprising, and would point at a sign error
+    somewhere in the chain.
+    """
+    from src.analysis.hough import compare_run
+
+    result = compare_run("P-17")
+    assert result.measured_c_angular_rad_s < 0
+    assert result.hough_c_angular_rad_s < 0
+    assert result.nondivergent_c_angular_rad_s < 0
+    assert abs(result.measured_c_angular_rad_s) < abs(result.nondivergent_c_angular_rad_s)
+    assert abs(result.hough_c_angular_rad_s) < abs(result.nondivergent_c_angular_rad_s)
+
+
+@pytestmark_runs
+def test_degree_is_read_from_vorticity_because_height_gives_the_wrong_answer():
+    """The mode's degree is a property of the streamfunction, not of the height.
+
+    A single-harmonic run seeds one spherical harmonic in the streamfunction, so
+    its vorticity is exactly that degree. Its *balanced height* is not: the balance
+    multiplies by ``sin(latitude)`` and ``mu P_n^m`` couples only to ``n +/- 1``, so
+    the height of a clean ``n = 4`` mode sits in degrees 3 and 5. Reading the degree
+    off the height field returns 3 — a plausible, wrong answer — and this test
+    documents that trap as much as it checks the code.
+    """
+    from src.analysis.hough import dominant_degree
+
+    assert dominant_degree("P-17", 2, "vorticity") == 4
+    assert dominant_degree("P-17", 2, "height") == 3
+
+
+@pytestmark_runs
+def test_the_comparison_is_reproducible_from_a_second_latitude_circle():
+    """The slowing belongs to the mode, so a different circle must give the same number.
+
+    An angular phase speed does not depend on which latitude circle it is measured
+    on. Recovering the same slowing from a different circle of the same run is a
+    check on the whole extraction chain that no synthetic test can provide.
+    """
+    from src.analysis.hough import compare_run
+
+    at_45 = compare_run("P-17", latitude_deg=45.0)
+    at_30 = compare_run("P-17", latitude_deg=30.0)
+    assert at_30.measured_vs_nondivergent == pytest.approx(
+        at_45.measured_vs_nondivergent, abs=0.005
+    )
+    assert at_45.mode_present and at_30.mode_present
+
+
+@pytestmark_runs
+def test_a_circle_where_the_mode_is_absent_is_refused_not_fitted():
+    """P-17's height signal vanishes at the equator, and the fit must say so.
+
+    This is physics, not a numerical accident: the balanced height of an
+    ``(m, n) = (2, 4)`` mode sits in degrees 3 and 5, both of which are
+    antisymmetric about the equator, so its ``m = 2`` component is identically zero
+    there. Phase is defined for any nonzero complex number however tiny, so the
+    fitter will happily return a confident slope through round-off — here a
+    "measured" speed 24 times too large and of the wrong sign. Detecting the
+    absence is the only defence.
+    """
+    from src.analysis.hough import compare_run
+
+    at_equator = compare_run("P-17", latitude_deg=0.0)
+    assert not at_equator.mode_present
+    assert any("MODE ABSENT" in note for note in at_equator.notes)

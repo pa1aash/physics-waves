@@ -87,6 +87,8 @@ class PhaseSpeedFit:
     residual_rms_rad: float
     nyquist_ratio: float
     aliasing_risk: str
+    variance_fraction: float = 1.0
+    mode_present: bool = True
     expected_c_angular_rad_s: float | None = None
     expected_nyquist_ratio: float | None = None
     alias_order: int | None = None
@@ -254,6 +256,24 @@ def fit_phase_speed(
                 "than of a physically different speed"
             )
 
+    # **Is the mode even present on this circle?** Phase is defined for any nonzero
+    # complex number, however tiny, so fitting the phase of a mode that is not
+    # there returns a confident slope through pure round-off. This is not a corner
+    # case: a mode with an antisymmetric meridional structure is identically zero
+    # at the equator, so asking for it there is an easy and entirely reasonable
+    # mistake that produces a precise, meaningless answer.
+    total_power = float(np.sum(np.abs(coef[:, 1:]) ** 2))
+    mode_power = float(np.sum(amplitude**2))
+    variance_fraction = mode_power / total_power if total_power > 0 else 0.0
+    mode_present = variance_fraction > 1e-6
+    if not mode_present:
+        notes.append(
+            f"MODE ABSENT: wavenumber {wavenumber} carries {variance_fraction:.2e} of the "
+            "variance on this latitude circle, which is round-off. The fitted speed is "
+            "meaningless. A mode with an antisymmetric meridional structure vanishes at "
+            "the equator; try a circle where it has amplitude."
+        )
+
     ratio = amplitude[-1] / amplitude[0] if amplitude[0] > 0 else np.inf
     if not amplitude_weighted and (ratio > 10 or ratio < 0.1):
         notes.append(
@@ -279,6 +299,8 @@ def fit_phase_speed(
         residual_rms_rad=float(np.sqrt(np.mean(residual**2))),
         nyquist_ratio=float(nyquist_ratio),
         aliasing_risk=risk,
+        variance_fraction=float(variance_fraction),
+        mode_present=bool(mode_present),
         expected_c_angular_rad_s=expected_c_angular,
         expected_nyquist_ratio=expected_ratio,
         alias_order=alias_order,
