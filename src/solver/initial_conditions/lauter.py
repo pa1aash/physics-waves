@@ -33,11 +33,28 @@ different problem, and the solution below is not a solution of it.
 
 **A transcription note, because the source PDF loses minus signs.** The text layer
 of the archived PDF drops several minus signs (they extract as empty glyphs).
-Rather than guess, the sign of every term was fixed by requiring the ``alpha = 0``
-reduction to reproduce Williamson et al. (1992) report eq. (95) — the reduction
-the paper itself asserts. The signs used here are the unique choice that does so,
-and ``tests/test_solver_core.py`` re-checks it numerically rather than trusting
-this paragraph.
+Rather than guess, the sign of every term was fixed in Session L5 by requiring the
+``alpha = 0`` reduction to reproduce Williamson et al. (1992) report eq. (95) —
+the reduction the paper itself asserts. The signs used here are the unique choice
+that does so, and ``tests/test_solver_core.py`` re-checks it numerically rather
+than trusting this paragraph.
+
+**And a visual check, because that reduction could not have caught everything.**
+The ``alpha -> 0`` limit constrains only terms that survive it. It says nothing
+about the ``sin(alpha)`` parts of the three axis projections, or about the phase
+combination ``chi = lambda + Omega t`` — which is to say, nothing about the
+precession that is the entire point of the case. Session L6 therefore *rendered
+the journal pages as images* and read every equation this module implements off
+the page rather than out of the text layer: eq. (22) on p. 544, eq. (23) and the
+spherical-coordinate forms on pp. 544-545, and the parameter values
+``alpha = pi/4``, ``u0 = 2 pi a / 12 m/day``, ``k1 = 133681 m^2/s^2``,
+``k2 = 0``.
+
+*Outcome: clean.* Every term matches, including the ones the ``alpha = 0`` test
+is blind to. Two things worth recording because they read as errors and are not:
+the paper writes ``Omega . x`` as a **dot** product, so that term is
+``a Omega sin(latitude)`` and not ``|Omega x x| = a Omega cos(latitude)``; and its
+``theta`` is **latitude**, not colatitude, throughout Example 3.
 """
 
 from __future__ import annotations
@@ -58,7 +75,7 @@ K2 = 0.0
 
 
 def _axis_projections(phi, lat, alpha: float, Omega_si: float, t_si: float):
-    """The three projections of the rotated axis, paper eq. (22) with ``a -> c``.
+    """The three projections of the rotated axis, paper eq. (22), p. 544, with ``a -> c``.
 
     With ``c = -sin(alpha) e1 + cos(alpha) e3`` and ``u_t`` the rotation by
     ``Omega t`` about ``e3``, the components onto the local eastward ``i``,
@@ -79,7 +96,9 @@ def analytic_fields(swp, params: dict, t_si: float = 0.0):
     """The Example-3 velocity (m/s) and free-surface geopotential (m^2/s^2) at time ``t``.
 
     Returned in SI on the solver's grid, so the error-norm machinery can call it
-    at any output time without rebuilding the case::
+    at any output time without rebuilding the case. Transcribed from the
+    spherical-coordinate forms printed on journal p. 545, immediately below
+    eq. (24), and confirmed against the rendered page::
 
         u   = u0 (c . j)
         v   = -u0 (c . i)

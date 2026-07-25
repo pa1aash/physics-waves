@@ -181,6 +181,20 @@ def test_williamson_case2_is_steady(resolution):
     1.9 km. Any real tendency here is an error in the equations, the Coriolis
     sign, the metric terms, or the balance — and every result the project will
     ever produce sits downstream of it.
+
+    **On why L1 is about an order of magnitude looser than L0** (5.9e-14 against
+    3.2e-15, measured in Session L5): this is round-off accumulation, not a
+    convergence failure, and it is expected to get *worse* with resolution rather
+    than better. The residual is a sum of rounding errors over the spectral
+    coefficients, and L1 carries sixteen times as many of them as L0 — a random
+    walk over N terms grows like sqrt(N), which is a factor of four, and the
+    remainder comes from the larger dynamic range of the transform at higher
+    truncation. The timestep count is identical (twelve steps of 300 s) at both,
+    so it contributes nothing to the difference. Both numbers are ten orders of
+    magnitude below any physical signal; the single tolerance below is set to
+    accommodate the looser one rather than tightened per resolution, because the
+    quantity being tested is "indistinguishable from steady", not the round-off
+    itself.
     """
     mean_depth = 2363.021
     config = make_config(

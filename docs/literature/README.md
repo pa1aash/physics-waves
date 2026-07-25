@@ -51,10 +51,32 @@ strength of that file; the parameter values may be cited against either.
 | Suggested filename | Citation |
 |--------------------|----------|
 | `galewsky_2004_initial_value_problem.pdf` | Galewsky, J., Scott, R. K., & Polvani, L. M. (2004). An initial-value problem for testing numerical models of the global shallow-water equations. *Tellus A* 56(5), 429–440. **Confirmed** (read; DOI [10.3402/tellusa.v56i5.14436](https://doi.org/10.3402/tellusa.v56i5.14436)). |
-| `lauter_2005_unsteady_analytical_solutions.pdf` | Läuter, M., Handorf, D., & Dethloff, K. (2005). *J. Comput. Phys.* 210(2), 535–553. |
+| `lauter_2005_unsteady_analytical_solutions.pdf` | Läuter, M., Handorf, D., & Dethloff, K. (2005). *J. Comput. Phys.* 210(2), 535–553. **Confirmed** (read, and Example 3 re-read from rendered page images — see below). |
 | `thuburn_2000_numerical_simulations_rossby_haurwitz.pdf` | Thuburn, J., & Li, Y. (2000). Numerical simulations of Rossby–Haurwitz waves. *Tellus A* 52(2). **Confirmed** (read). Its reference list is the verified source for the Haurwitz (1940b) page range 254–267. |
 | `longuethiggins_1968_laplace_tidal_eigenfunctions.pdf` | Longuet-Higgins, M. S. (1968). The eigenfunctions of Laplace's tidal equations over a sphere. *Phil. Trans. R. Soc. A* 262, 511–607. *(confirm citation)* |
 | `swarztrauber_1985_vector_harmonic_analysis.pdf` | Swarztrauber, P. N., & Kasahara, A. (1985). Vector harmonic analysis of Laplace's tidal equations. *SIAM J. Sci. Stat. Comput.* 6. *(confirm citation)* |
+
+**Two PDFs have unreliable text layers. Both were re-read as rendered images.**
+
+*Läuter et al. (2005), Example 3.* The archived text layer drops minus signs —
+they extract as empty glyphs. Session L5 reconstructed the signs by requiring the
+`α = 0` reduction to Williamson case 2 that the paper itself asserts, and checked
+that numerically at 1e-12. But that limit constrains only terms surviving it, so
+Session L6 rendered pp. 544–545 as images and read every implemented equation off
+the page: eq. (22), eq. (23), the spherical-coordinate forms below eq. (24), and
+the parameters `α = π/4`, `u₀ = 2πa/12 m/day`, `k₁ = 133681 m² s⁻²`, `k₂ = 0`.
+**Outcome: clean, no correction needed** — including the `sin α` terms and the
+`χ = λ + Ωt` phase that the `α → 0` test is blind to. Two readings that look like
+errors and are not: the paper's `Ω · x` is a **dot** product, giving
+`aΩ sin(latitude)` rather than `aΩ cos(latitude)`; and its `θ` is **latitude**
+throughout Example 3.
+
+*Williamson ORNL/TM-11895, cases 5 and 6.* The scanned text layer garbles digits
+(`K = 7.848×10⁻⁶` extracted as `K = _.o,_ x lO-(_`). Session L6 rendered pp. 18–19
+and confirmed visually: case 5 `h₀ = 5400 m` (**not** the 5960 m that appears in
+some of the literature), `h_s0 = 2000 m`, `R = π/9`, `λ_c = −π/2`, `θ_c = π/6`;
+case 6 `ω = K = 7.848 × 10⁻⁶ s⁻¹`, `h₀ = 8 × 10³ m`, wavenumber 4; and
+eqs. (140)–(143) term for term. **Outcome: clean, no correction needed.**
 
 > **`longuethiggins_1968_…` and `swarztrauber_1985_…` could not be obtained.**
 > See [`MISSING.md`](MISSING.md) for full citations, DOIs, why the project is not
