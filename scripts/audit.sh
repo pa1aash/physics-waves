@@ -251,5 +251,80 @@ else
   skip "30. theory/sympy_checks not present"
 fi
 
+# 31. Every external-match claim in a check output has a PROVENANCE_AUDIT row.
+#     A script may only claim agreement with a published value if that value's
+#     page or equation is recorded. The screened phrases are the ones the sweep
+#     in Session L3-PATCH found: an unattributed "published" is the failure mode.
+prov="theory/PROVENANCE_AUDIT.md"
+if [ -d theory/sympy_checks/output ]; then
+  if [ ! -f "$prov" ]; then
+    bad "31. $prov missing"
+  else
+    prov_ok=1; why31=""
+    shopt -s nullglob
+    for out in theory/sympy_checks/output/*.txt; do
+      base="$(basename "$out" .txt)"
+      # Does this output claim agreement with something external?
+      if grep -qiE 'published|HBA[0-9]|p\.[0-9]{3,}|et al\. \([0-9]{4}\)' "$out"; then
+        grep -q "$base" "$prov" || { prov_ok=0; why31="$why31 $base:no-row"; }
+      fi
+      # An unattributed "published" with no page or source is never acceptable.
+      if grep -qiE 'published' "$out" && ! grep -qiE 'p\.[0-9]|Eq\.|source:' "$out"; then
+        prov_ok=0; why31="$why31 $base:unattributed-published"
+      fi
+    done
+    shopt -u nullglob
+    if [ "$prov_ok" -eq 1 ]; then
+      pass "31. every external-match claim is grounded in PROVENANCE_AUDIT.md"
+    else
+      bad "31. provenance gap:$why31"
+    fi
+  fi
+else
+  skip "31. theory/sympy_checks/output not present"
+fi
+
+# 32. Every PDF in docs/literature/ is named in the README index. A filename
+#     that misrepresents its paper is how Session L3 came to cite the wrong
+#     Heifetz year, so the index and the directory must agree exactly.
+litdir="docs/literature"
+if [ -d "$litdir" ]; then
+  lit_ok=1; why32=""
+  shopt -s nullglob
+  for f in "$litdir"/*.pdf; do
+    b="$(basename "$f")"
+    grep -qF "\`$b\`" "$litdir/README.md" 2>/dev/null || { lit_ok=0; why32="$why32 $b:not-indexed"; }
+  done
+  shopt -u nullglob
+  # Filenames known to have misrepresented their contents must not reappear.
+  for stale in "haurwitz_1940_motion_of_atmospheric_disturbances.pdf" \
+               "heifetz_2004_counter_propagating_rossby_waves.pdf"; do
+    [ -f "$litdir/$stale" ] && { lit_ok=0; why32="$why32 $stale:corrected-name-reverted"; }
+  done
+  if [ "$lit_ok" -eq 1 ]; then
+    n="$(ls "$litdir"/*.pdf 2>/dev/null | wc -l | tr -d ' ')"
+    pass "32. all $n literature PDFs are indexed under their true identity"
+  else
+    bad "32. literature metadata:$why32"
+  fi
+else
+  skip "32. docs/literature not present"
+fi
+
+# 33. Every judgement item in the derivation review carries a disposition.
+#     None may sit in a bare "flagged" state waiting for someone to notice.
+rev="theory/DERIVATION_REVIEW.md"
+if [ -f "$rev" ]; then
+  items=$(grep -cE '^\| \([a-j]\) \|' "$rev" || true)
+  disp=$(grep -E '^\| \([a-j]\) \|' "$rev" | grep -cE 'Resolved|Accepted as a stated limitation' || true)
+  if [ "$items" -eq 10 ] && [ "$disp" -eq 10 ]; then
+    pass "33. all 10 review judgement items carry an explicit disposition"
+  else
+    bad "33. review dispositions: $disp of $items items dispositioned (want 10/10)"
+  fi
+else
+  bad "33. $rev missing"
+fi
+
 echo "== $( [ "$fail" -eq 0 ] && echo "AUDIT PASSED" || echo "AUDIT FAILED ($fail check(s))" ) =="
 exit "$fail"
