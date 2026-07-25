@@ -4,12 +4,12 @@ Claim: the section-10 two-interface counter-propagating Rossby wave
 model is an exact reduction for piecewise-constant PV, and yields the
 opposite-sign requirement and a short-wave cutoff.
 
-Arm 1 - reduction to the published Rayleigh dispersion relation
+Arm 1 - reduction to the Rayleigh dispersion relation of HBA99 Eq. (6)
 ------------------------------------------------------------------------
-  root C = -sqrt(K**2*exp(2*K) - 2*K*exp(2*K) + exp(2*K) - 1)*exp(-K)/(2*K)  ->  matches published form
-  root C = sqrt(K**2*exp(2*K) - 2*K*exp(2*K) + exp(2*K) - 1)*exp(-K)/(2*K)  ->  matches published form
-  reference: Heifetz, Bishop & Alpert (1999), QJRMS 125, 2835-2853,
-  their Eq. (6) for the Rayleigh constant-shear strip.
+  root C = -sqrt(K**2*exp(2*K) - 2*K*exp(2*K) + exp(2*K) - 1)*exp(-K)/(2*K)  ->  matches HBA99 Eq. (6)
+  root C = sqrt(K**2*exp(2*K) - 2*K*exp(2*K) + exp(2*K) - 1)*exp(-K)/(2*K)  ->  matches HBA99 Eq. (6)
+  source: Heifetz, Bishop & Alpert (1999), QJRMS 125(560), 2835-2853,
+  p. 2838, Eq. (6) -- read from the held PDF, not recalled.
 
 Arm 2 - instability requires oppositely signed PV jumps
 ------------------------------------------------------------------------
@@ -20,11 +20,11 @@ Arm 2 - instability requires oppositely signed PV jumps
   requirement rather than as an integral constraint.
   same-sign case is a sum of non-negative terms: yes
 
-Arm 3 - published cutoff, optimum and peak growth rate
+Arm 3 - cutoff, optimum and peak growth vs Heifetz et al. (1999) p. 2838
 ------------------------------------------------------------------------
-  short-wave cutoff  K_c = 1.2785   published 1.28   |diff| = 0.0015
-  most unstable      K_m = 0.7968   published 0.8    |diff| = 0.0032
-  peak growth / shear    = 0.2012   published 0.2   |diff| = 0.0012
+  short-wave cutoff  K_c = 1.2785   HBA99 p.2838: 1.28   |diff| = 0.0015
+  most unstable      K_m = 0.7968   HBA99 p.2838: 0.8    |diff| = 0.0032
+  peak growth / shear    = 0.2012   HBA99 p.2838: 0.2   |diff| = 0.0012
   Physically: waves shorter than K_c cannot reach across the jet
   (the coupling carries exp(-2K)), and waves much longer than K_m
   counter-propagate too fast to hold a fixed phase against the shear.

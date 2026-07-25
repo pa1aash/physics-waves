@@ -27,9 +27,17 @@ Arms:
 
        C = +- (1/(2K)) sqrt[ (K - 1)^2 - exp(-2K) ] ,   K = 2 k b ,
 
-   as given by Heifetz, Bishop and Alpert (1999), their Eq. (6). This is the
-   external validation of the toy model: it is not a cartoon fitted after the
-   fact, it is an exact reduction for piecewise-constant potential vorticity.
+   as given by Heifetz, Bishop and Alpert (1999), their Eq. (6) on p. 2838.
+   This is the external validation of the toy model: it is not a cartoon fitted
+   after the fact, it is an exact reduction for piecewise-constant potential
+   vorticity.
+
+   Provenance note. The three benchmark constants in arm 3 (K_c, K_max and the
+   peak growth as a fraction of the shear) are read from p. 2838 of that paper,
+   in the paragraph immediately after Eq. (6) -- not recalled from general
+   familiarity. The held PDF is filed under a 2004 filename but is the 1999
+   paper; the filename was corrected in Session L3-PATCH and the citation has
+   always been to the 1999 paper.
 
 2. Instability requires ``gamma_1 gamma_2 < 0``, i.e. oppositely signed PV jumps.
    This is the Rayleigh-Kuo sign change of section 8 re-derived as a condition
@@ -61,8 +69,14 @@ import numpy as np
 import sympy as sp
 from scipy.optimize import brentq, minimize_scalar
 
-# Published values for Rayleigh's model, from Heifetz, Bishop & Alpert (1999),
-# quoted to the precision the paper states them.
+# Published values for Rayleigh's model. SOURCE, verified by reading the page:
+# Heifetz, Bishop & Alpert (1999), QJRMS 125(560), 2835-2853, **page 2838**, in
+# the paragraph immediately following their Eq. (6). That paragraph states the
+# critical wavenumber as K_c = 1 + exp(-K_c) ~ 1.28; the growth rate Lambda K C_i
+# as maximum at K_max ~ 0.8, corresponding to a wavelength about eight times the
+# width of the vorticity strip; and that maximum as about 20% of the shear
+# Lambda. Quoted here to the precision the paper itself states them.
+# (Provenance re-verified in Session L3-PATCH; see theory/PROVENANCE_AUDIT.md.)
 PUBLISHED_KC = 1.28
 PUBLISHED_KM = 0.8
 PUBLISHED_PEAK_GROWTH_FRACTION = 0.20
@@ -110,10 +124,10 @@ def arm_dispersion(lines):
         ok = ok and matched
         lines.append(
             f"  root C = {sp.simplify(C)}  ->  "
-            f"{'matches published form' if matched else 'NO MATCH'}"
+            f"{'matches HBA99 Eq. (6)' if matched else 'NO MATCH'}"
         )
-    lines.append("  reference: Heifetz, Bishop & Alpert (1999), QJRMS 125, 2835-2853,")
-    lines.append("  their Eq. (6) for the Rayleigh constant-shear strip.")
+    lines.append("  source: Heifetz, Bishop & Alpert (1999), QJRMS 125(560), 2835-2853,")
+    lines.append("  p. 2838, Eq. (6) -- read from the held PDF, not recalled.")
     return ok
 
 
@@ -156,13 +170,15 @@ def arm_published_numbers(lines):
     dpk = abs(peak - PUBLISHED_PEAK_GROWTH_FRACTION)
     ok = dkc < PUBLISHED_TOL["kc"] and dkm < PUBLISHED_TOL["km"] and dpk < PUBLISHED_TOL["growth"]
     lines.append(
-        f"  short-wave cutoff  K_c = {kc:.4f}   published {PUBLISHED_KC}   " f"|diff| = {dkc:.4f}"
+        f"  short-wave cutoff  K_c = {kc:.4f}   HBA99 p.2838: {PUBLISHED_KC}   "
+        f"|diff| = {dkc:.4f}"
     )
     lines.append(
-        f"  most unstable      K_m = {km:.4f}   published {PUBLISHED_KM}    " f"|diff| = {dkm:.4f}"
+        f"  most unstable      K_m = {km:.4f}   HBA99 p.2838: {PUBLISHED_KM}    "
+        f"|diff| = {dkm:.4f}"
     )
     lines.append(
-        f"  peak growth / shear    = {peak:.4f}   published "
+        f"  peak growth / shear    = {peak:.4f}   HBA99 p.2838: "
         f"{PUBLISHED_PEAK_GROWTH_FRACTION}   |diff| = {dpk:.4f}"
     )
     lines.append("  Physically: waves shorter than K_c cannot reach across the jet")
@@ -248,7 +264,7 @@ def main() -> int:
     lines.append("opposite-sign requirement and a short-wave cutoff.")
     lines.append("")
 
-    lines.append("Arm 1 - reduction to the published Rayleigh dispersion relation")
+    lines.append("Arm 1 - reduction to the Rayleigh dispersion relation of HBA99 Eq. (6)")
     lines.append("-" * 72)
     ok1 = arm_dispersion(lines)
 
@@ -258,7 +274,7 @@ def main() -> int:
     ok2 = arm_sign_requirement(lines)
 
     lines.append("")
-    lines.append("Arm 3 - published cutoff, optimum and peak growth rate")
+    lines.append("Arm 3 - cutoff, optimum and peak growth vs Heifetz et al. (1999) p. 2838")
     lines.append("-" * 72)
     ok3, km = arm_published_numbers(lines)
 
