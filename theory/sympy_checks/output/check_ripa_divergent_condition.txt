@@ -51,7 +51,21 @@ Arm 2 - is the extra divergent condition binding for this project?
 
   condition (ii) binding at margin < 2.0x: NO
 
-Arm 3 - can the project's rotation sweep (P-08 ... P-12) activate it?
+  WHAT THIS DOES AND DOES NOT ESTABLISH. Ripa's two conditions are
+  JOINTLY SUFFICIENT for stability. The Galewsky jet FAILS condition (i)
+  -- check_rayleigh_kuo.py finds dQ/dphi changing sign at four latitudes
+  -- so Ripa's theorem certifies nothing at all about this jet, which is
+  expected, since the jet is known to be unstable. The large margin on
+  (ii) therefore does NOT prove anything about the jet's stability.
+
+  What it does indicate is narrower and still useful: the flow is far
+  from the regime where the free surface can supply an instability
+  mechanism of its own, so the instability this project studies is the
+  classical potential-vorticity-gradient one and not the negative-energy
+  route of Hayashi & Young (1987). That is an indication from a
+  sufficient condition, not a proof, and is stated as such.
+
+Arm 3 - can the project's rotation range activate it?
 ------------------------------------------------------------------------
    Omega     eps      sqrt(gH)   max|c0-u|   margin   (ii) holds
    0.25x      0.55      313.1       40.0     7.83x   yes
@@ -59,6 +73,9 @@ Arm 3 - can the project's rotation sweep (P-08 ... P-12) activate it?
    1.00x      8.80      313.1       40.0     7.83x   yes
    2.00x     35.22      313.1       40.0     7.83x   yes
    4.00x    140.87      313.1       40.0     7.83x   yes
+
+  (Omega range only. The runs that sweep Omega WITH a jet are I-06...I-09,
+   which use the idealised jet; P-08...P-12 sweep Omega but carry no jet.)
 
   Condition (ii) contains sqrt(gH) and ubar and NO rotation rate, so
   sweeping Omega cannot activate it. Lamb's parameter eps rises from

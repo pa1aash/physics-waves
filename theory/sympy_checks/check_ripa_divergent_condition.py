@@ -72,7 +72,12 @@ PHI0 = np.pi / 7
 PHI1 = np.pi / 2 - PHI0
 EN = np.exp(-4.0 / (PHI1 - PHI0) ** 2)
 
-# Rotation multipliers of runs P-08 ... P-12.
+# Rotation multipliers used by the project. NOTE: runs P-08...P-12 sweep Omega
+# but are `single_harmonic` Rossby-Haurwitz runs containing NO JET, so they are
+# the wrong runs to name here -- an error in the first version of this script,
+# caught by the Session L4b dialectic critic. The jet-with-Omega sweep is
+# I-06...I-09, which use the *idealised* jet rather than Galewsky's. The sweep
+# below is therefore the project's Omega RANGE, not a specific run series.
 OMEGA_SWEEP = (0.25, 0.5, 1.0, 2.0, 4.0)
 
 # Condition (ii) is a margin test. A margin below this would make the divergent
@@ -171,10 +176,24 @@ def main() -> int:
         f"  condition (ii) binding at margin < {BINDING_MARGIN}x: "
         f"{'YES -- divergence matters here' if binding else 'NO'}"
     )
+    lines.append("")
+    lines.append("  WHAT THIS DOES AND DOES NOT ESTABLISH. Ripa's two conditions are")
+    lines.append("  JOINTLY SUFFICIENT for stability. The Galewsky jet FAILS condition (i)")
+    lines.append("  -- check_rayleigh_kuo.py finds dQ/dphi changing sign at four latitudes")
+    lines.append("  -- so Ripa's theorem certifies nothing at all about this jet, which is")
+    lines.append("  expected, since the jet is known to be unstable. The large margin on")
+    lines.append("  (ii) therefore does NOT prove anything about the jet's stability.")
+    lines.append("")
+    lines.append("  What it does indicate is narrower and still useful: the flow is far")
+    lines.append("  from the regime where the free surface can supply an instability")
+    lines.append("  mechanism of its own, so the instability this project studies is the")
+    lines.append("  classical potential-vorticity-gradient one and not the negative-energy")
+    lines.append("  route of Hayashi & Young (1987). That is an indication from a")
+    lines.append("  sufficient condition, not a proof, and is stated as such.")
 
     # ---- Arm 3: can the rotation sweep activate it? -----------------------
     lines.append("")
-    lines.append("Arm 3 - can the project's rotation sweep (P-08 ... P-12) activate it?")
+    lines.append("Arm 3 - can the project's rotation range activate it?")
     lines.append("-" * 72)
     lines.append("   Omega     eps      sqrt(gH)   max|c0-u|   margin   (ii) holds")
     sweep_ok = True
@@ -187,6 +206,9 @@ def main() -> int:
             f"{margin:6.2f}x   {'yes' if holds else 'NO'}"
         )
     ok = ok and sweep_ok
+    lines.append("")
+    lines.append("  (Omega range only. The runs that sweep Omega WITH a jet are I-06...I-09,")
+    lines.append("   which use the idealised jet; P-08...P-12 sweep Omega but carry no jet.)")
     lines.append("")
     lines.append("  Condition (ii) contains sqrt(gH) and ubar and NO rotation rate, so")
     lines.append("  sweeping Omega cannot activate it. Lamb's parameter eps rises from")

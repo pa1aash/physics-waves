@@ -455,5 +455,47 @@ else
   bad "38. LITERATURE_REVIEW.md missing or lacks the sign-off statement"
 fi
 
+# 39. The divergent-stability decision memo exists and states an explicit
+#     recommendation. A memo that surveys options without choosing one is not a
+#     decision memo, so the check requires the words "Option A" or "Option B" to
+#     appear under a recommendation heading.
+dsd="docs/literature/DIVERGENT_STABILITY_DECISION.md"
+if [ -f "$dsd" ]; then
+  # Must SELECT one option, not merely mention both. A survey of alternatives is
+  # not a decision memo, and the first version of this check accepted one.
+  rec="$(grep -oiE '(take|recommend|recommendation is|choose|adopt)[^.]{0,24}option [AB]' "$dsd" | head -1)"
+  if [ -n "$rec" ]; then
+    pass "39. divergent-stability decision memo selects an option ($rec)"
+  else
+    bad "39. $dsd has no explicit Option A / Option B recommendation"
+  fi
+else
+  bad "39. $dsd missing"
+fi
+
+# 40. Every paper Session L4b targeted has an up-to-date status line in
+#     MISSING.md -- obtained, or recorded as still missing with a reason. A
+#     targeted acquisition attempt that leaves the record unchanged is how a
+#     stale "unobtainable" note survives past the point where it is true.
+miss="docs/literature/MISSING.md"
+if [ -f "$miss" ]; then
+  m40=1; why40=""
+  for token in "10.1017/S0022112083000270" "10.1017/S0022112087002982" \
+               "ABSTRACT-VERIFIED" "kasahara_1976_normal_modes_ultralong_waves.pdf"; do
+    grep -qF "$token" "$miss" || { m40=0; why40="$why40 [$token]"; }
+  done
+  # Kasahara was obtained in L4: its row must no longer claim it is unavailable.
+  if grep -qE 'kasahara.*(could not be obtained|not obtained|unobtainable)' "$miss"; then
+    m40=0; why40="$why40 [kasahara-still-marked-missing]"
+  fi
+  if [ "$m40" -eq 1 ]; then
+    pass "40. MISSING.md reflects the L4/L4b acquisition outcomes"
+  else
+    bad "40. MISSING.md stale for:$why40"
+  fi
+else
+  bad "40. $miss missing"
+fi
+
 echo "== $( [ "$fail" -eq 0 ] && echo "AUDIT PASSED" || echo "AUDIT FAILED ($fail check(s))" ) =="
 exit "$fail"

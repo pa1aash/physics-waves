@@ -28,6 +28,7 @@ scope contract had drifted.
 | **c2** Two-season ENSO design | **SURVIVES (as study design, not as a result)** | A robustness control the project chose; no novelty claimed |
 | **c3** Is a westward branch resolvable at 500 hPa? | **SURVIVES** | A genuine diagnostic question with a reportable answer either way; arguably the most defensible empirical fragment |
 | **d** One-interface / two-interface identification | **NOT NOVEL — exposition** | Bretherton (1966) originated it; Heifetz et al. (1999) explicitly present it as pedagogy |
+| **e1** Extending the stability analysis to the divergent shallow-water system | **FULLY NARROWED — not a contribution** | Paldor, Shamir & Garfinkel (2020) publish exactly this comparison for a spherical jet; White & Staniforth (2009) already apply Ripa's criteria on the sphere to guide model testing |
 
 ---
 
@@ -127,6 +128,14 @@ corpus-adequacy audit named Skiba.
 **Does the steelman succeed? YES, decisively.** There is nothing methodologically
 new in solving this eigenvalue problem, on the plane or on the sphere.
 
+**Session L4b sharpens this.** The verdict was recorded on the strength of titles;
+it now rests on governing equations. All five papers in this programme — Skiba &
+Pérez-García (2004), Skiba (2008), Skiba (2024), Constantin & Germain (2022) and
+Cao, Wang & Zuo (2023) — work in the **nondivergent** barotropic vorticity
+equation or the incompressible Euler equation on the sphere, established from
+their abstracts (see `SKIBA_PROGRAMME_NOTES.md`). Since this project's EVP is also
+nondivergent, the prior art is exactly on target.
+
 **What is left.** Applying a standard method to a specific configuration, with the
 resolution-doubling filter and the plateau reporting stated explicitly. That is
 careful work, not a methodological contribution, and the paper should say so —
@@ -166,6 +175,16 @@ Step 7 width critique surfaced it. It is verified but **not obtained**.
 **Verdict:** survives as a negative-search result — no prior published spectrum
 found — but must be reported as the spectrum of the *nondivergent* problem, with
 the divergent mismatch stated as a limitation, not discovered by a referee.
+
+**Session L4b weakens this further, and the reported precision must drop.** Paldor,
+Shamir & Garfinkel (2020), *GAFD* 115(1), 15–34, compare barotropic-instability
+growth rates for a zonal jet on the sphere across the nondivergent, quasi-geostrophic
+and full shallow-water formulations. Per the authors' own EGU2020 abstract of that
+work, shallow-water growth rates "can be smaller by more than 50%" than the
+nondivergent prediction at mean depths of 5–10 km, converging only above 30 km.
+**This project uses H = 10 km.** Quoting `σ` to five significant figures and
+distinguishing `m = 6` from `m = 7` at 0.07% inside a >50% formulation bias is not
+defensible. See `DIVERGENT_STABILITY_DECISION.md`.
 
 ## c1 — Doppler-correcting the observed phase speed
 
@@ -231,15 +250,168 @@ al. and Heifetz et al., and claim only the exposition.
 
 ## Open questions this campaign could not close
 
-1. **Hayashi & Young (1987)**, `10.1017/S0022112087002982`. The width critic
-   reported that this paper exhibits shallow-water shear instabilities with no
-   PV-gradient sign change. **Not verified** — the paper was not obtained. If true
-   it bounds H7, which the blueprint calls its strongest test *because* it is a
-   prohibition: the prohibition would hold for the nondivergent system and not
-   necessarily for the divergent one the project integrates. **This should be
-   settled before H7 is reported as a passed or failed test.**
+1. **Hayashi & Young (1987)**, `10.1017/S0022112087002982` — **RESOLVED in
+   Session L4b, and the report was correct.** Their abstract, obtained verbatim,
+   states that "when the basic state has no potential vorticity gradients an
+   unstable wave has zero wave energy": instability with no PV gradient at all is
+   real in the divergent system, so Rayleigh–Kuo's necessary condition does not
+   transfer. **But the setting is an equatorial β-plane**, and the mechanism is
+   energetic — the free surface makes wave energy non-positive-definite, which
+   requires the flow to be comparable to the gravity-wave speed. This project's
+   midlatitude jet has a Froude-like ratio of 0.26 and sits 7.8× inside Ripa's
+   gravity-wave condition. **The counterexample is real and does not reach this
+   configuration.** H7 stands as a prohibition on modal growth for the
+   nondivergent problem it is posed in. See `RIPA_HAYASHI_YOUNG_NOTES.md`.
 2. **Longuet-Higgins (1968) and Swarztrauber & Kasahara (1985)** remain unobtained,
    and they are the papers most likely to contain fragment a3.
-3. **Ripa (1983)** unobtained; it is the correct reference for the divergent
-   stability conditions.
+3. **Ripa (1983)** — **RESOLVED in Session L4b.** Still unobtained as full text,
+   but the publisher abstract was obtained verbatim and states both conditions.
+   They **reduce cleanly** to the classical Rayleigh–Kuo condition in the
+   nondivergent limit: divergence does not modify the classical condition, it adds
+   a second, independent gravity-wave criticality condition. White & Staniforth
+   (2009), `10.1002/qj.504`, extend the criteria to the sphere and close the
+   remaining question about the spherical form. See `RIPA_HAYASHI_YOUNG_NOTES.md`.
 4. **Randel & Held (1991)** or equivalent still absent.
+
+---
+
+## e1 — extending the stability analysis to the divergent system
+
+**Added Session L4b.** Full record below; the decision it feeds is
+`docs/literature/DIVERGENT_STABILITY_DECISION.md`.
+
+# Dialectic challenge — fragment e1 (divergent stability extension)
+
+**Session L5, Step 11-equivalent.** Same standard as `DIALECTIC_CHALLENGE.md`
+(a1–d). Adversarial by design.
+
+**Fragment.** Extend the stability analysis from the nondivergent barotropic
+vorticity equation to the full divergent shallow-water system; test whether
+Ripa's condition holds / is modified / is violated for the Galewsky jet across
+the project's rotation-rate sweep; cross-validate against the nonlinear runs.
+
+---
+
+## VERDICT: FULLY NARROWED — not a contribution
+
+Stronger than any verdict reached in Session L4. Fragment e1 fails on three
+independent grounds: the prior art is direct and recent, the answer is known in
+advance and is vacuous, and the fragment's stated premise about the project's own
+campaign is factually false.
+
+---
+
+## Attack 1 — prior art (decisive)
+
+All found by forward-citation sweep of Ripa (1983) via OpenAlex
+(`W2166185040`, 118 citing works retrieved). None was in `CANDIDATE_POOL.csv`.
+
+**a. Staniforth & White (2008)**, *Stability of some exact solutions of the
+shallow-water equations for testing numerical models in spherical geometry*,
+QJRMS 134, `10.1002/qj.240`. Abstract, verbatim: sufficient stability conditions
+are derived for axisymmetric spherical shallow-water solutions "as an aid to the
+development and testing of global numerical models … so that any significant time
+evolution occurring in a numerical model initialised with one of these exact
+solutions is of numerical origin, and does not reflect an inherent physical
+instability," and — the killer clause — "**planetary rotation stabilises the
+solutions** (as would be so if the flow were governed by barotropic vorticity
+dynamics), and **low Rossby and Froude numbers favour their stability**." That is
+fragment e1's deliverable — Ripa-class conditions, on the sphere, swept over
+rotation, in the numerical-model-verification context — published in 2008.
+
+**b. White & Staniforth (2009)**, *Stability criteria for shallow-water flow above
+zonally symmetric orography on the sphere*, QJRMS 135, `10.1002/qj.504`.
+Verbatim: "the sufficient stability criteria given by P. Ripa in 1983 for zonal
+shallow-water flow on the sphere may be extended to include zonally symmetric
+orography … The context of the study is the use of stable flows to test the
+formulation of discretized numerical models; **illustrative examples of how to
+apply the criteria in this context are presented**." This is the *applied,
+worked, numerical* version of Ripa on the sphere. It also closes the open
+question at `RIPA_HAYASHI_YOUNG_NOTES.md` §3 (spherical vs β-plane form) — which
+means it is a citation the project needs regardless.
+
+**c. Poulin & Flierl (2003)**, *The Nonlinear Evolution of Barotropically Unstable
+Jets*, JPO 33, `10.1175/1520-0485(2003)033<2173:TNEOBU>2.0.CO;2`. Verbatim: "the
+linear stability problem is solved for a wide range of Rossby and Froude numbers
+to elucidate the functional dependency of growth rate on these two nondimensional
+parameters. Then the nonlinear evolution of the instability is investigated
+through the use of numerical experiments." **Divergent shallow-water jet EVP,
+swept over a rotation-equivalent parameter, cross-validated against nonlinear
+runs.** That is the fragment's *entire* methodological content, minus the sphere.
+
+**d. Shepherd (2003)**, *Ripa's Theorem and its Relatives*, ch. 1 of *Nonlinear
+Processes in Geophysical Fluid Dynamics*, `10.1007/978-94-010-0074-1_1`. A review
+chapter exists. Reviewed material is not a contribution.
+
+**e. Clark & Herron (2012)**, GAFD, `10.1080/03091929.2012.671817` — *Improved
+bounds on linear instability of barotropic zonal flow within the shallow water
+equations*: a semi-ellipse bound "based on the wave-number, Froude number, and
+depth". The "is it modified?" question already has a published sharpened answer.
+
+**f. Dowling (1993, 2014, 2020)** — Arnol'd/Kelvin–Arnol'd second-branch
+criteria evaluated numerically against *observed* planetary jets; *Jupiter-style
+Jet Stability* (PSJ 2020, `10.3847/psj/ab789d`) states outright that branch KA-I
+"includes as special cases the textbook shear stability theorems of Rayleigh,
+Kuo, Charney–Stern, and Fjørtoft" and that the second branch is a Mach-number-like
+criticality condition. The project's §7.8× margin is a KA-II margin computation.
+
+**g. SWMHD, as the L4 width critique suspected.** Mak, Griffiths & Hughes (2016),
+JFM 788, `10.1017/jfm.2015.718`: "Various classical instability results, such as
+Høiland's growth-rate bound and Howard's semi-circle theorem, **are extended to
+this shallow-water system** for quite general flow and field profiles," then
+solved numerically for the Bickley jet across Froude number. Yes — that community
+has already done the equivalent extension, and did it more generally.
+
+## Attack 2 — there is nothing to find, and it is worse than a null result
+
+The margin test (`check_ripa_divergent_condition.txt`) shows condition (ii) holds
+at 7.83×, identically at every Ω in P-08…P-12, because (ii) contains no rotation
+rate. But the fatal point is condition **(i)**, and the project has already
+computed it: `check_rayleigh_kuo.txt` arm 4(b) finds `dQ/dφ` **changes sign at
+four latitudes** (+32.19°, +39.79°, +49.82°, +58.16°) for the Galewsky jet.
+
+Ripa's conditions are *sufficient for stability, jointly*. Condition (i) fails.
+Therefore **Ripa's theorem returns no verdict for this jet at any rotation rate**
+— it is not "satisfied", "modified" or "violated"; it is silent. The fragment
+asks a question whose answer is "the theorem does not apply here", derivable in
+five lines from two files the project already has.
+
+## Attack 3 — the premise is factually wrong about this campaign
+
+`configs/RUN_REGISTRY.md`: P-08…P-12 are **`single_harmonic` phase-speed runs**
+(degree n = 4 Rossby–Haurwitz), containing no jet at all. There is **no
+Galewsky-jet rotation sweep**: I-00 is a single anchor run at Ω₀, and the
+rotation sweep I-06…I-09 uses the *idealised* jet. And all **42 of 42 runs are
+"not started"** — there are no "nonlinear initial-value runs already in the
+campaign" to cross-validate against. The existing check also inherits this: it
+evaluates a jet-derived margin "across P-08 to P-12", runs that contain no jet.
+
+## Attack 4 — scope creep
+
+Blueprint §2.3: "The contribution is not new theory." `GAP_STATEMENT.md` records
+L1 as a *limitation to state*, and the width critique already prescribed the fix:
+"state that §8–§9 are the nondivergent limit, cite Ripa … bound the resulting
+bias on σ using §6.4's own numbers. **That is a two-paragraph fix.**" e1 converts
+a two-paragraph citation fix into a research programme in energy–Casimir
+stability theory. Meanwhile nothing has been run.
+
+---
+
+## The steelman, honestly
+
+There is one, and it is **not** an argument for e1 as written.
+
+A large margin on a *sufficient stability condition* says nothing about the
+*magnitude* of a growth rate. The project's exposed number is
+`σ = 2.0748×10⁻⁵ s⁻¹` quoted to five figures with `m = 6` vs `m = 7` separated at
+0.07%, from a nondivergent operator, for a jet with `L_d ≈ 3×10⁶ m`. Poulin &
+Flierl (2003) demonstrate that σ depends functionally on Froude number; Mak et al.
+(2016) find weak shear instabilities surviving to arbitrarily large Froude number.
+So "condition (ii) holds at 7.83×" does **not** license "the divergent correction
+to σ is negligible", and §6.4's own 6–40% frequency corrections point the other
+way.
+
+The defensible move is therefore the *divergent EVP for σ(m)* — a bias estimate on
+the headline number, framed as verification, claimed as nothing — not a test of
+Ripa's conditions, which is answered and occupied. Even that should be ranked
+against simply reporting L1 honestly and running the 42 pending runs.

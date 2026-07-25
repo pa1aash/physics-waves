@@ -255,6 +255,40 @@ not claimed as new.
 
 ---
 
+## 6b. Session L4b — read this alongside, before signing off
+
+**Session L4b ran after this document was written**, as a narrow follow-up to the
+one open question the dialectic challenge could not close: whether Rayleigh–Kuo's
+nondivergent necessary condition survives in the divergent shallow-water system
+the project actually integrates. It **materially changes items L1, L5, b1 and
+b2**, and its output should be read together with this review.
+
+**Read `docs/literature/DIVERGENT_STABILITY_DECISION.md`.** Its recommendation, in
+one line: *do not extend the stability analysis to the divergent case, because the
+comparison was published in 2020 — but strengthen limitation L1, because that
+published work says the project's growth rates carry a formulation bias of more
+than 50% at its own layer depth.*
+
+What changed:
+
+| Item | Change |
+|------|--------|
+| **New fragment e1** | Extending the stability analysis to the divergent system: **FULLY NARROWED**, the strongest verdict any fragment has received. Paldor, Shamir & Garfinkel (2020), *GAFD* 115(1), 15–34, publish exactly that comparison for a spherical jet; White & Staniforth (2009) already apply Ripa's criteria on the sphere to guide numerical model testing |
+| **L1** | Was a scoping statement; is now a **sized, cited bias**. The reported growth-rate precision must drop: `m = 6` versus `m = 7` at 0.07% is not meaningful inside a >50% formulation bias |
+| **L5** | Two of the four unobtained sources are now **ABSTRACT-VERIFIED**, a status this project did not previously have. Ripa's conditions were extracted and shown to reduce cleanly to Rayleigh–Kuo in the nondivergent limit |
+| **b1** | Verdict unchanged, but now rests on **governing equations** named in abstracts rather than on titles: all five papers in the Skiba/Constantin–Germain/Cao–Wang programme are nondivergent |
+| **b2** | Weakened further, for the reason under L1 |
+| **Open questions 1 and 3** | **Resolved.** Hayashi & Young's counterexample is real but equatorial and does not reach this configuration; Ripa's conditions add a gravity-wave criticality condition satisfied here with a 7.8× margin |
+
+**One item added to §6 of this document by L4b:** the highest-value literature
+action remaining in the project is obtaining Paldor, Shamir & Garfinkel (2020). It
+is bronze open-access — free to read in a browser, blocked to scripted retrieval —
+and its >50% figure is currently cited from the authors' own conference abstract
+rather than from the journal text. That figure should be checked against the
+published paper before it reaches the manuscript.
+
+---
+
 ## 7. Closing statement
 
 ```

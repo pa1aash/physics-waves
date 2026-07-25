@@ -108,6 +108,40 @@ def main() -> int:
             )
         entries.append("@" + etype + "{" + key + ",\n" + ",\n".join(fields) + "\n}")
 
+    # Pre-DOI entries, emitted by the generator rather than appended by hand.
+    # The Journal of Marine Research (1937-2021) predates DOI registration, so
+    # these two cannot come through the DOI-keyed pool -- but they are the origin
+    # of the result this paper tests, and dropping them to satisfy a DOI-only rule
+    # would be worse than the exception. They live here because a hand-append to
+    # references.bib does not survive the next regeneration, which is exactly how
+    # they were silently lost once.
+    entries.append(
+        "@article{rossby1939,\n"
+        "  author  = {Rossby, Carl-Gustaf},\n"
+        "  title   = {Relation between variations in the intensity of the zonal "
+        "circulation of the atmosphere and the displacements of the semi-permanent "
+        "centers of action},\n"
+        "  journal = {Journal of Marine Research},\n"
+        "  volume  = {2},\n"
+        "  number  = {1},\n"
+        "  pages   = {38--55},\n"
+        "  year    = {1939},\n"
+        "  url     = {https://elischolar.library.yale.edu/journal_of_marine_research/}\n"
+        "}"
+    )
+    entries.append(
+        "@article{haurwitz1940b,\n"
+        "  author  = {Haurwitz, Bernhard},\n"
+        "  title   = {The motion of atmospheric disturbances on the spherical Earth},\n"
+        "  journal = {Journal of Marine Research},\n"
+        "  volume  = {3},\n"
+        "  number  = {3},\n"
+        "  pages   = {254--267},\n"
+        "  year    = {1940},\n"
+        "  url     = {https://elischolar.library.yale.edu/journal_of_marine_research/575/}\n"
+        "}"
+    )
+
     header = (
         "% manuscript/references.bib\n"
         "% Compiled by scripts/lit_bib.py from docs/literature/VERIFIED_POOL.csv\n"
