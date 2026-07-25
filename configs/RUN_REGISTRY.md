@@ -56,7 +56,7 @@ Sub-questions (blueprint section 3.2): **SQ1** dispersion-relation theory · **S
 | I-11 | instability | Resolution robustness — supercritical idealised jet | jet | L1 | Resolution | sigma convergence | SQ5 | not started |
 | I-12 | instability | Perturbation-seed robustness — supercritical idealised jet | jet | L1 | Random seed | sigma spread across seeds | SQ5 | not started |
 | EVP-hough | evp | Hough-mode eigenfrequencies of the divergent shallow-water system, swept over Lamb's parameter and azimuthal order (authorised extension B) | — | L1 | Lamb's parameter, azimuthal order | Hough eigenfrequencies | SQ1 / SQ3 | not started |
-| EVP-jet-stability | evp | Linear stability eigenvalues about each zonal base state u-bar(phi) (authorised extension C) | jet | L1 | Base state, azimuthal order | Growth rates sigma(m), eigenmodes | SQ5 | not started |
+| EVP-jet-stability | evp | Linear stability eigenvalues about each zonal base state u-bar(phi) (authorised extension C). **Nondivergent by decision** (Session L4b, Option B) — see `docs/literature/DIVERGENT_STABILITY_DECISION.md` | jet | L1 | Base state, azimuthal order | Nondivergent modal growth rates sigma(m), eigenmodes | SQ5 | not started |
 
 ## Observational datasets (D1–D4)
 

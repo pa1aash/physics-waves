@@ -1,6 +1,15 @@
 # Run-config stub (Session 00). Solver-dependent values are marked
 # TBD_SESSION_L5 and finalised in Session L5. Validates against
 # configs/_schema.yaml.
+#
+# SCOPE DECISION (Session L4b, Option B) -- do not re-litigate.
+# This eigenvalue problem is deliberately NONDIVERGENT. Extending it to the full
+# divergent shallow-water system was investigated and found to be established
+# ground (Paldor, Shamir & Garfinkel 2020; White & Staniforth 2009), so the
+# nondivergent scope is a considered choice rather than an oversight. Growth
+# rates are therefore nondivergent MODAL growth rates and carry a one-signed
+# formulation bias -- nondivergent overestimates. Rationale and costing:
+# docs/literature/DIVERGENT_STABILITY_DECISION.md
 run_id: EVP-jet-stability
 campaign: evp
 description: Linear stability eigenvalues about each zonal base state u-bar(phi) (authorised
@@ -16,5 +25,9 @@ initial_condition_params:
   base_states: TBD_SESSION_L5
   azimuthal_orders: TBD_SESSION_L5
   truncation: TBD_SESSION_L5
-notes: Exact growth rates sigma(m) and eigenmode structure; closes the Rayleigh-Kuo
-  'necessary but not sufficient' gap.
+notes: >-
+  Nondivergent modal growth rates sigma(m) and eigenmode structure; converts the
+  Rayleigh-Kuo prohibition into a prediction. Not a general stability proof --
+  the operator is non-normal, so an all-real spectrum does not exclude transient
+  growth. Scope decision recorded in
+  docs/literature/DIVERGENT_STABILITY_DECISION.md
