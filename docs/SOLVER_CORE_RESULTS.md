@@ -163,6 +163,27 @@ of 78×, so the flow is *certified stable* by a genuinely sufficient condition. 
 every rung above it, condition (i) fails and Ripa's theorem says **nothing at
 all** — which is not the same as saying the flow is unstable, even where it is.
 
+> **Refined in Session L6** (`src/analysis/stability_evp.py`, which turned this
+> table into a sweep). Every rung above reproduces exactly. Two of the numbers
+> above are properties of the *ladder spacing* rather than thresholds, and the
+> finer sweep separates them:
+>
+> - **Ripa's threshold coincides with Rayleigh–Kuo's, at S = 0.0728.** S = 0.05 was
+>   simply the largest rung tested. Condition (ii) holds with a margin of order
+>   fifty throughout this family, so it never binds, and condition (i) fails
+>   exactly where `dQ/dy` first reverses — which is Rayleigh–Kuo's condition. They
+>   would separate only at much larger `ε`, or much smaller `gH`.
+> - **Growth actually begins at S = 0.158** (bracket 0.154–0.161, bisected at
+>   truncation 240/480), inside the 0.10–0.25 window this section stated. The
+>   permitted-but-quiet band is therefore S ∈ [0.073, 0.158].
+>
+> One caveat found while bisecting: near the onset, "does a growing mode exist" is
+> partly a statement about resolution. At S = 0.25 the fastest mode has σ = 3.5225
+> × 10⁻⁶ at truncation 120/240 and 3.5221 × 10⁻⁶ at 240/480 — the same rate to four
+> figures — but the resolution-doubling filter rejects it at the coarse truncation
+> and accepts it at the fine one, which moves a coarse-truncation onset search to
+> S ≈ 0.33. The onset is therefore quoted with the truncation it was found at.
+
 ## 7. Known limitations of this session's results
 
 - **Three proof runs, one resolution each.** No convergence study, no error

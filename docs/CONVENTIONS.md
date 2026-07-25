@@ -287,6 +287,43 @@ asserts, after the archived PDF's text layer was found to drop minus signs.
 omission, and the one-signed bias it implies (nondivergent overestimates growth
 rates) travels with every number the module produces.
 
+## Analysis pipeline
+
+Built in Session L6. Everything reads a completed run through
+`src/diagnostics/slices.py`, which is the single place that knows the HDF5 layout;
+nothing else opens a run file directly.
+
+| Module | Consumes | Produces |
+|--------|----------|----------|
+| `src/diagnostics/slices.py` | a run directory | concatenated time axis **in seconds**, task arrays, grids, provenance and unit conversions; Hovmöller arrays; snapshot maps |
+| `src/diagnostics/conservation.py` | a run's `spectra` handler | mass / energy / potential-enstrophy series, relative drift, and the blueprint §9.3 verdicts |
+| `src/diagnostics/spectra.py` | a 2-D field + its colatitude grid | spherical-harmonic power by degree and by order; time series of either |
+| `src/analysis/compute_error_norms.py` | a field + an exact reference | `l1`, `l2`, `l∞` (Williamson eqs. 82–84, 97), and the reference itself for the three cases that have one |
+| `src/analysis/extract_hovmoller.py` | a run + a latitude | a longitude–time field, from a stored slice where one exists and interpolated snapshots otherwise, labelled either way |
+| `src/analysis/fit_phase_speed.py` | a Hovmöller array | `c_ang` with standard error, aliasing risk, and mode-presence check |
+| `src/analysis/fit_growth_rate.py` | a diagnostic time series | `σ` with standard error, automatic growth-window selection, oscillation removal, window-sensitivity spread |
+| `src/analysis/spectral_decompose.py` | a longitude–time field | zonal spectrum; **space–time (Hayashi) decomposition** into eastward and westward branches |
+| `src/analysis/extract_structure.py` | a snapshot sequence | meridional mode profile, structure diagnostics, comparison against an EVP eigenfunction |
+| `src/analysis/hough.py` | a completed phase-speed run | **measured vs nondivergent vs Hough**, with the departures between all three |
+| `src/analysis/stability_evp.py` | a shear parameter or a ladder of them | **necessary (Rayleigh–Kuo) vs sufficient (Ripa) vs actual growth**, and the three thresholds |
+
+**Two of these are the session's point.** `hough.py` and `stability_evp.py` turn
+findings that Session L5 obtained by hand into comparisons that now happen for
+every run as a matter of course, and both are regression-locked in
+`tests/test_analysis_pipeline.py` against the numbers that session reported.
+
+**Every fitter is validated against fabricated data whose answer is known**, to
+better than 0.1% — the blueprint's own exit criterion. That is a stronger test
+than agreement with a previous run, because a biased fitter reproduces itself
+perfectly. The tolerance is not to be loosened to make a test pass.
+
+**Still out of scope, deliberately.** `src/analysis/process_reanalysis.py` remains
+a stub until **Session L8** (it needs ERA5/NCEP fields, and the Hayashi tool it
+will use was built and validated here precisely so that session does not have to
+debug a new tool on noisy real data). `src/analysis/aggregate_results.py` remains
+a stub until **Session L9** (a master CSV and Richardson extrapolation need many
+completed campaign runs, which do not exist yet).
+
 ## Run provenance
 
 Every run writes `runs/<RUN_ID>/provenance.json`. The bulk HDF5 beside it is

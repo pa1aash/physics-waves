@@ -23,6 +23,24 @@ equations and initial condition work end to end. It is *not* a campaign result:
 its resolution row is not complete and no verification gate has been claimed on
 it. A run marked **complete** ran the full sweep its config declares.
 
+**Analysis tooling (Session L6).** Two comparisons that Session L5 performed by
+hand are now pipeline stages, available to every run in this table without further
+work:
+
+- **`src/analysis/hough.py`** — for any phase-speed run, measures the phase speed
+  and sets it beside both the nondivergent Rossby–Haurwitz prediction and the
+  independently-solved divergent Hough eigenvalue at the run's own `ε`.
+  `python -m src.analysis.hough P-17`.
+- **`src/analysis/stability_evp.py`** — for any jet-family base state, returns the
+  Rayleigh–Kuo (necessary) verdict, the Ripa (sufficient) verdict and the actual
+  modal growth rate, and can bisect all three thresholds.
+  `python -m src.analysis.stability_evp --thresholds`.
+
+**Reference baseline.** The regression tests in `tests/test_analysis_pipeline.py`
+lock both tools against Session L5's results, and `docs/SOLVER_CORE_RESULTS.md`
+§§3, 6 records the numbers. Any future P- or I-campaign run should be compared
+against that baseline before its own numbers are trusted.
+
 Sub-questions (blueprint section 3.2): **SQ1** dispersion-relation theory · **SQ2** verification and convergence · **SQ3** phase speed vs wavenumber and rotation · **SQ4** meridional structure and observational comparison · **SQ5** jet instability.
 
 | Run ID | Campaign | Purpose | Initial condition | Resolution | Varies | Measured | Sub-question | Status |
