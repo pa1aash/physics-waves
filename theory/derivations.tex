@@ -729,6 +729,39 @@ potential-vorticity budget goes into stretching. A small-scale mode has a scale
 far below $L_d$, the surface barely deflects, and the flow is effectively
 nondivergent: it behaves as Section~\ref{sec:rest} says it should.
 
+\subsection{The sectoral modes are a genuine special case}
+\label{sec:hough:sectoral}
+
+One family departs from that trend, systematically and for a structural reason
+worth stating rather than smoothing over. The \emph{sectoral} modes, those with
+$n = m$, are consistently slowed \emph{less} than their $n = m+1$ neighbours ---
+at $m=2$, for instance, $7.5\%$ against $19.8\%$. This holds for every $m$
+tested, so it is a property of the sectoral family and not an artefact of one
+calculation.
+
+The cause is visible in the structure of \eqref{eq:houghevp}. The Coriolis
+coupling matrix $B$ is tridiagonal: multiplication by $\mu = \sin\varphi$ and by
+$(1-\mu^2)\,\dd/\dd\mu$ each connect degree $n$ only to $n\pm1$. A sectoral mode
+sits at the bottom of the degree ladder, since $n \ge m$ always, so it has only
+\emph{one} neighbour to couple through instead of two. Physically: the rotation
+of the sphere can hand a sectoral mode's rotational flow to one adjacent degree
+rather than two, so a smaller share of its potential-vorticity budget is
+available to be absorbed by vortex stretching, and it is correspondingly less
+slowed by the free surface.
+
+This is demonstrated causally rather than inferred. Deleting the lower
+neighbour of a \emph{non}-sectoral mode from the spectral basis --- leaving its
+latitudinal structure untouched --- collapses its slowing to sectoral values: at
+$(m,n) = (2,3)$, from $19.8\%$ to $6.4\%$, against a true sectoral $7.5\%$.
+
+A second, weaker effect points the same way. The relevant stiffness is set by
+the \emph{local} deformation radius $\sqrt{gH}/|f|$, which grows toward the
+equator, so the appropriate parameter for a given mode is
+$\varepsilon\langle\sin^2\!\varphi\rangle/[n(n+1)]$ rather than $\varepsilon$
+itself. Sectoral modes, whose associated Legendre function
+$P_m^m \propto \cos^m\!\varphi$ has no meridional node and is equatorially
+confined, sit where that local deformation radius is largest.
+
 \medskip
 \noindent\emph{Physical payoff:} this is hypothesis H5, expressed as what it
 actually is --- a statement about how a free surface changes the restoring
@@ -1048,13 +1081,21 @@ Solving \eqref{eq:genevp} for the Galewsky jet gives a resolved unstable band
 $1 \le m \le 8$ peaking at
 %
 \begin{equation}
-m^{*} = 6 , \qquad
+m^{*} \approx 6 , \qquad
 \sigma(m^{*}) = 2.07\times10^{-5}\ \mathrm{s^{-1}},
 \qquad
 \text{$e$-folding time } 0.56\ \text{days} .
 \label{eq:galewskygrowth}
 \end{equation}
 %
+The approximation sign is meant literally and is not hedging. The growth rates
+at $m = 6$ and $m = 7$ differ by $0.07\%$ --- $2.0748\times10^{-5}$ against
+$2.0734\times10^{-5}\ \mathrm{s^{-1}}$ --- which is far inside any physical
+uncertainty in the base state. The instability peaks on a \emph{plateau}
+spanning $m = 6$--$7$, and quoting a single sharp $m^{*}$ would overstate what
+the calculation resolves. What is robust is the band: growth is resolved for
+$1 \le m \le 8$ and the peak sits near its upper middle.
+
 By contrast, solid-body rotation --- whose $\dd Q/\dd y = 2(\Omega + U_0/R)
 \cos\varphi$ has no sign change --- yields a spectrum that is real to machine
 precision at every $m$ tested. The two results together are the content of the
@@ -1200,8 +1241,8 @@ stated plainly rather than glossed. For the Galewsky jet, $\dd Q/\dd\varphi$
 changes sign four times ($32.2^\circ$, $39.8^\circ$, $49.8^\circ$,
 $58.2^\circ$N), giving two reversed-gradient bands flanking a positive core.
 Taking $b_{\mathrm{eff}}$ as half the separation between the band centres
-($1001$~km) gives $m^{*} \approx 1.8$, against the $m^{*} = 6$ that the solved
-eigenvalue problem \eqref{eq:galewskygrowth} returns. The two disagree by a
+($1001$~km) gives $m^{*} \approx 1.8$, against the $m^{*} \approx 6$ that the
+solved eigenvalue problem \eqref{eq:galewskygrowth} returns. The two disagree by a
 factor of about three, and the disagreement is reported rather than tuned away.
 Two reasons are identifiable, both physical: concentrating each gradient into a
 delta function maximises the long-range reach of the inverted flow and so biases
@@ -1355,7 +1396,10 @@ H5 & Departure from the nondivergent prediction grows as the wave scale
      approaches $L_d$
    & \eqref{eq:houghevp}, \eqref{eq:limit}
    & No systematic dependence on Burger number; or a measured departure that
-     does not converge to zero as $\varepsilon\to0$ at first order. \\
+     does not converge to zero as $\varepsilon\to0$ at first order. Note the
+     sectoral modes $n = m$ depart less than their neighbours for the
+     structural reason given in
+     Section~\ref{sec:hough:sectoral}; that is predicted, not a failure. \\
 H6 & Benchmark error decays spectrally with resolution
    & --- (numerical, not predicted here)
    & Algebraic convergence, indicating an implementation error. \\
@@ -1373,7 +1417,9 @@ H9 & Increasing $\Omega$ at fixed jet shape stabilises the flow
      \eqref{eq:dQdy} less able to reverse the sign. \\
 H10 & Model dominant zonal wavenumber is of the same order as observed
    & \eqref{eq:genevp}, \eqref{eq:mstar}
-   & Order-of-magnitude disagreement in wavenumber. \\
+   & Order-of-magnitude disagreement in wavenumber. The model side is a
+     plateau ($m = 6$--$7$ for the Galewsky jet), not a sharp value, so the
+     comparison is band-against-band. \\
 \bottomrule
 \end{longtable}
 
@@ -1383,7 +1429,9 @@ about the physics, and is deliberately not derived here. H10 is supported by two
 independent routes --- the solved eigenvalue problem \eqref{eq:genevp} and the
 counter-propagating-wave scaling \eqref{eq:mstar} --- which currently disagree by
 a factor of about three for the Galewsky jet; Section~\ref{sec:crw} states why,
-and the eigenvalue problem is the one to be trusted.
+and the eigenvalue problem is the one to be trusted. Note also that the
+eigenvalue problem returns a plateau spanning $m = 6$--$7$ rather than a single
+wavenumber, so H10 is tested band-against-band.
 
 % =====================================================================
 \begin{thebibliography}{99}

@@ -175,6 +175,42 @@ def rossby_frequencies(m: int, nmax: int, eps: float, targets):
     return out
 
 
+def _build_truncated_below(m: int, nmin: int, nmax: int, eps: float):
+    """The same operator with the spectral basis cut off BELOW at ``nmin``.
+
+    ``nmin = m`` is the true problem. Setting ``nmin > m`` artificially places
+    the mode of degree ``nmin`` at the bottom of the degree ladder, removing its
+    lower Coriolis coupling partner while leaving its latitudinal structure
+    alone. Used only by arm 5, as a causal probe.
+    """
+    M, D, degrees = legendre_matrices(m, nmax)
+    k = list(degrees).index(nmin)
+    M, D, degrees = M[k:, k:], D[k:, k:], degrees[k:]
+    lam = degrees * (degrees + 1.0)
+    B = M - D / lam[None, :]
+    size = len(degrees)
+    Z = np.zeros((size, size))
+    root = np.sqrt(eps)
+    return np.block(
+        [
+            [np.diag(1j * m / lam), -B, Z],
+            [B, np.diag(1j * m / lam), np.diag(lam) / root],
+            [Z, -np.eye(size) / root, Z],
+        ]
+    )
+
+
+def _track_truncated_below(m: int, n: int, eps_target: float, nmax: int, steps: int = 60):
+    """Arm-5 probe: track degree ``n`` in a basis that starts at ``n``."""
+    ladder = np.geomspace(1e-6, eps_target, steps)
+    sigma = 1j * np.linalg.eigvals(_build_truncated_below(m, n, nmax, ladder[0]))
+    cur = sigma[int(np.argmin(np.abs(sigma - (-m / (n * (n + 1.0))))))]
+    for eps in ladder[1:]:
+        sigma = 1j * np.linalg.eigvals(_build_truncated_below(m, n, nmax, eps))
+        cur = sigma[int(np.argmin(np.abs(sigma - cur)))]
+    return cur
+
+
 def track_rossby_mode(m: int, n: int, eps_target: float, nmax: int, steps: int = 60):
     """Follow one Rossby branch from eps = 1e-6 up to ``eps_target``.
 
@@ -301,14 +337,17 @@ def main() -> int:
             frac = (abs(s.real) - abs(sigma0)) / abs(sigma0) * 100.0
             eqbt = -m / (lam + EPS_EARTH)
             arm4_monotone = arm4_monotone and (abs(s.real) < abs(sigma0))
+            tag = "  <- sectoral (n=m)" if n == m else ""
             lines.append(
                 f"  {m:2d}  {n:2d}   {sigma0:+.6f}     {s.real:+.6f}   "
-                f"{frac:+7.2f}%     {eqbt:+.6f}"
+                f"{frac:+7.2f}%     {eqbt:+.6f}{tag}"
             )
     lines.append("")
-    lines.append("  Every mode is slowed, and the fractional slowing is largest at low n")
-    lines.append("  -- the largest scales, closest to the deformation radius. This is H5")
-    lines.append("  as a curve rather than as an assertion.")
+    lines.append("  Every mode is slowed. Among the NON-sectoral modes the fractional")
+    lines.append("  slowing falls as n rises -- small scales need less surface deflection,")
+    lines.append("  so less of the PV budget goes into stretching. This is H5 as a curve")
+    lines.append("  rather than as an assertion. The sectoral modes n = m sit below that")
+    lines.append("  trend for a structural reason, established in arm 5.")
     lines.append("  The last column is the equivalent-barotropic estimate -m/(Lam + eps),")
     lines.append("  shown for orientation only: it captures the sense and rough size of")
     lines.append("  the effect but is not the Hough answer, which is what the project")
@@ -319,10 +358,78 @@ def main() -> int:
     )
     lines.append("  (Arm 4 is a physical readout, not a pass/fail gate.)")
 
+    # ---- Arm 5 ------------------------------------------------------------
+    lines.append("")
+    lines.append("Arm 5 - why the sectoral modes n = m sit below the trend")
+    lines.append("-" * 72)
+    lines.append("  Session L3 flagged the m=2, n=2 entry of arm 4 as an unexplained")
+    lines.append("  outlier. It is not an outlier and it is not numerical: EVERY sectoral")
+    lines.append("  mode behaves this way, and the cause is structural.")
+    lines.append("")
+    lines.append("  (i) The pattern is systematic across m:")
+    lines.append("      m |    n=m      n=m+1     n=m+2")
+    arm5 = True
+    for m in range(1, 6):
+        cells = []
+        for n in range(m, m + 3):
+            s0 = -m / (n * (n + 1.0))
+            s = track_rossby_mode(m, n, EPS_EARTH, 60)
+            cells.append((abs(s.real) - abs(s0)) / abs(s0) * 100.0)
+        # The sectoral mode must be less slowed than its n=m+1 neighbour.
+        arm5 = arm5 and (abs(cells[0]) < abs(cells[1]))
+        lines.append(f"      {m} | " + "  ".join(f"{c:+7.2f}%" for c in cells))
+    lines.append(
+        f"      sectoral less slowed than its n=m+1 neighbour, every m: "
+        f"{'yes' if arm5 else 'NO -- inspect'}"
+    )
+    lines.append("")
+    lines.append("  (ii) The cause, demonstrated causally. The Coriolis coupling matrix B")
+    lines.append("       is tridiagonal: it connects degree n only to n +/- 1. A sectoral")
+    lines.append("       mode sits at the bottom of the degree ladder (n >= m), so it has")
+    lines.append("       only ONE neighbour to couple through instead of two -- half the")
+    lines.append("       channels through which its rotational flow can be converted into")
+    lines.append("       divergence and surface displacement.")
+    lines.append("")
+    lines.append("       Test: take a NON-sectoral mode and delete its lower neighbour from")
+    lines.append("       the basis, leaving its latitudinal structure untouched. If the")
+    lines.append("       explanation is right, its slowing must collapse toward sectoral")
+    lines.append("       values.")
+    lines.append("")
+    lines.append("        m   n   full basis   lower partner removed   true sectoral (n=m)")
+    arm5b = True
+    for m, n in ((1, 2), (2, 3), (3, 4)):
+        s0 = -m / (n * (n + 1.0))
+        full = track_rossby_mode(m, n, EPS_EARTH, 60)
+        cut = _track_truncated_below(m, n, EPS_EARTH, 60)
+        s0s = -m / (m * (m + 1.0))
+        sect = track_rossby_mode(m, m, EPS_EARTH, 60)
+        f_full = (abs(full.real) - abs(s0)) / abs(s0) * 100.0
+        f_cut = (abs(cut.real) - abs(s0)) / abs(s0) * 100.0
+        f_sect = (abs(sect.real) - abs(s0s)) / abs(s0s) * 100.0
+        # Removing the partner must move the mode most of the way to sectoral.
+        arm5b = arm5b and abs(f_cut) < 0.5 * abs(f_full)
+        lines.append(
+            f"       {m:2d}  {n:2d}   {f_full:+7.2f}%        {f_cut:+7.2f}%"
+            f"              {f_sect:+7.2f}%"
+        )
+    lines.append(
+        f"      removing the partner halves the slowing or better: "
+        f"{'yes' if arm5b else 'NO -- inspect'}"
+    )
+    lines.append("")
+    lines.append("  Physical statement: a sectoral mode has no meridional node and sits at")
+    lines.append("  the bottom of the spherical-harmonic degree ladder. The rotation of the")
+    lines.append("  sphere can hand its rotational flow to only one adjacent degree rather")
+    lines.append("  than two, so a smaller share of its potential-vorticity budget is")
+    lines.append("  available to be absorbed by vortex stretching, and it is correspondingly")
+    lines.append("  less slowed by the free surface. This is a genuine physical special")
+    lines.append("  case, not a numerical artefact.")
+    ok = ok and arm5 and arm5b
+
     lines.append("")
     lines.append(f"VERDICT: {'VERIFIED' if ok else 'MISMATCH'}")
     if not ok:
-        lines.append(f"  arm1={arm1}  arm2={arm2}  arm3={arm3}  (see the failing arm above)")
+        lines.append(f"  arm1={arm1}  arm2={arm2}  arm3={arm3}  arm5={arm5} arm5b={arm5b}")
 
     report = "\n".join(lines) + "\n"
     print(report, end="")

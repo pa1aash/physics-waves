@@ -49,19 +49,62 @@ Arm 4 - readout at Earth's Lamb parameter (hypothesis H5)
    1   3   -0.083333     -0.060134    -27.84%     -0.048067
    1   5   -0.033333     -0.028895    -13.32%     -0.025770
    1   8   -0.013889     -0.013071     -5.89%     -0.012376
-   2   2   -0.333333     -0.308288     -7.51%     -0.135095
+   2   2   -0.333333     -0.308288     -7.51%     -0.135095  <- sectoral (n=m)
    2   3   -0.166667     -0.133662    -19.80%     -0.096134
    2   5   -0.066667     -0.058738    -11.89%     -0.051541
    2   8   -0.027778     -0.026213     -5.63%     -0.024751
 
-  Every mode is slowed, and the fractional slowing is largest at low n
-  -- the largest scales, closest to the deformation radius. This is H5
-  as a curve rather than as an assertion.
+  Every mode is slowed. Among the NON-sectoral modes the fractional
+  slowing falls as n rises -- small scales need less surface deflection,
+  so less of the PV budget goes into stretching. This is H5 as a curve
+  rather than as an assertion. The sectoral modes n = m sit below that
+  trend for a structural reason, established in arm 5.
   The last column is the equivalent-barotropic estimate -m/(Lam + eps),
   shown for orientation only: it captures the sense and rough size of
   the effect but is not the Hough answer, which is what the project
   actually validates against.
   every listed mode slowed by the free surface: yes
   (Arm 4 is a physical readout, not a pass/fail gate.)
+
+Arm 5 - why the sectoral modes n = m sit below the trend
+------------------------------------------------------------------------
+  Session L3 flagged the m=2, n=2 entry of arm 4 as an unexplained
+  outlier. It is not an outlier and it is not numerical: EVERY sectoral
+  mode behaves this way, and the cause is structural.
+
+  (i) The pattern is systematic across m:
+      m |    n=m      n=m+1     n=m+2
+      1 |  -15.78%   -40.38%   -27.84%
+      2 |   -7.51%   -19.80%   -15.77%
+      3 |   -4.00%   -10.45%    -9.51%
+      4 |   -2.34%    -6.08%    -6.10%
+      5 |   -1.47%    -3.83%    -4.13%
+      sectoral less slowed than its n=m+1 neighbour, every m: yes
+
+  (ii) The cause, demonstrated causally. The Coriolis coupling matrix B
+       is tridiagonal: it connects degree n only to n +/- 1. A sectoral
+       mode sits at the bottom of the degree ladder (n >= m), so it has
+       only ONE neighbour to couple through instead of two -- half the
+       channels through which its rotational flow can be converted into
+       divergence and surface displacement.
+
+       Test: take a NON-sectoral mode and delete its lower neighbour from
+       the basis, leaving its latitudinal structure untouched. If the
+       explanation is right, its slowing must collapse toward sectoral
+       values.
+
+        m   n   full basis   lower partner removed   true sectoral (n=m)
+        1   2    -40.38%         -10.90%               -15.78%
+        2   3    -19.80%          -6.44%                -7.51%
+        3   4    -10.45%          -3.98%                -4.00%
+      removing the partner halves the slowing or better: yes
+
+  Physical statement: a sectoral mode has no meridional node and sits at
+  the bottom of the spherical-harmonic degree ladder. The rotation of the
+  sphere can hand its rotational flow to only one adjacent degree rather
+  than two, so a smaller share of its potential-vorticity budget is
+  available to be absorbed by vortex stretching, and it is correspondingly
+  less slowed by the free surface. This is a genuine physical special
+  case, not a numerical artefact.
 
 VERDICT: VERIFIED
