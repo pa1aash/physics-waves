@@ -366,3 +366,16 @@ satisfy a hard constraint of this repository.
 3. **`LICENSE-DATA` is a pointer.** Under the third-party-text rule above, the
    data licence file points to the CC BY 4.0 legal code rather than transcribing
    it; the full text is fetched via `make licenses` before the Zenodo deposit.
+4. **The literature pool CSVs are exempt from the blanket attribution screen.**
+   `docs/literature/CANDIDATE_POOL.csv` and `VERIFIED_POOL.csv` hold
+   machine-retrieved bibliographic metadata. Several real researchers in this
+   field carry a given name that collides with one of the screened tokens, and a
+   blunt case-insensitive match cannot tell a person's name from a tool byline.
+   Corrupting third-party author names to satisfy a guard would be worse than
+   the risk the guard covers. The two files are therefore excluded from the
+   `forbidden-attribution` pre-commit hook and from audit check 1, and are
+   covered instead by **audit check 1b**, which screens them for the same tokens
+   in *every column except `authors`* — so a tool byline smuggled into a title,
+   venue or query string is still caught. The exemption is narrow by path and by
+   column, and it is the only place in the repository where the screen is
+   relaxed.

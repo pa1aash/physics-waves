@@ -75,13 +75,29 @@ Two open-access substitutes cover the same physics and should be obtained if
 possible (flagged for the **Session L4 corpus-adequacy audit** to chase
 open-access equivalents):
 
-| Suggested filename | Citation | Availability |
-|--------------------|----------|--------------|
-| `kasahara_1976_normal_modes_ultralong_waves.pdf` | Kasahara, A. (1976). Normal modes of ultralong waves in the atmosphere. *Journal of the Atmospheric Sciences*, 33(3), 408–424. | Freely available from the AMS journals archive. |
-| `paldor_2015_shallow_water_waves.pdf` | Paldor, N. (2015). *Shallow Water Waves on the Rotating Earth.* SpringerBriefs in Earth System Sciences. | SpringerBriefs monograph. |
+| Filename | Citation | Status |
+|----------|----------|--------|
+| `kasahara_1976_normal_modes_ultralong_waves.pdf` | Kasahara, A. (1976). Normal modes of ultralong waves in the atmosphere. ***Monthly Weather Review*, 104(6), 669–690.** DOI [10.1175/1520-0493(1976)104<0669:NMOUWI>2.0.CO;2](https://doi.org/10.1175/1520-0493(1976)104%3C0669:NMOUWI%3E2.0.CO;2) | **OBTAINED** in Session L4 and held. |
+| `paldor_2015_shallow_water_waves.pdf` | Paldor, N. (2015). *Shallow Water Waves on the Rotating Earth.* SpringerBriefs in Earth System Sciences. | Not obtained; monograph, not open access. Not required — see below. |
 
-Kasahara (1976) develops the normal modes (including the Rossby–Haurwitz /
-Hough structure) of the linearised shallow-water system on the sphere; Paldor
-(2015) is a modern, pedagogical treatment of the same wave physics. Either is an
-adequate stand-in for the historical attribution the two unobtainable papers
-would have provided.
+> **Citation correction (Session L4).** This table previously recorded Kasahara
+> (1976) as *Journal of the Atmospheric Sciences* **33**(3), 408–424. **That was
+> wrong.** The paper is *Monthly Weather Review* **104**(6), 669–690, confirmed
+> against the Crossref work record and against the journal masthead on page 669
+> of the retrieved PDF. The erroneous venue entered the project in Session 00b
+> and had never been checked, because the paper had never been obtained. It is
+> the second wrong-citation record this project has found in its own literature
+> index, after the Haurwitz filename corrected in L3-PATCH.
+
+**Kasahara (1976) is now held and read**, and it does more than stand in for the
+historical attribution. Its abstract states the structure this project's §6
+derives independently: the horizontal parts of the normal modes are Hough
+harmonics, and they fall into three families of distinct frequency — eastward and
+westward gravity waves, and *westward-propagating rotational waves of the
+Rossby–Haurwitz type*. That is the branch structure the project's own eigenvalue
+solver reproduces, so the paper is now a genuine external cross-check on the
+qualitative branch structure, not merely a citation. It does not supply the
+mode-by-mode numbers at Earth's `ε`, which remain internally derived.
+
+Paldor (2015) was not obtained and is not required: with Kasahara held, nothing
+depends on it.

@@ -20,13 +20,45 @@ skip() { printf "  SKIP  %s\n" "$1"; }
 
 echo "== physics-waves repository audit =="
 
-# 1. No forbidden strings in tracked files
-offenders="$(git ls-files -z | xargs -0 grep -riEl "$pat" 2>/dev/null || true)"
+# 1. No forbidden strings in tracked files.
+#    The two literature pool CSVs are excluded and covered by check 1b instead:
+#    they are machine-retrieved bibliographic metadata, and several real
+#    researchers in this field carry a given name that collides with one of the
+#    screened tokens. The blunt pattern cannot tell a person's name from a tool
+#    byline. See docs/CONVENTIONS.md, authorised deviation 4.
+pool_re='^docs/literature/(CANDIDATE|VERIFIED)_POOL\.csv$'
+offenders="$(git ls-files -z | grep -zEv "$pool_re" | xargs -0 grep -riEl "$pat" 2>/dev/null || true)"
 if [ -n "$offenders" ]; then
   bad "1. forbidden strings present in tracked files"
   sed 's/^/       /' <<<"$offenders"
 else
-  pass "1. no forbidden strings in tracked files"
+  pass "1. no forbidden strings in tracked files (pool CSVs -> check 1b)"
+fi
+
+# 1b. The excluded pool CSVs carry the forbidden tokens ONLY inside the authors
+#     column. Anywhere else in those files -- title, venue, query string -- is a
+#     real finding. Column 3 is `authors` in both files.
+pool_bad=""
+for f in docs/literature/CANDIDATE_POOL.csv docs/literature/VERIFIED_POOL.csv; do
+  [ -f "$f" ] || continue
+  hits="$(python3 - "$f" <<'PY_EOF'
+import csv, sys, re
+pat = re.compile(r"[c]laude|[a]nthropic|co-[a]uthored|[g]enerated with", re.I)
+bad = []
+with open(sys.argv[1], newline="", encoding="utf-8") as fh:
+    for i, row in enumerate(csv.DictReader(fh), start=2):
+        for k, v in row.items():
+            if k != "authors" and v and pat.search(v):
+                bad.append(f"line {i} column {k}")
+print("; ".join(bad))
+PY_EOF
+)"
+  [ -n "$hits" ] && pool_bad="$pool_bad $f:[$hits]"
+done
+if [ -z "$pool_bad" ]; then
+  pass "1b. pool CSVs carry forbidden tokens only in the authors column"
+else
+  bad "1b. forbidden token outside authors column:$pool_bad"
 fi
 
 # 2. No forbidden strings in commit history
