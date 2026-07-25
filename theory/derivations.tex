@@ -1092,13 +1092,34 @@ m^{*} \approx 6 , \qquad
 \label{eq:galewskygrowth}
 \end{equation}
 %
-The approximation sign is meant literally and is not hedging. The growth rates
-at $m = 6$ and $m = 7$ differ by $0.07\%$ --- $2.0748\times10^{-5}$ against
-$2.0734\times10^{-5}\ \mathrm{s^{-1}}$ --- which is far inside any physical
-uncertainty in the base state. The instability peaks on a \emph{plateau}
-spanning $m = 6$--$7$, and quoting a single sharp $m^{*}$ would overstate what
-the calculation resolves. What is robust is the band: growth is resolved for
-$1 \le m \le 8$ and the peak sits near its upper middle.
+The approximation sign is meant literally, and the reason is more serious than
+numerical scatter.
+
+The eigenvalue problem \eqref{eq:genevp} is posed for the \emph{nondivergent}
+barotropic potential-vorticity equation, while the jet it describes lives in the
+divergent shallow-water system, whose external deformation radius
+$L_d = \sqrt{gH}/2\Omega \approx 3\times10^{6}\ \mathrm{m}$ is comparable to the
+jet's own width. That is not a detail. \citet{paldor2020} compare
+barotropic-instability growth rates for a zonal jet on a sphere across the
+nondivergent, quasi-geostrophic and full shallow-water formulations, and report
+that at mean depths of $5$--$10\ \mathrm{km}$ the shallow-water growth rates can
+be smaller than the nondivergent ones by more than $50\%$, the three
+formulations converging only above about $30\ \mathrm{km}$. This project uses
+$H = 10\ \mathrm{km}$, inside the band where that discrepancy is largest.
+
+Two consequences follow, and they govern how \eqref{eq:galewskygrowth} may be
+read. First, $\sigma$ is a \emph{nondivergent modal} growth rate, and carries a
+formulation-level bias of order tens of per cent relative to the shallow-water
+system the nonlinear runs integrate. Second, and because of the first, the
+apparent resolution of the calculation is illusory below that bias: the raw
+values at $m = 6$ and $m = 7$ differ by about $0.07\%$, but discriminating two
+wavenumbers at sub-per-cent separation inside a bias two orders of magnitude
+larger is not a physical claim. It is arithmetic on a biased operator.
+
+What survives is coarser and genuinely robust: growth is resolved for
+$1 \le m \le 8$, the peak sits on a broad \emph{plateau} spanning $m = 6$--$7$,
+and the $e$-folding time is of order half a day rather than days or hours. Those
+are the statements the nonlinear runs can be asked to reproduce.
 
 By contrast, solid-body rotation --- whose $\dd Q/\dd y = 2(\Omega + U_0/R)
 \cos\varphi$ has no sign change --- yields a spectrum that is real to machine
@@ -1124,6 +1145,31 @@ growth, which in shear flows can be large. What Section~\ref{sec:evp} supplies
 is the \emph{modal} growth rate, which is what hypotheses H7--H9 are about and
 what the nonlinear runs are validated against. Transient, non-modal growth is
 outside the scope of this project and is not claimed to be excluded.
+
+\medskip
+\noindent\textbf{What the divergent system would require instead.}
+\citet{ripa1983} gives sufficient conditions for the stability of a zonal flow in
+a one-layer model on the $\beta$-plane or the sphere --- without the
+quasi-geostrophic approximation and, unlike the present analysis, without
+restriction to normal modes. Two conditions must hold together: that the product
+of the meridional potential-vorticity gradient with the difference between an
+arbitrary constant and the zonal velocity be everywhere non-negative, which is
+the Fj\o{}rtoft-strengthened form of Section~\ref{sec:rayleighkuo}'s criterion;
+and that the magnitude of that same difference nowhere exceed the local speed of
+long gravity waves. The second has no nondivergent analogue --- it is a
+criticality condition, and it disappears in the rigid-lid limit where
+$\sqrt{gH}\to\infty$. So divergence does not \emph{modify} the classical
+condition; it \emph{adds} one. For the jet studied here that added condition is
+satisfied with a margin of roughly eight, at every rotation rate in the
+campaign, so the instability under study is the classical
+potential-vorticity-gradient one rather than the free-surface energetic route
+that \citet{hayashi1987} exhibit on an equatorial $\beta$-plane.
+
+The nondivergent scope of \eqref{eq:genevp} is therefore a deliberate choice, not
+an oversight: extending the eigenvalue problem to the divergent system was
+investigated and found to be established ground --- \citet{paldor2020} for the
+growth-rate comparison, and \citet{white2009} for Ripa's criteria carried onto
+the sphere and applied to numerical-model testing.
 
 % =====================================================================
 \section{Instability as counter-propagating Rossby waves}
@@ -1424,7 +1470,11 @@ H6 & Benchmark error decays spectrally with resolution
 H7 & Jets failing the Rayleigh--Kuo condition remain stable
    & \eqref{eq:dQdy}, \eqref{eq:rk}
    & Growth in a run whose base state has no sign change in $\dd Q/\dd y$.
-     This is a prohibition, so any single violation falsifies it. \\
+     This is a prohibition, so any single violation falsifies it.
+     \textbf{Scoped to modal growth}: the caveat closing
+     Section~\ref{sec:evp} applies here. H7 forbids a growing normal mode,
+     not finite-time transient amplification, which a non-normal operator
+     permits and this project does not test. \\
 H8 & Growth rate increases with supercriticality above threshold
    & \eqref{eq:genevp}, \eqref{eq:growth}
    & No systematic relation between shear and growth rate. \\
@@ -1506,11 +1556,39 @@ The eigenfunctions of Laplace's tidal equations over a sphere.
 \emph{Philosophical Transactions of the Royal Society A}, \textbf{262}(1132),
 511--607. \doilink{10.1098/rsta.1968.0003}
 
+\bibitem[Hayashi \& Young(1987)]{hayashi1987}
+Hayashi, Y.-Y., \& Young, W.~R. (1987).
+Stable and unstable shear modes of rotating parallel flows in shallow water.
+\emph{Journal of Fluid Mechanics}, \textbf{184}, 477--504.
+\doilink{10.1017/S0022112087002982}
+Cited from its publisher abstract; the full text could not be obtained. See
+\file{theory/PROVENANCE_AUDIT.md}.
+
+\bibitem[Paldor et al.(2020)]{paldor2020}
+Paldor, N., Shamir, O., \& Garfinkel, C.~I. (2020).
+Barotropic instability of a zonal jet on the sphere: from non-divergence through
+quasi-geostrophy to shallow water.
+\emph{Geophysical \& Astrophysical Fluid Dynamics}, \textbf{115}(1), 15--34.
+\doilink{10.1080/03091929.2020.1724996}
+The quoted growth-rate discrepancy is taken from the authors' own conference
+abstract of this work, not from the journal text, which could not be retrieved.
+See \file{theory/PROVENANCE_AUDIT.md}.
+
 \bibitem[Rhines(1975)]{rhines1975}
 Rhines, P.~B. (1975).
 Waves and turbulence on a beta-plane.
 \emph{Journal of Fluid Mechanics}, \textbf{69}(3), 417--443.
 \doilink{10.1017/S0022112075001504}
+
+\bibitem[Ripa(1983)]{ripa1983}
+Ripa, P. (1983).
+General stability conditions for zonal flows in a one-layer model on the
+$\beta$-plane or the sphere.
+\emph{Journal of Fluid Mechanics}, \textbf{126}, 463--489.
+\doilink{10.1017/S0022112083000270}
+Cited from its publisher abstract, which states both conditions in words; the
+full text could not be obtained, and no equation-precise claim is made from it.
+See \file{theory/PROVENANCE_AUDIT.md}.
 
 \bibitem[Rossby(1939)]{rossby1939}
 Rossby, C.-G., and collaborators (1939).
@@ -1525,6 +1603,13 @@ Swarztrauber, P.~N., \& Kasahara, A. (1985).
 The vector harmonic analysis of Laplace's tidal equations.
 \emph{SIAM Journal on Scientific and Statistical Computing}, \textbf{6}(2),
 464--491. \doilink{10.1137/0906033}
+
+\bibitem[White \& Staniforth(2009)]{white2009}
+White, A.~A., \& Staniforth, A. (2009).
+Stability criteria for shallow-water flow above zonally symmetric orography on
+the sphere.
+\emph{Quarterly Journal of the Royal Meteorological Society}, \textbf{135}(640),
+961--971. \doilink{10.1002/qj.504}
 
 \bibitem[Vallis \& Maltrud(1993)]{vallis1993}
 Vallis, G.~K., \& Maltrud, M.~E. (1993).

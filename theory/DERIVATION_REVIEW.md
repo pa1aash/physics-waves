@@ -1,7 +1,17 @@
 # Derivation review — operator sign-off required
 
-**Session L3, patched by Session L3-PATCH. Last written 2026-07-25.
-Status: AWAITING SIGN-OFF.**
+**Session L3, patched by Session L3-PATCH, reconciled by Session PRE-L5.
+Last written 2026-07-25. Status: SUPERSEDED FOR SIGN-OFF PURPOSES — see
+`docs/PRE_L5_SIGNOFF.md`.**
+
+> **Read this first.** This document is still accurate and still worth reading,
+> but it is no longer signed off on its own. Session PRE-L5 reconciled it with
+> the literature-campaign documents and with `theory/derivations.tex` itself, and
+> produced a single combined gate: **`docs/PRE_L5_SIGNOFF.md`**. Approving that
+> approves this.
+>
+> Two items in this document were written before later sessions changed them, and
+> the current state is recorded in "Reconciliation notes" at the foot.
 
 This document is self-contained. It can be read on its own, without
 `theory/derivations.tex` open alongside it, and it is the thing to read before
@@ -548,3 +558,63 @@ GOVERNING EQUATIONS AND INITIAL CONDITIONS. NO FURTHER AUTOMATED SESSION IN
 THIS PROJECT MAY PROCEED UNTIL THIS REVIEW HAS BEEN READ AND EXPLICITLY
 APPROVED BY THE OPERATOR.
 ```
+
+---
+
+## Reconciliation notes (Session PRE-L5)
+
+Added so this document describes the repository as it stands, not as it stood
+when it was written.
+
+### 1. The §9 "sufficient test" correction — **confirmed already applied**
+
+The L4 report stated that theory §9 had described the stability eigenvalue
+problem as a "genuine sufficient computational test", and that this was corrected.
+Session PRE-L5 verified the claim rather than trusting it:
+
+- `git log -S "genuine sufficient computational test" -- theory/derivations.tex`
+  shows the phrase introduced in `b12eaa7` and removed in **`00a7524`**.
+- `git log -S "non-normal" -- theory/derivations.tex` shows the replacement
+  caveat added in the same commit, **`00a7524`**.
+- The current §9 text states that a normal-mode eigenvalue problem is *not* a
+  sufficient condition for stability, explains non-normality, limits an all-real
+  spectrum to asymptotic stability against infinitesimal normal-mode
+  disturbances, and names H7–H9 as the hypotheses in scope.
+
+**The correction was real and is in place.** It was not re-applied. §2 of this
+document, which lists `check_rayleigh_kuo.py` as VERIFIED, is unaffected: the
+script tests the necessary condition and the modal spectrum, both of which remain
+correct under the narrowed reading.
+
+**One gap did remain, and was closed in this session:** the scoping had not
+propagated to the H7 row of §12's hypothesis table, which still read as an
+unqualified prohibition. That row now states explicitly that H7 forbids a growing
+normal mode and not finite-time transient amplification.
+
+### 2. Item (e), the growth-rate plateau — **superseded by a larger effect**
+
+Item (e) of §3 above records the `m = 6` versus `m = 7` separation of 0.07% and
+resolves it by reporting a plateau rather than a sharp `m*`. That resolution
+stands, but its *reasoning* has been overtaken.
+
+Session L4b established that the eigenvalue problem is nondivergent while the jet
+is not, and that Paldor, Shamir & Garfinkel (2020) measure the resulting
+formulation bias at more than 50% for mean depths of 5–10 km — this project uses
+10 km. So the reason not to discriminate `m = 6` from `m = 7` is not that 0.07%
+is small against base-state uncertainty; it is that the whole value carries a
+bias two orders of magnitude larger. Section 9 of `derivations.tex` now says so
+directly, in the text rather than in a footnote.
+
+### 3. Item (a), the CRW `m*` mismatch — unchanged, but now better contextualised
+
+Item (a) records that the two-interface toy model gives `m* ≈ 1.8` against the
+eigenvalue problem's `m* ≈ 6`. That comparison is between two *nondivergent*
+calculations and is unaffected by the divergent-bias finding. It remains an
+accepted limitation on the same terms.
+
+### 4. Provenance
+
+`theory/PROVENANCE_AUDIT.md` is now the single provenance ledger for the whole
+project, extended in this session with the `ABSTRACT-VERIFIED` and `TITLE-ONLY`
+categories and with every citation Session L4b examined. There is no longer a
+second ledger in `docs/literature/`.
