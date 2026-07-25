@@ -87,6 +87,40 @@ def jet_profile(lat, umax: float = UMAX, phi0: float = PHI0, phi1: float = PHI1)
     return out
 
 
+def jet_profile_derivatives(lat, umax: float = UMAX, phi0: float = PHI0, phi1: float = PHI1):
+    """``(u, du/dphi, d2u/dphi2)`` for the same jet, differentiated analytically.
+
+    The stability eigenvalue problem needs the background absolute-vorticity
+    gradient, which involves ``d^2 ubar / dphi^2``. Finite-differencing this
+    profile is a bad idea: near the jet edges it behaves like ``exp(-1/x)``, whose
+    curvature has structure on a scale that shrinks without bound as the edge is
+    approached, and a fixed grid will either smear it or amplify round-off. With
+    ``s = (phi - phi0)(phi - phi1)`` and ``s' = 2 phi - phi0 - phi1``,
+
+        u    = A exp(1/s)
+        u'   = A exp(1/s) (-s' / s^2)
+        u''  = A exp(1/s) (s'^2/s^4 - 2/s^2 + 2 s'^2/s^3)
+
+    which is exact everywhere in the support and vanishes at both edges along with
+    ``u`` itself.
+    """
+    lat = np.asarray(lat, dtype=float)
+    en = np.exp(-4.0 / (phi1 - phi0) ** 2)
+    u = np.zeros_like(lat)
+    du = np.zeros_like(lat)
+    d2u = np.zeros_like(lat)
+    inside = (lat > phi0) & (lat < phi1)
+    p = lat[inside]
+    s = (p - phi0) * (p - phi1)
+    sp = 2 * p - phi0 - phi1
+    amp = umax / en
+    e = np.exp(1.0 / s)
+    u[inside] = amp * e
+    du[inside] = amp * e * (-sp / s**2)
+    d2u[inside] = amp * e * (sp**2 / s**4 - 2.0 / s**2 + 2.0 * sp**2 / s**3)
+    return u, du, d2u
+
+
 def height_perturbation(phi, lat, params: dict):
     """Paper eq. (4): the localised, deliberately unbalanced height bump.
 
