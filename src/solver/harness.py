@@ -344,7 +344,7 @@ def _add_outputs(swp, solver, config: dict, output_dir: Path):
         Omega = swp.params["Omega"] / units.second
         zeta = -d3.div(d3.skew(swp.u))
         depth = H + swp.h
-        handler.add_task(d3.Average(swp.h, swp.coords), name="mass")
+        handler.add_task(d3.Average(H + swp.h, swp.coords), name="mass")
         handler.add_task(
             d3.Average(depth * (swp.u @ swp.u) / 2 + g * swp.h * swp.h / 2, swp.coords),
             name="energy",
