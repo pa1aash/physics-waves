@@ -1,18 +1,30 @@
 # Derivation review — operator sign-off required
 
-**Session L3. Written 2026-07-25. Status: AWAITING SIGN-OFF.**
+**Session L3, patched by Session L3-PATCH. Last written 2026-07-25.
+Status: AWAITING SIGN-OFF.**
 
 This document is self-contained. It can be read on its own, without
 `theory/derivations.tex` open alongside it, and it is the thing to read before
-deciding whether the theory is fit to be consumed as ground truth by
-Session L5.
+deciding whether the theory is fit to be consumed as ground truth by Session L5.
+
+**What changed since the first version.** Operator review of the original raised
+two items that had not been fully closed: whether three benchmark constants in
+the counter-propagating-wave check were read from a real page or supplied from
+familiarity, and whether an unexplained anomaly in the Hough-departure table was
+hiding a fault. Both are now closed — the constants are on p. 2838 of a paper the
+project holds and has read, and the "anomaly" is a systematic physical property of
+sectoral modes, demonstrated causally. The investigation also found one genuine
+instance of the failure mode the operator was probing for, in a *different*
+script, and fixed it. All ten judgement items now carry explicit dispositions,
+and two mislabeled literature filenames have been corrected. Details in
+§2, §3 and §4; the full sweep is in `theory/PROVENANCE_AUDIT.md`.
 
 Contents, in the order the sign-off gate specifies:
 
 1. [The spine, in plain language](#1-the-spine-in-plain-language)
 2. [Verdict of every verification check](#2-verdict-of-every-verification-check)
-3. [Modelling choices and assumptions requiring approval](#3-modelling-choices-and-assumptions-requiring-conscious-approval)
-4. [Citations attributed by DOI rather than direct reading](#4-citations-attributed-by-doi-rather-than-direct-reading)
+3. [Judgement items and their dispositions](#3-modelling-choices-and-assumptions-requiring-conscious-approval)
+4. [Citation provenance](#4-citation-provenance)
 5. [Closing statement](#5-closing-statement)
 
 ---
@@ -150,27 +162,40 @@ H1–H10 to the numbered equation predicting it and to what would falsify it.
 ## 2. Verdict of every verification check
 
 Seven scripts under `theory/sympy_checks/`. All seven report **VERIFIED**. Full
-recorded output is in `theory/sympy_checks/output/`; the verbatim verdicts and
-the substantive numbers are reproduced below.
+recorded output is in `theory/sympy_checks/output/`.
 
-**There are no unresolved discrepancies.** Nothing in this section is being held
-back for operator adjudication on grounds of a symbolic or numerical mismatch.
-The judgement calls are in §3 below instead, which is where the real risk lies.
+**There are no unresolved discrepancies.** No check reports MISMATCH, and nothing
+is being held back for adjudication on symbolic or numerical grounds. The
+judgement calls are in §3.
 
 | Script | Verdict | Substance |
 |--------|---------|-----------|
-| `check_spherical_laplacian_eigenvalue.py` | **VERIFIED** | Symbolic residual exactly zero for 8 pairs `(n,m)`; worst relative residual `7.03e-15` over `1 ≤ n ≤ 40`, `0 ≤ m ≤ 8` (tolerance `1e-9`) |
-| `check_christoffel_symbols.py` | **VERIFIED** | All 8 components agree with the closed forms *and* with published 2-sphere values transported from colatitude; divergence formula and both momentum metric terms exact |
+| `check_spherical_laplacian_eigenvalue.py` | **VERIFIED** | Symbolic residual exactly zero for 8 pairs `(n,m)`; worst relative residual `7.0e-15` over `1 ≤ n ≤ 40`, `0 ≤ m ≤ 8` |
+| `check_christoffel_symbols.py` | **VERIFIED** | 5 arms. Symbols derived from the metric; independently recomputed in the colatitude chart and transported; **Gaussian curvature confirmed `= 1/R²`**; divergence formula and both momentum metric terms exact |
 | `check_pv_conservation.py` | **VERIFIED** | `h Dq/Dt − curl(M) + qC = 0` exactly, symbolically, for arbitrary `u,v,h`; numeric spot-check residual `7.7e-180` |
-| `check_rh_dispersion.py` | **VERIFIED** | `ω = −2Ωm/[n(n+1)]` exact for 9 pairs `(n,m)`; beta-term cancellation exact; sign derived from the displacement argument |
-| `check_hough_epsilon_limit.py` | **VERIFIED** | Convergence rate `1.0000` (four figures) for every degree and order tested; see the detail below |
-| `check_rayleigh_kuo.py` | **VERIFIED** | Necessary condition follows with no extra assumption; solid-body spectrum real to machine precision; Galewsky jet gives `m* = 6`, e-folding `0.56` days |
-| `check_crw_two_interface.py` | **VERIFIED** | Reduces exactly to the published Rayleigh dispersion relation; `K_c = 1.2785`, `K_m = 0.7968`, peak growth `0.2012 × shear` |
+| `check_rh_dispersion.py` | **VERIFIED** | `ω = −2Ωm/[n(n+1)]` exact for 9 pairs; beta-term cancellation exact; westward sign derived from the displacement argument |
+| `check_hough_epsilon_limit.py` | **VERIFIED** | 5 arms. Convergence rate `1.0000` to four figures; H5 readout; **new arm 5 explains the sectoral-mode behaviour causally** |
+| `check_rayleigh_kuo.py` | **VERIFIED** | Necessary condition follows with no extra assumption; solid-body spectrum real to machine precision; Galewsky jet resolved band `m = 1–8`, peak on an `m = 6–7` plateau, e-folding `0.56` days |
+| `check_crw_two_interface.py` | **VERIFIED** | Exact reduction to the Heifetz et al. (1999) Eq. (6) dispersion relation; `K_c = 1.2785`, `K_m = 0.7968`, peak growth `0.2012 × shear`, against p. 2838's `≈1.28`, `≈0.8`, `≈20%` |
 
-### `check_hough_epsilon_limit.py` — convergence behaviour in detail
+### Two arms changed since the first version
 
-The gate item explicitly asks for the convergence *rate*, not a pass/fail at one
-small `ε`. Errors are relative, against `σ₀ = −m/[n(n+1)]`:
+**`check_christoffel_symbols.py` arm 2 was rewritten.** It previously compared
+the computed symbols against colatitude values labelled "published 2-sphere
+values" — but no publication had been consulted; the values were written down
+from familiarity. That is precisely the failure mode this project's provenance
+rule exists to prevent, and it is recorded as such rather than quietly softened.
+The arm now recomputes the connection independently from the colatitude metric
+and transports it through `θ = π/2 − φ`, quoting nothing. A new arm 3 confirms
+the connection reproduces Gaussian curvature `1/R²`. Both are **stronger** than
+what they replaced: the old arm restated a convention, the new ones test it.
+
+**`check_hough_epsilon_limit.py` gained arm 5**, which establishes the sectoral
+result described in §3(g).
+
+### `check_hough_epsilon_limit.py` — convergence behaviour
+
+Errors are relative, against `σ₀ = −m/[n(n+1)]`:
 
 | m | n | rel. err at ε=1e-2 | rel. err at ε=1e-6 | fitted d(log err)/d(log ε) |
 |---|---|--------------------|--------------------|----------------------------|
@@ -183,59 +208,49 @@ small `ε`. Errors are relative, against `σ₀ = −m/[n(n+1)]`:
 
 First order is what the physics predicts: the fraction of the PV budget the
 surface absorbs is proportional to its compliance, and the compliance is `ε`.
-The rate is clean to four figures across two zonal orders and three degrees,
-which is a stronger statement than the limit merely being approached.
 
 Supporting arms: Legendre matrix elements agree with their closed-form
-recurrences to `6.1e-13` and satisfy the integration-by-parts adjoint identity
-`Dᵀ = −D + 2M` to `1.6e-13`; the answer moves by `4.3e-13` when the spectral
-truncation is doubled from 40 to 80.
+recurrences to `6.1e-13` and satisfy the adjoint identity `Dᵀ = −D + 2M` to
+`1.6e-13`; the answer moves by `4.3e-13` when the truncation doubles.
 
 ### `check_hough_epsilon_limit.py` — the H5 readout at Earth's ε
 
-Not a pass/fail arm; a physical readout, obtained by following each Rossby
-branch by continuation from `ε = 1e-6`:
+Branches followed by continuation from `ε = 1e-6`:
 
-| m | n | nondivergent σ | Hough σ | slowing |
-|---|---|----------------|---------|---------|
-| 1 | 2 | −0.166667 | −0.099366 | −40.4% |
-| 1 | 3 | −0.083333 | −0.060134 | −27.8% |
-| 1 | 5 | −0.033333 | −0.028895 | −13.3% |
-| 1 | 8 | −0.013889 | −0.013071 | −5.9% |
-| 2 | 2 | −0.333333 | −0.308288 | −7.5% |
-| 2 | 3 | −0.166667 | −0.133662 | −19.8% |
-| 2 | 5 | −0.066667 | −0.058738 | −11.9% |
-| 2 | 8 | −0.027778 | −0.026213 | −5.6% |
+| m | n | nondivergent σ | Hough σ | slowing | |
+|---|---|----------------|---------|---------|---|
+| 1 | 2 | −0.166667 | −0.099366 | −40.4% | |
+| 1 | 3 | −0.083333 | −0.060134 | −27.8% | |
+| 1 | 5 | −0.033333 | −0.028895 | −13.3% | |
+| 1 | 8 | −0.013889 | −0.013071 | −5.9% | |
+| 2 | 2 | −0.333333 | −0.308288 | −7.5% | **sectoral** |
+| 2 | 3 | −0.166667 | −0.133662 | −19.8% | |
+| 2 | 5 | −0.066667 | −0.058738 | −11.9% | |
+| 2 | 8 | −0.027778 | −0.026213 | −5.6% | |
 
-Every mode is slowed, and within each `m` the fractional slowing falls as `n`
-rises — large scales, closest to the deformation radius, are affected most. One
-entry departs from that pattern and is flagged in §3 item (g): the `m = 2, n = 2`
-sectoral mode is slowed by only 7.5%, less than `m = 2, n = 3`.
+Every mode is slowed. Among non-sectoral modes the fractional slowing falls as
+`n` rises. The sectoral row is explained in §3(g) — it is no longer flagged.
 
 ### `check_rayleigh_kuo.py` — the growth-rate spectrum
 
 Solid-body rotation (`U₀ = 40 m/s`, no sign change in `dQ/dφ`): every eigenvalue
-real to machine precision at `m = 1…6`, `max|Im c_a|/spread(Re c_a) = 0`
-exactly. This is H7 as a prohibition, and it holds.
+real to machine precision at `m = 1…6`. H7 as a prohibition, and it holds.
 
 Galewsky jet (`dQ/dφ` changes sign at 32.20°, 39.79°, 49.82°, 58.16°N):
 
-| m | growth `m·Im(c_a)` [1/s] | e-folding [days] | change on doubling N | resolved? |
-|---|--------------------------|------------------|----------------------|-----------|
+| m | growth [1/s] | e-folding [days] | change on doubling N | resolved? |
+|---|--------------|------------------|----------------------|-----------|
 | 1 | 2.988e-06 | 3.873 | 2.75e-05 | yes |
 | 2 | 5.710e-06 | 2.027 | 7.79e-05 | yes |
 | 3 | 7.551e-06 | 1.533 | 2.91e-04 | yes |
 | 4 | 1.483e-05 | 0.780 | 3.56e-08 | yes |
 | 5 | 1.889e-05 | 0.613 | 2.63e-08 | yes |
 | **6** | **2.075e-05** | **0.558** | 4.84e-07 | yes |
-| 7 | 2.073e-05 | 0.558 | 1.47e-05 | yes |
+| **7** | **2.073e-05** | **0.558** | 1.47e-05 | yes |
 | 8 | 1.891e-05 | 0.612 | 1.96e-04 | yes |
-| 9 | 1.516e-05 | 0.763 | 1.97e-03 | **no** |
-| 10–12 | — | — | 9.9e-02 … 3.5e-01 | **no** |
+| 9–12 | — | — | 2.0e-03 … 3.5e-01 | **no** |
 
-`m* = 6`, though `m = 7` is within 0.1% of it — see §3 item (e).
-
----
+Peak on a plateau spanning `m = 6–7`; see §3(e).
 
 ## 3. Modelling choices and assumptions requiring conscious approval
 
@@ -424,84 +439,105 @@ eigenvector-overlap tracking, which agrees to eight decimal places.
 
 *Standing caution:* Session L5 must use continuation, not nearest matching, when
 labelling Hough modes by degree at finite `ε`.
+## 4. Citation provenance
 
-## 4. Citations attributed by DOI rather than direct reading
+Eleven works are cited in `theory/derivations.tex`. This section states, for
+each, exactly what grounds it. The systematic sweep behind it —
+covering every "matches published"-style claim in the check outputs and the
+document — is `theory/PROVENANCE_AUDIT.md`.
 
-Eleven works are cited in `theory/derivations.tex`. The grounding of each:
+### The escalated question, answered
 
-### Read directly from the PDF in `docs/literature/`
+**Where did `K_c ≈ 1.28`, `K_m ≈ 0.8` and "peak growth ≈ 20% of the shear" come
+from?**
+
+They are on **page 2838 of Heifetz, Bishop & Alpert (1999)**, *QJRMS* 125(560),
+in the paragraph immediately following their Eq. (6). That page was read directly
+from the held PDF during this session. The paragraph states the critical
+wavenumber as `K_c = 1 + exp(−K_c) ≈ 1.28`; the growth rate `ΛKC_i` as maximum at
+`K_max ≈ 0.8`, corresponding to a wavelength about eight times the width of the
+vorticity strip; and that maximum as about 20% of the shear `Λ`.
+
+So the constants were **properly grounded all along** — Session L3 read that page
+and the script has always cited the 1999 paper. What was genuinely wrong was
+narrower but still worth fixing: the *file* was named `heifetz_2004_…`, so a
+reader of the review could not tell which paper had been consulted. The page
+reference is now explicit in the script, its output, the document and the
+bibliography, and the filename is corrected.
+
+Bretherton (1966) was also read in full this session, to check whether the
+constants originated there instead. They do not — that paper is about the
+critical layer and the eddy potential-vorticity flux integral — but the reading
+strengthened §8 and §9, which now cite it precisely (p. 331 Eq. (13) for the
+Charney–Stern generalisation; p. 332 for the critical-layer statement).
+
+### The instance of the failure mode that *was* found
+
+The sweep turned up one real case, in a different script.
+`check_christoffel_symbols.py` claimed agreement with "published 2-sphere values"
+when no publication had been consulted — the colatitude Christoffel symbols were
+written down from familiarity. They are standard material, which is what makes
+the phrasing tempting and exactly why the rule exists. **Corrected**: the arm now
+recomputes the connection independently in the colatitude chart, and a new arm
+confirms the implied Gaussian curvature is `1/R²`. §2 of `derivations.tex`
+carried the same wording and was corrected to match.
+
+### Read directly from a held PDF
 
 | Citation | How read | Used for |
 |----------|----------|----------|
-| Bretherton (1966) | Image scan, pages 1–6 read visually | §9 critical layer; §10 the delta-function equivalence that makes the edge-wave idealisation exact |
-| Galewsky, Scott & Polvani (2004) | Text layer | §11 jet profile, balance integration, perturbation |
-| Heifetz, Bishop & Alpert (1999) | Text layer | §10 the CRW phase-locking picture and the Rayleigh-model dispersion relation |
+| Bretherton (1966) | Image scan, **read in full** this session | §9 critical layer (p. 332); §10 the delta-function equivalence (p. 329 eq. 6); §8 Charney–Stern generalisation (p. 331 eq. 13) |
+| Galewsky, Scott & Polvani (2004) | Text layer | §11 jet profile, balance integration, perturbation (eqs. 2, 3, 4) |
+| Heifetz, Bishop & Alpert (1999) | Image scan, **p. 2838 read** | §10 CRW dispersion relation and the three benchmark constants |
 | Hoskins, McIntyre & Robertson (1985) | Text layer | §10 PV inversion |
-| Kuo (1949) | Image scan, pages 1–6 read visually | §8 the necessary condition |
+| Kuo (1949) | Image scan, pp. 105–110 read | §8 the necessary condition |
 | Rhines (1975) | Text layer | §7 the arrest wavenumber `k_β = (β/2U)^{1/2}` |
-| Rossby (1939) | Image scan, page 1 read visually (identity confirmed) | §5 attribution |
-| Vallis & Maltrud (1993) | Image scan, page 1 read visually (abstract and introduction) | §7 the `O(√(U/β))` transition scale |
+| Rossby (1939) | Image scan, title page read | §5 attribution |
+| Thuburn & Li (2000) | Text layer, **reference list read** | Verified source for the Haurwitz (1940b) page range |
+| Vallis & Maltrud (1993) | Image scan, p. 1346 read | §7 the `O(√(U/β))` transition scale |
 
-### Attributed by DOI, not read
+### Cited but not held
 
-| Citation | DOI | Why, and what depends on it |
-|----------|-----|------------------------------|
-| Longuet-Higgins (1968) | `10.1098/rsta.1968.0003` | **Could not be obtained** — recorded in `docs/literature/MISSING.md`. Cited in §6 for the classical formulation only. Nothing in the derivation depends on it: the validation target is the internal `ε → 0` limit, not a published table. |
-| Swarztrauber & Kasahara (1985) | `10.1137/0906033` | **Could not be obtained** — same record. Cited in §6 for the vector-harmonic treatment only. Same independence. |
-| Haurwitz (1940b) | none (pre-DOI) | **Not present in `docs/literature/`.** See the warning below. |
+| Citation | DOI / access | What depends on it |
+|----------|--------------|--------------------|
+| Longuet-Higgins (1968) | `10.1098/rsta.1968.0003` — unobtainable | §6 classical formulation, historical attribution only. The derivation and its `ε → 0` validation target are internal. |
+| Swarztrauber & Kasahara (1985) | `10.1137/0906033` — unobtainable | §6 vector-harmonic treatment, attribution only. Same independence. |
+| Haurwitz (1940b) | Pre-DOI; **open access, one click**: [EliScholar record](https://elischolar.library.yale.edu/journal_of_marine_research/575/) | §5 attribution of `c_ang = −2Ω/[n(n+1)]`. Nothing depends on reading it: §5 derives the result and `check_rh_dispersion.py` verifies it symbolically for nine `(n,m)` pairs. |
 
-### Two preflight findings about the literature directory that must be recorded
+**On Haurwitz (1940b):** three retrieval routes were tried this session — `curl`
+with browser headers and a cookie jar, the project's `hyperresearch fetch`, and a
+direct `HEAD`. All returned HTTP 403: the bepress platform blocks scripted
+downloads. It is free and one browser click away for the operator. Its volume and
+issue (3(3), 1940) are confirmed live from the publisher's landing page, and its
+page range (254–267) from the reference list of Thuburn & Li (2000), a PDF the
+project holds and has read — not from recollection.
 
-**1. The file named `haurwitz_1940_motion_of_atmospheric_disturbances.pdf` is not
-the paper the project's index says it is.** It is Haurwitz (1940),
-*The motion of atmospheric disturbances*, J. Mar. Res. **3**(1), 35–50 — the
-**beta-plane, finite-lateral-extent** extension of Rossby (1939). Its own text
-says the spherical case "will be given in a later paper." The paper that
-actually contains the spherical Rossby–Haurwitz result is Haurwitz (1940),
-*The motion of atmospheric disturbances on the spherical earth*, J. Mar. Res.
-**3**(3), 254–267, and **that paper is not in `docs/literature/`.** §5 cites it
-for attribution of `c_ang = −2Ω/[n(n+1)]`. The derivation does not depend on
-having read it — §5 derives the result from first principles and
-`check_rh_dispersion.py` verifies it symbolically — but the attribution is
-bibliographic rather than checked against the primary source.
+### Literature filenames corrected
 
-**2. The file named `heifetz_2004_counter_propagating_rossby_waves.pdf` is
-Heifetz, Bishop & Alpert (1999)**, QJRMS **125**(560), 2835–2853, not the 2004
-Heifetz–Methven–Hoskins–Bishop paper the session brief names. The 1999 paper is
-the one actually read and the one cited; §10's toy model is validated against
-its published dispersion relation and numbers. Heifetz et al. (2004) is *not*
-cited, since it was neither read nor needed.
+| Was | Now | Why |
+|-----|-----|-----|
+| `haurwitz_1940_motion_of_atmospheric_disturbances.pdf` | `haurwitz_1940a_beta_plane_extension.pdf` | The file is Haurwitz (1940a), *J. Mar. Res.* 3(1), 35–50 — the **beta-plane** extension of Rossby (1939), whose own text defers the spherical case "to a later paper". The old name implied it was the spherical paper. |
+| `heifetz_2004_counter_propagating_rossby_waves.pdf` | `heifetz_1999_counter_propagating_rossby_waves.pdf` | The file is Heifetz, Bishop & Alpert (1999). The citation was always to the 1999 paper; only the filename was wrong. |
 
-*Operator decision required:* both filenames should be corrected in
-`docs/literature/README.md`, and Haurwitz (1940b) added to the fetch list. That
-is a documentation fix outside this session's scope; flagged rather than done.
-
-### Textbooks named in the session brief that are absent
-
-`pedlosky_1987_gfd.pdf` and `vallis_2017_aofd.pdf` are listed in
-`docs/literature/README.md` but are not present in the directory. **No claim in
-`theory/derivations.tex` is attributed to either.** Where a standard textbook
-result was needed — the 2-sphere Christoffel symbols — it was verified
-computationally against the published colatitude forms instead of cited
-(`check_christoffel_symbols.py`, arm 2).
+`docs/literature/README.md` was reconciled against the directory: all 19 PDFs
+present are now indexed under their true identity, and the three textbooks named
+in the index but absent (Pedlosky 1987, Vallis 2017, Zeitlin 2018) are marked
+**NOT held**. No claim in `derivations.tex` is attributed to any of them. Audit
+check 32 enforces this from now on.
 
 ### DOI resolution
 
-All nine DOIs in the bibliography were confirmed **registered** against the
-Crossref REST API. Six additionally resolve on a live `HEAD` request. Two —
-the AMS legacy identifiers for Kuo (1949) and Vallis & Maltrud (1993) — return
-HTTP 403 to an unauthenticated `HEAD`, which is publisher access control, not a
-missing record. `scripts/refcheck.py` treats any status ≥ 400 as a failure and
-will flag these two when Session L4 creates `manuscript/references.bib`; that is
-a false negative in the checker. Recorded in `theory/README.md`.
+All nine DOIs in the bibliography are confirmed **registered** against the
+Crossref REST API. Six resolve on a live `HEAD`; two AMS legacy identifiers (Kuo
+1949, Vallis & Maltrud 1993) return HTTP 403 to an unauthenticated `HEAD`, which
+is publisher access control, not a missing record. `scripts/refcheck.py` treats
+any status ≥ 400 as failure and will flag those two when Session L4 creates
+`manuscript/references.bib`; that is a false negative in the checker, recorded in
+`theory/README.md`.
 
-`make refcheck` was run and correctly reports "no bibliography file yet;
-nothing to check" — `manuscript/references.bib` arrives in Session L4. The
-equivalent check was therefore done by hand: all 11 `\cite` keys resolve to a
-`\bibitem`, no `\bibitem` is uncited, and the DOI verification above was
-performed independently.
-
----
+`make refcheck` was run and correctly reports "no bibliography file yet". The
+equivalent manual check passes: all 11 `\cite` keys resolve to a `\bibitem`, and
+no `\bibitem` is uncited.
 
 ## 5. Closing statement
 
