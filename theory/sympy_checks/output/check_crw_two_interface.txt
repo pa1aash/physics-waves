@@ -1,0 +1,56 @@
+check_crw_two_interface
+========================================================================
+Claim: the section-10 two-interface counter-propagating Rossby wave
+model is an exact reduction for piecewise-constant PV, and yields the
+opposite-sign requirement and a short-wave cutoff.
+
+Arm 1 - reduction to the published Rayleigh dispersion relation
+------------------------------------------------------------------------
+  root C = -sqrt(K**2*exp(2*K) - 2*K*exp(2*K) + exp(2*K) - 1)*exp(-K)/(2*K)  ->  matches published form
+  root C = sqrt(K**2*exp(2*K) - 2*K*exp(2*K) + exp(2*K) - 1)*exp(-K)/(2*K)  ->  matches published form
+  reference: Heifetz, Bishop & Alpert (1999), QJRMS 125, 2835-2853,
+  their Eq. (6) for the Rayleigh constant-shear strip.
+
+Arm 2 - instability requires oppositely signed PV jumps
+------------------------------------------------------------------------
+  discriminant = Delta_1*Delta_2*exp(-4*b*k)/(4*k**2) + Delta_c**2/4
+  the first term is a square, so disc < 0 requires Delta_1 Delta_2 < 0:
+  the two interfaces must carry oppositely signed PV jumps. This is
+  exactly the section-8 sign change, arrived at as a phase-locking
+  requirement rather than as an integral constraint.
+  same-sign case is a sum of non-negative terms: yes
+
+Arm 3 - published cutoff, optimum and peak growth rate
+------------------------------------------------------------------------
+  short-wave cutoff  K_c = 1.2785   published 1.28   |diff| = 0.0015
+  most unstable      K_m = 0.7968   published 0.8    |diff| = 0.0032
+  peak growth / shear    = 0.2012   published 0.2   |diff| = 0.0012
+  Physically: waves shorter than K_c cannot reach across the jet
+  (the coupling carries exp(-2K)), and waves much longer than K_m
+  counter-propagate too fast to hold a fixed phase against the shear.
+  Instability lives in the window between those two failures.
+
+Arm 4 - mapping to a spherical zonal wavenumber (readout)
+------------------------------------------------------------------------
+  dQ/dphi sign changes at: 32.20 deg, 39.79 deg, 49.82 deg, 58.16 deg
+  reversed-gradient bands centred at 36.00 deg and 53.99 deg
+  -> phi_j = 44.99 deg, b_eff = 1001 km
+  toy-model m* = K_m cos(phi_j) R / (2 b_eff) = 1.79
+  solved eigenvalue problem (section 9) gives m* = 6
+
+  THESE DISAGREE, by a factor of about 3.3, and the disagreement is reported rather
+  than tuned away. Two identified reasons, both physical:
+   (i) the toy model concentrates each PV gradient into a delta
+       function, which maximises the long-range reach of the inverted
+       flow and so biases the optimum toward longer waves than a
+       smoothly distributed gradient supports;
+   (ii) the Galewsky jet has *three* distinct gradient regions, not
+        two -- a positive core between the two reversed bands -- so a
+        two-interface reduction omits one of the interacting waves
+        entirely.
+  The toy model's standing claims are therefore the mechanism, the
+  opposite-sign requirement, the short-wave cutoff and the scaling
+  m* ~ cos(phi_j) R / b_eff -- not the absolute value of m*. Section 9
+  supplies that. This arm is a readout, not a pass/fail gate.
+
+VERDICT: VERIFIED

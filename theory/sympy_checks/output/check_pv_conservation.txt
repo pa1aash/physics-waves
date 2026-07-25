@@ -1,0 +1,20 @@
+check_pv_conservation
+============================================================
+Claim: the spherical shallow-water momentum and continuity equations
+combine algebraically into Dq/Dt = 0 with q = (zeta + f)/h,
+with no unaccounted residual term.
+
+Arms 1-2 - symbolic, arbitrary fields u(lam,phi,t), v(...), h(...)
+------------------------------------------------------------
+  d_t zeta + div[(zeta+f) u] - curl(M) = 0 exactly
+  h Dq/Dt - curl(M) + q C = 0 exactly
+
+Arm 3 - numeric spot-check on concrete analytic fields
+------------------------------------------------------------
+  worst |residual| over 4 sample points: 7.712e-180
+  tolerance: 1.0e-09
+
+Consequence: setting M = 0 and C = 0 (the equations of motion)
+leaves h Dq/Dt = 0, hence Dq/Dt = 0 for h > 0.
+
+VERDICT: VERIFIED

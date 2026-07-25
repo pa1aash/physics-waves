@@ -1,0 +1,23 @@
+check_spherical_laplacian_eigenvalue
+============================================================
+Claim: nabla^2 Y_n^m = -n(n+1)/R^2 Y_n^m on a sphere of radius R.
+
+Arm 1 - symbolic, exact zero residual required
+------------------------------------------------------------
+  (n, m) = (1, 0):  residual exact zero
+  (n, m) = (1, 1):  residual exact zero
+  (n, m) = (2, 0):  residual exact zero
+  (n, m) = (2, 1):  residual exact zero
+  (n, m) = (2, 2):  residual exact zero
+  (n, m) = (3, 1):  residual exact zero
+  (n, m) = (3, 3):  residual exact zero
+  (n, m) = (4, 2):  residual exact zero
+
+Arm 2 - numeric, associated Legendre operator form
+------------------------------------------------------------
+  degrees swept: 1 <= n <= 40, orders 0 <= m <= 8
+  nodes: 256 Gauss-Legendre points in mu = sin(phi)
+  worst relative residual: 7.025e-15 at (n, m) = (38, 0)
+  tolerance: 1.0e-09
+
+VERDICT: VERIFIED

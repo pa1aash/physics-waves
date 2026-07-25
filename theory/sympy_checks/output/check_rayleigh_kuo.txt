@@ -1,0 +1,66 @@
+check_rayleigh_kuo
+========================================================================
+Claim: the necessary condition -- dQ/dy must change sign -- follows
+from the structure of the linearised PV equation, with no assumption
+beyond those stated in section 8.
+
+Arm 1 - normal-mode reduction to the section-9 operator
+------------------------------------------------------------------------
+  base vorticity, Laplacian form vs metric curl form: exact zero
+  linearised PV equation - i m [(ubar_a - c_a) L Psi + Q_phi Psi/(R^2 cos)] e^(...) = exact zero
+
+Arm 2 - integration-by-parts identity (reality and sign of <Psi,LPsi>)
+------------------------------------------------------------------------
+  pointwise identity residual: exact zero
+  the quadratic terms cos|Psi'|^2 + m^2|Psi|^2/cos reduce to (c**2*(a**2 + b**2) + m**2*p**2 + m**2*q**2)/c: imaginary part zero
+  and are non-negative for cos(phi) > 0: (c**2*(a**2 + b**2) + m**2*p**2 + m**2*q**2)/c is a sum of squares
+  hence <Psi, L Psi> is real and negative once regularity at the poles
+  removes the exact-derivative term.
+
+Arm 3 - imaginary-part extraction
+------------------------------------------------------------------------
+  Im[1/(ubar_a - c_a)] - c_i/|ubar_a - c_a|^2 = exact zero
+  the weight |Psi|^2/|ubar_a - c_a|^2 is strictly positive, so c_i != 0
+  forces dQ/dphi to change sign. Necessary condition established.
+  Assumptions used, and only these: base flow real and zonal;
+  Psi regular at both poles; Psi not identically zero.
+
+Arm 4 - necessary but not sufficient, on two concrete base states
+------------------------------------------------------------------------
+  (a) solid-body rotation, U0 = 40 m/s: dQ/dphi has no sign change
+      dQ/dphi min = 1.5840e-10, max = 1.5840e-04, sign change: no
+      m = 1:  96 modes, max|Im c_a|/spread(Re c_a) = 0.00e+00  [all real]
+      m = 2:  95 modes, max|Im c_a|/spread(Re c_a) = 0.00e+00  [all real]
+      m = 3:  94 modes, max|Im c_a|/spread(Re c_a) = 0.00e+00  [all real]
+      m = 4:  93 modes, max|Im c_a|/spread(Re c_a) = 0.00e+00  [all real]
+      m = 5:  92 modes, max|Im c_a|/spread(Re c_a) = 0.00e+00  [all real]
+      m = 6:  91 modes, max|Im c_a|/spread(Re c_a) = 0.00e+00  [all real]
+      tolerance: 1.0e-08  (this is hypothesis H7 as a prohibition)
+
+  (b) Galewsky et al. (2004) jet: dQ/dphi does change sign
+      sign changes at latitudes: +32.19 deg, +39.79 deg, +49.82 deg, +58.16 deg
+       m   growth m*Im(c_a) [1/s]   e-fold [days]   N-doubling change
+       1   2.988052e-06             3.873       2.75e-05  resolved
+       2   5.710230e-06             2.027       7.79e-05  resolved
+       3   7.550865e-06             1.533       2.91e-04  resolved
+       4   1.483243e-05             0.780       3.56e-08  resolved
+       5   1.889113e-05             0.613       2.63e-08  resolved
+       6   2.074841e-05             0.558       4.84e-07  resolved
+       7   2.073386e-05             0.558       1.47e-05  resolved
+       8   1.890543e-05             0.612       1.96e-04  resolved
+       9   1.516413e-05             0.763       1.97e-03  UNRESOLVED
+      10   9.247052e-06             1.252       9.91e-02  UNRESOLVED
+      11   2.518969e-06             4.595       4.05e-01  UNRESOLVED
+      12   4.884458e-07            23.696       3.46e-01  UNRESOLVED
+      resolution: N = 240, doubled to 480; tolerance 1e-03
+
+      most unstable zonal wavenumber m* = 6, growth rate 2.0748e-05 1/s (e-folding 0.56 days)
+      The Phase-0 gate observed roll-up over days 4-6; with a
+      120 m initial height bump that is several e-foldings at this
+      rate, so the two are consistent.
+
+      Necessary is not sufficient: (a) shows the criterion forbids
+      growth when it is not met, (b) shows that when it *is* met only
+      the solved eigenvalue problem supplies a growth rate and an m*.
+
+VERDICT: VERIFIED

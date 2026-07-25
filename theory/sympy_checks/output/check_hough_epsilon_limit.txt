@@ -1,0 +1,67 @@
+check_hough_epsilon_limit
+========================================================================
+Claim: the divergent (Laplace tidal / Hough) eigenfrequencies converge
+to sigma = -m/[n(n+1)] as Lamb's parameter eps -> 0.
+
+Arm 1 - Legendre matrix elements: quadrature vs. closed form
+------------------------------------------------------------------------
+  max |M_quadrature - M_recurrence| : 3.446e-14
+  max |D_quadrature - D_recurrence| : 6.111e-13
+  max |D^T + D - 2M| (adjoint identity): 1.562e-13
+  tolerance: 1.0e-12
+
+Arm 2 - spectral truncation convergence (m = 1, eps = 1e-3)
+------------------------------------------------------------------------
+  N =  20: baseline
+  N =  40: max relative change from previous N: 1.903e-12
+  N =  80: max relative change from previous N: 4.281e-13
+  tolerance: 1.0e-10
+
+Arm 3 - the eps -> 0 sweep and its convergence rate
+------------------------------------------------------------------------
+  zonal order m = 1
+    n = 2: sigma_0 = -0.16666667   rel. err 9.18e-04 (eps=1e-2) -> 9.19e-08 (eps=1e-6)
+           fitted convergence rate d(log err)/d(log eps) = 0.9999   [in window 0.9-1.1]
+    n = 3: sigma_0 = -0.08333333   rel. err 4.50e-04 (eps=1e-2) -> 4.50e-08 (eps=1e-6)
+           fitted convergence rate d(log err)/d(log eps) = 1.0000   [in window 0.9-1.1]
+    n = 5: sigma_0 = -0.03333333   rel. err 1.73e-04 (eps=1e-2) -> 1.73e-08 (eps=1e-6)
+           fitted convergence rate d(log err)/d(log eps) = 1.0000   [in window 0.9-1.1]
+  zonal order m = 2
+    n = 2: sigma_0 = -0.33333333   rel. err 1.06e-04 (eps=1e-2) -> 1.06e-08 (eps=1e-6)
+           fitted convergence rate d(log err)/d(log eps) = 1.0000   [in window 0.9-1.1]
+    n = 3: sigma_0 = -0.16666667   rel. err 3.01e-04 (eps=1e-2) -> 3.01e-08 (eps=1e-6)
+           fitted convergence rate d(log err)/d(log eps) = 1.0000   [in window 0.9-1.1]
+    n = 5: sigma_0 = -0.06666667   rel. err 1.54e-04 (eps=1e-2) -> 1.54e-08 (eps=1e-6)
+           fitted convergence rate d(log err)/d(log eps) = 1.0000   [in window 0.9-1.1]
+
+  Rate ~ 1 is the expected physics: the divergent correction enters at
+  first order in eps, the surface absorbing a share of the PV budget
+  proportional to how compliant it is.
+  tolerance on the smallest-eps error: 1.0e-05
+
+Arm 4 - readout at Earth's Lamb parameter (hypothesis H5)
+------------------------------------------------------------------------
+  eps_Earth = 4 Omega^2 R^2 / (g H) = 8.8044 for H = 10 km, i.e. R / L_d = 2.967
+  Branches followed by continuation from eps = 1e-6 (see track_rossby_mode).
+
+   m   n   nondivergent      Hough        slowing    -m/(Lam+eps)
+   1   2   -0.166667     -0.099366    -40.38%     -0.067548
+   1   3   -0.083333     -0.060134    -27.84%     -0.048067
+   1   5   -0.033333     -0.028895    -13.32%     -0.025770
+   1   8   -0.013889     -0.013071     -5.89%     -0.012376
+   2   2   -0.333333     -0.308288     -7.51%     -0.135095
+   2   3   -0.166667     -0.133662    -19.80%     -0.096134
+   2   5   -0.066667     -0.058738    -11.89%     -0.051541
+   2   8   -0.027778     -0.026213     -5.63%     -0.024751
+
+  Every mode is slowed, and the fractional slowing is largest at low n
+  -- the largest scales, closest to the deformation radius. This is H5
+  as a curve rather than as an assertion.
+  The last column is the equivalent-barotropic estimate -m/(Lam + eps),
+  shown for orientation only: it captures the sense and rough size of
+  the effect but is not the Hough answer, which is what the project
+  actually validates against.
+  every listed mode slowed by the free surface: yes
+  (Arm 4 is a physical readout, not a pass/fail gate.)
+
+VERDICT: VERIFIED
