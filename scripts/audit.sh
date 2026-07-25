@@ -497,5 +497,74 @@ else
   bad "40. $miss missing"
 fi
 
+# 41. The stability EVP is not described as a sufficient stability test.
+#     A normal-mode EVP cannot establish stability -- the operator is non-normal.
+#     The word "sufficient" legitimately appears elsewhere (Ripa's conditions
+#     genuinely ARE sufficient; section 8's criterion is "necessary, not
+#     sufficient"), so this screens for the specific dangerous assertions and
+#     also requires the section-9 caveat to still be present.
+tex="theory/derivations.tex"
+if [ -f "$tex" ]; then
+  bad41=""
+  # (a) dangerous phrasings, in any form that asserts it of THIS project's EVP.
+  if grep -qiE '(genuine|actual|is a) sufficient (computational )?(test|condition)' "$tex"; then
+    hits="$(grep -niE '(genuine|actual|is a) sufficient (computational )?(test|condition)' "$tex" \
+            | grep -viE 'not a sufficient' | cut -d: -f1 | tr '\n' ' ')"
+    [ -n "$hits" ] && bad41="$bad41 asserted-at-line:$hits"
+  fi
+  # (b) the caveat must still be there.
+  grep -qF 'is \emph{not} a sufficient condition' "$tex" || bad41="$bad41 caveat-missing"
+  grep -qi 'non-normal' "$tex" || bad41="$bad41 non-normality-note-missing"
+  if [ -z "$bad41" ]; then
+    pass "41. stability EVP scoped to modal instability; non-normality caveat present"
+  else
+    bad "41. section-9 scope regression:$bad41"
+  fi
+else
+  bad "41. $tex missing"
+fi
+
+# 42. derivations.tex cites Ripa (1983) -- the divergent stability reference --
+#     and does so inside the eigenvalue-problem section rather than only in the
+#     bibliography.
+if [ -f "$tex" ]; then
+  if grep -q 'bibitem\[Ripa(1983)\]{ripa1983}' "$tex" \
+     && grep -qE '\\cite[a-z]*\{[^}]*ripa1983' "$tex"; then
+    pass "42. derivations.tex cites Ripa (1983) in the text and bibliography"
+  else
+    bad "42. derivations.tex does not cite Ripa (1983) in both text and bibliography"
+  fi
+fi
+
+# 43. The unified provenance ledger covers every citation Session L4b examined.
+prov="theory/PROVENANCE_AUDIT.md"
+if [ -f "$prov" ]; then
+  miss43=""
+  for tok in "Ripa (1983)" "Hayashi & Young (1987)" "Skiba & Pérez-García (2004)" \
+             "Skiba (2008)" "Skiba (2024)" "Constantin & Germain (2022)" \
+             "Cao, Wang & Zuo (2023)" "Paldor, Shamir & Garfinkel (2020)" \
+             "ABSTRACT-VERIFIED" "TITLE-ONLY"; do
+    grep -qF "$tok" "$prov" || miss43="$miss43 [$tok]"
+  done
+  if [ -z "$miss43" ]; then
+    pass "43. provenance ledger covers all L4b citations and both new categories"
+  else
+    bad "43. provenance ledger missing:$miss43"
+  fi
+else
+  bad "43. $prov missing"
+fi
+
+# 44. The combined pre-L5 sign-off document carries its exact closing statement.
+sig="docs/PRE_L5_SIGNOFF.md"
+if [ -f "$sig" ] \
+   && grep -q "THIS DOCUMENT REQUIRES OPERATOR SIGN-OFF BEFORE SESSION L5 MAY BEGIN." "$sig" \
+   && grep -q "IT SUPERSEDES SEPARATE SIGN-OFF OF DERIVATION_REVIEW.MD, LITERATURE_REVIEW.MD," "$sig" \
+   && grep -q "DERIVATIONS.TEX HAS BEEN RECONCILED TO MATCH THEM." "$sig"; then
+  pass "44. PRE_L5_SIGNOFF.md carries the exact closing statement"
+else
+  bad "44. $sig missing or lacks the exact closing statement"
+fi
+
 echo "== $( [ "$fail" -eq 0 ] && echo "AUDIT PASSED" || echo "AUDIT FAILED ($fail check(s))" ) =="
 exit "$fail"
