@@ -208,9 +208,12 @@ def resolve(config: dict) -> dict:
         numerics["hyperdiffusion_coefficient"] = float(f"{NU4:.6g}")
         numerics["stop_sim_time"] = STOP_BY_CASE[ic]
         if run_id == "P-18":
-            # The sensitivity run brackets the standard value by a decade either
-            # way; the sweep generator (Session L7) expands this into three runs.
-            numerics["hyperdiffusion_coefficient"] = float(f"{NU4:.6g}")
+            # The sensitivity run has to differ from the standard one or it is
+            # not a run at all. It takes ten times the standard coefficient, so
+            # that P-03 and P-18 form a two-point sensitivity at fixed mode and
+            # resolution. Session L7's sweep generator widens this into a proper
+            # bracket; one decade is enough to show whether the answer moves.
+            numerics["hyperdiffusion_coefficient"] = float(f"{10 * NU4:.6g}")
         config["numerics"] = numerics
 
     outputs = dict(config.get("outputs") or {})
