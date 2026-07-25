@@ -139,6 +139,32 @@ def stability_evp(
     return vals[np.isfinite(vals)]
 
 
+def eigenfunction_on_latitudes(vector, degrees, m: int, lat) -> np.ndarray:
+    """Evaluate a spectral eigenvector ``Psi(phi) = sum a_n P_n^m(sin phi)`` on a grid.
+
+    The eigenvectors :func:`stability_evp` returns are coefficients in the same
+    normalised associated-Legendre basis the operator was built in, so turning one
+    into a meridional profile means summing that series — and it has to be summed
+    with *that* normalisation, not a textbook one, or the shape comes out subtly
+    wrong. Keeping the evaluation next to the basis that defines it is what stops
+    the two from drifting apart.
+
+    Returns the complex profile; its modulus is the disturbance amplitude against
+    latitude and its argument is the meridional phase tilt, which is the part that
+    carries the momentum flux.
+    """
+    lat = np.asarray(lat, dtype=float)
+    mu = np.sin(lat)
+    table = assoc_legendre_p_all(int(np.max(degrees)), m, mu, norm=True, diff_n=0)
+    quad_mu, quad_w = roots_legendre(QUADRATURE_POINTS)
+    quad_table = assoc_legendre_p_all(int(np.max(degrees)), m, quad_mu, norm=True, diff_n=0)
+    profile = np.zeros(lat.shape, dtype=complex)
+    for coefficient, n in zip(np.asarray(vector), np.asarray(degrees), strict=True):
+        norm = np.sqrt((quad_table[0, n, m] ** 2 * quad_w).sum())
+        profile = profile + coefficient * table[0, n, m] / norm
+    return profile
+
+
 def resolved_growth_rate(m: int, profile, R_si: float, Omega_si: float, truncation=None) -> dict:
     """Fastest growth rate at order ``m``, with the resolution-doubling verdict.
 
