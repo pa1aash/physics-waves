@@ -13,8 +13,14 @@ YEARS ?= 2015 2016
 FILE ?=
 ARGS ?=
 
+# Run configuration for `make run`. No default: a run must be named explicitly,
+# because "configs are the single source of truth" only means anything if the
+# config is chosen deliberately.
+CONFIG ?=
+
 .PHONY: env lock test hooks data data-ncep data-era5 data-torch licenses \
-        audit sync clean reproduce help verify refcheck manuscript figure sweep
+        audit sync clean reproduce help verify refcheck manuscript figure sweep \
+        run configs
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -69,10 +75,17 @@ manuscript: ## build the manuscript PDF (falls back to theory/derivations.tex un
 figure: ## figure pipeline (L10); preview now with `make figure ARGS=--style-preview`
 	python src/figures/make_figures.py $(ARGS)
 
+run: ## integrate one run: `make run CONFIG=configs/verification/V-02.yaml [ARGS=--dry-run]`
+	@test -n "$(CONFIG)" || (echo "usage: make run CONFIG=configs/<campaign>/<ID>.yaml" && exit 2)
+	python -m src.solver.harness $(CONFIG) $(ARGS)
+
+configs: ## re-derive every solver-dependent config value from the stated policy
+	python scripts/resolve_configs.py $(ARGS)
+
 sweep:
 	@echo "NOT YET IMPLEMENTED."
-	@echo "The run-configuration system and harness arrive in Session L5;"
-	@echo "the pod sweep generator arrives in Session L7."
+	@echo "One run at a time works now: make run CONFIG=configs/<campaign>/<ID>.yaml"
+	@echo "The multi-run pod sweep generator arrives in Session L7."
 	@exit 1
 
 sync: ## mirror the working tree to the compute pod

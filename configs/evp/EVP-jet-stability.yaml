@@ -1,6 +1,6 @@
-# Run-config stub (Session 00). Solver-dependent values are marked
-# TBD_SESSION_L5 and finalised in Session L5. Validates against
-# configs/_schema.yaml.
+# Run configuration. Solver-dependent values were resolved in Session L5 by
+# scripts/resolve_configs.py, which states the policy behind each one.
+# Validates against configs/_schema.yaml.
 #
 # SCOPE DECISION (Session L4b, Option B) -- do not re-litigate.
 # This eigenvalue problem is deliberately NONDIVERGENT. Extending it to the full
@@ -22,12 +22,29 @@ physical:
   g: 9.80616
   H: 10000.0
 initial_condition_params:
-  base_states: TBD_SESSION_L5
-  azimuthal_orders: TBD_SESSION_L5
-  truncation: TBD_SESSION_L5
-notes: >-
-  Nondivergent modal growth rates sigma(m) and eigenmode structure; converts the
-  Rayleigh-Kuo prohibition into a prediction. Not a general stability proof --
-  the operator is non-normal, so an all-real spectrum does not exclude transient
-  growth. Scope decision recorded in
-  docs/literature/DIVERGENT_STABILITY_DECISION.md
+  base_states:
+  - I-00
+  - I-01
+  - I-02
+  - I-03
+  - I-04
+  - I-05
+  azimuthal_orders:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  truncation:
+  - 240
+  - 480
+notes: Nondivergent modal growth rates sigma(m) and eigenmode structure; converts the Rayleigh-Kuo
+  prohibition into a prediction. Not a general stability proof -- the operator is non-normal,
+  so an all-real spectrum does not exclude transient growth. Scope decision recorded in docs/literature/DIVERGENT_STABILITY_DECISION.md

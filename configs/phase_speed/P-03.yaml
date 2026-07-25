@@ -1,6 +1,6 @@
-# Run-config stub (Session 00). Solver-dependent values are marked
-# TBD_SESSION_L5 and finalised in Session L5. Validates against
-# configs/_schema.yaml.
+# Run configuration. Solver-dependent values were resolved in Session L5 by
+# scripts/resolve_configs.py, which states the policy behind each one.
+# Validates against configs/_schema.yaml.
 run_id: P-03
 campaign: phase_speed
 description: Wavenumber dependence — single Rossby-Haurwitz mode, degree n=4.
@@ -12,19 +12,19 @@ physical:
   g: 9.80616
   H: 10000.0
 numerics:
-  timestepper: TBD_SESSION_L5
-  dt: TBD_SESSION_L5
+  timestepper: RK222
+  dt: 600.0
   dealias: 1.5
   hyperdiffusion_order: 4
-  hyperdiffusion_coefficient: TBD_SESSION_L5
-  stop_sim_time: TBD_SESSION_L5
+  hyperdiffusion_coefficient: 3964110000000000.0
+  stop_sim_time: 1728000.0
 outputs:
-  snapshot_cadence: TBD_SESSION_L5
-  slice_cadence: TBD_SESSION_L5
-  spectra_cadence: TBD_SESSION_L5
+  snapshot_cadence: 86400.0
+  slice_cadence: 3600.0
+  spectra_cadence: 3600.0
   write_full_fields: false
 initial_condition_params:
   degree_n: 4
-  order_m: TBD_SESSION_L5
-  amplitude: TBD_SESSION_L5
+  order_m: 2
+  amplitude: 1.0
 notes: Measures westward phase speed c and angular phase speed c_ang.

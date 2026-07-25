@@ -77,3 +77,10 @@ tests/phase0_gate/diagnostics/*.pdf
 figures/style_preview.*
 theory/derivations.pdf
 manuscript/main.pdf
+
+# Simulation output. Same rule as data/: the bulk HDF5 is reproducible from the
+# config and the code, so it is never committed, while each run's provenance
+# record — which is what makes it reproducible — is tracked.
+runs/**
+!runs/*/
+!runs/*/provenance.json

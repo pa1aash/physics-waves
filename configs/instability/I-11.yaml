@@ -1,6 +1,6 @@
-# Run-config stub (Session 00). Solver-dependent values are marked
-# TBD_SESSION_L5 and finalised in Session L5. Validates against
-# configs/_schema.yaml.
+# Run configuration. Solver-dependent values were resolved in Session L5 by
+# scripts/resolve_configs.py, which states the policy behind each one.
+# Validates against configs/_schema.yaml.
 run_id: I-11
 campaign: instability
 description: Resolution robustness — supercritical idealised jet.
@@ -12,19 +12,23 @@ physical:
   g: 9.80616
   H: 10000.0
 numerics:
-  timestepper: TBD_SESSION_L5
-  dt: TBD_SESSION_L5
+  timestepper: RK222
+  dt: 600.0
   dealias: 1.5
   hyperdiffusion_order: 4
-  hyperdiffusion_coefficient: TBD_SESSION_L5
-  stop_sim_time: TBD_SESSION_L5
+  hyperdiffusion_coefficient: 3964110000000000.0
+  stop_sim_time: 1296000.0
 outputs:
-  snapshot_cadence: TBD_SESSION_L5
-  slice_cadence: TBD_SESSION_L5
-  spectra_cadence: TBD_SESSION_L5
+  snapshot_cadence: 21600.0
+  slice_cadence: 3600.0
+  spectra_cadence: 3600.0
   write_full_fields: false
 initial_condition_params:
   profile: idealised_jet
-  shear_parameter_S: TBD_SESSION_L5
-  perturbation: TBD_SESSION_L5
+  shear_parameter_S: 1.0
+  perturbation:
+    h_hat: 120.0
+    phi2: 0.7853981633974483
+    alpha: 0.3333333333333333
+    beta: 0.06666666666666667
 notes: Resolution L1, L2; growth-rate convergence.

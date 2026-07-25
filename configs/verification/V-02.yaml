@@ -1,10 +1,9 @@
-# Run-config stub (Session 00). Solver-dependent values are marked
-# TBD_SESSION_L5 and finalised in Session L5. Validates against
-# configs/_schema.yaml.
+# Run configuration. Solver-dependent values were resolved in Session L5 by
+# scripts/resolve_configs.py, which states the policy behind each one.
+# Validates against configs/_schema.yaml.
 run_id: V-02
 campaign: verification
-description: Steady-state accuracy — Williamson case 2 (steady nonlinear geostrophic
-  flow).
+description: Steady-state accuracy — Williamson case 2 (steady nonlinear geostrophic flow).
 resolution: L0
 initial_condition: williamson_2
 case: 2
@@ -12,17 +11,17 @@ physical:
   R: 6371220.0
   Omega: 7.292e-05
   g: 9.80616
-  H: 10000.0
+  H: 2363.021
 numerics:
-  timestepper: TBD_SESSION_L5
-  dt: TBD_SESSION_L5
+  timestepper: RK222
+  dt: 2400.0
   dealias: 1.5
   hyperdiffusion_order: 4
-  hyperdiffusion_coefficient: TBD_SESSION_L5
-  stop_sim_time: TBD_SESSION_L5
+  hyperdiffusion_coefficient: 3964110000000000.0
+  stop_sim_time: 432000.0
 outputs:
-  snapshot_cadence: TBD_SESSION_L5
-  slice_cadence: TBD_SESSION_L5
-  spectra_cadence: TBD_SESSION_L5
+  snapshot_cadence: 86400.0
+  slice_cadence: 21600.0
+  spectra_cadence: 3600.0
   write_full_fields: true
 notes: Resolution ladder L0-L3. Primary accuracy test.
