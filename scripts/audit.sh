@@ -630,5 +630,79 @@ else
   bad "48. $ev missing the nondivergent-scope / bias / non-normality statement"
 fi
 
+
+# 49. Every analysis-pipeline module built in Session L6 is genuinely implemented
+#     -- no stub docstring left behind -- and states the physics before the
+#     mechanism. The two modules that are deliberately still stubs are named
+#     explicitly, so that finishing them later cannot be mistaken for a
+#     regression and so that leaving them cannot be mistaken for an oversight.
+miss49=""
+for f in src/diagnostics/slices.py src/diagnostics/conservation.py \
+         src/diagnostics/spectra.py src/analysis/compute_error_norms.py \
+         src/analysis/extract_hovmoller.py src/analysis/fit_phase_speed.py \
+         src/analysis/fit_growth_rate.py src/analysis/spectral_decompose.py \
+         src/analysis/extract_structure.py src/analysis/hough.py \
+         src/analysis/stability_evp.py; do
+  if [ ! -f "$f" ]; then
+    miss49="$miss49 [missing:$f]"
+  elif grep -q "^# Implementation: Session" "$f"; then
+    miss49="$miss49 [still-a-stub:$f]"
+  elif ! grep -qF "Physics first" "$f"; then
+    miss49="$miss49 [no-physics-first:$f]"
+  fi
+done
+for f in src/analysis/process_reanalysis.py src/analysis/aggregate_results.py; do
+  grep -q "^# Implementation: Session" "$f" 2>/dev/null \
+    || miss49="$miss49 [expected-to-remain-a-stub:$f]"
+done
+if [ -z "$miss49" ]; then
+  pass "49. analysis-pipeline modules implemented, physics-first; L8/L9 stubs still stubs"
+else
+  bad "49. analysis-pipeline module problems:$miss49"
+fi
+
+# 50. The synthetic-data fitter tests recover their known ground truth to better
+#     than 0.1%, for every (m, omega) and every sigma case. This runs the tests
+#     rather than trusting that they exist, and it also checks that the tolerance
+#     constant itself has not been quietly relaxed -- a test that passes because
+#     its bar was lowered is worse than no test.
+if grep -q "^FITTER_TOLERANCE = 1e-3$" tests/test_analysis_pipeline.py; then
+  if python -m pytest tests/test_analysis_pipeline.py -q \
+       -k "recovers_known_input or superimposed_oscillation or conventions_differ" \
+       >/dev/null 2>&1; then
+    pass "50. every synthetic fitter case recovers ground truth to better than 0.1%"
+  else
+    bad "50. a synthetic fitter case fails to recover its known input to 0.1%"
+  fi
+else
+  bad "50. FITTER_TOLERANCE is no longer 1e-3 in tests/test_analysis_pipeline.py"
+fi
+
+# 51. The Part-6 regression test still reproduces Session L5's (m=2, n=4) finding:
+#     a measured slowing of 15.72% against a Hough eigenvalue of 15.77%, agreeing
+#     to 0.05 percentage points. This is the session's headline cross-check and
+#     the thing most likely to move silently if a fitter is refactored.
+if [ -f runs/P-17/provenance.json ]; then
+  if python -m pytest tests/test_analysis_pipeline.py -q \
+       -k "hough_comparison_reproduces" >/dev/null 2>&1; then
+    pass "51. Hough comparison still reproduces Session L5's (m=2,n=4) result"
+  else
+    bad "51. the measured-vs-Hough comparison no longer reproduces Session L5's result"
+  fi
+else
+  skip "51. run P-17 not present; cannot check the Hough regression"
+fi
+
+# 52. The Part-7 regression test still reproduces Session L5's shear ladder --
+#     all five rungs, each with its necessary verdict, sufficient verdict and
+#     growth rate -- and the refined thresholds still lie inside the brackets
+#     that session reported.
+if python -m pytest tests/test_analysis_pipeline.py -q \
+     -k "shear_ladder_reproduces or three_regimes or growth_onset_lies" >/dev/null 2>&1; then
+  pass "52. shear ladder and thresholds still reproduce Session L5"
+else
+  bad "52. the stability sweep no longer reproduces Session L5's shear ladder"
+fi
+
 echo "== $( [ "$fail" -eq 0 ] && echo "AUDIT PASSED" || echo "AUDIT FAILED ($fail check(s))" ) =="
 exit "$fail"
