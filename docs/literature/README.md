@@ -27,6 +27,25 @@ waves" below.
 | `hack_1992_ncar_tn343.pdf` | Hack, J. J., & Jakob, R. (1992). *Description of a Global Shallow Water Model Based on the Spectral Transform Method.* NCAR Technical Note NCAR/TN-343+STR. |
 | `jakob_1993_ncar_tn388.pdf` | Jakob, R., Hack, J. J., & Williamson, D. L. (1993). *Solutions to the Shallow Water Test Set Using the Spectral Transform Method.* NCAR Technical Note NCAR/TN-388+STR. |
 
+**The Williamson PDF held here is the ORNL report, not the journal article, and
+its equation numbers differ.** The file is **ORNL/TM-11895**, an Oak Ridge
+National Laboratory technical memorandum by the same five authors with the same
+title as the *J. Comput. Phys.* article cited above. Session L4 found the
+mismatch; Session L5 checked what it costs while transcribing the test cases into
+`src/solver/initial_conditions/williamson.py`.
+
+*Finding.* The **test-case definitions and every parameter value agree** — case 1
+is its §3.1, case 2 its §3.2, case 5 its §3.5, case 6 its §3.6, with the Earth
+parameters `a = 6.37122e6 m`, `Ω = 7.292e-5 s⁻¹`, `g = 9.80616 m s⁻²` as its
+eqs. (72)–(74), `gh₀ = 2.94e4 m² s⁻²` for case 2, `h₀ = 5400 m` and
+`h_s0 = 2000 m` for case 5, and `ω = K = 7.848e-6 s⁻¹`, `h₀ = 8000 m`, `R = 4`
+for case 6. **The equation numbering does not**: the report numbers the cosine
+bell at (75)–(80) and the Rossby–Haurwitz wave at (135)–(143), continuing a
+sequence begun in its own earlier sections. Equation numbers quoted in
+`williamson.py` are therefore marked as *report* numbers. **No claim in this
+project may cite a Williamson equation number against the JCP article** on the
+strength of that file; the parameter values may be cited against either.
+
 ## Extension references
 
 | Suggested filename | Citation |

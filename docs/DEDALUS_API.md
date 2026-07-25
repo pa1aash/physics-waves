@@ -252,3 +252,79 @@ The Laplace–Beltrami operator on the unit sphere has eigenvalues `−n(n+1)`, 
 
 matching `n(n+1)` to all printed digits. The API translation above is therefore
 confirmed, not assumed — the same standard Session L1 applied to the IVP path.
+
+---
+
+# Session L5 additions: balance, averages, and the advection path
+
+Three more pieces of the API were needed to build the initial conditions and the
+run harness. All three were confirmed the same way — a live micro-example whose
+answer is known — and two of them are places where the obvious call fails.
+
+## 12. Area averages: `Average`, not `integ`
+
+**Deviation.** `d3.integ(field)` raises `NotImplementedError` on a `SphereBasis`:
+
+```
+NotImplementedError: No subclasses of <class 'dedalus.core.operators.Integrate'>
+found for the supplied arguments: (<Field>, <S2Coordinates>)
+```
+
+The working call is `d3.Average`:
+
+```python
+d3.Average(field, coords).evaluate()      # -> the area-weighted mean
+```
+
+Confirmed on a `(64, 32)` sphere: `<1> = 1`, `<sin(lat)> = 0` and
+`<sin²(lat)> = 1/3` to 1e-12. This matters more than it looks — `np.mean` over
+the grid is *not* the area average, because the colatitude grid is
+Gauss–Legendre in `cos θ` and weights the poles far too heavily.
+
+## 13. Evaluated operators come back dealiased
+
+An operator's `.evaluate()` returns a field on the **dealiased** grid, so with
+`dealias = 1.5` a `(64, 32)` problem yields `(96, 48)` data and a direct copy
+raises:
+
+```
+ValueError: could not broadcast input array from shape (2,96,48) into shape (2,64,32)
+```
+
+Call `.change_scales(1)` on the result before reading `['g']`. This affects every
+place the project derives one field from another — velocity from a
+streamfunction, vorticity from velocity, a mean from a product.
+
+## 14. `LBVP` for the balanced height field
+
+The nonlinear balance relation is solved as a linear boundary-value problem, with
+an auxiliary constant absorbing the Laplacian's null space on a closed sphere:
+
+```python
+c = dist.Field(name='c')
+problem = d3.LBVP([h, c], namespace=...)
+problem.add_equation("g*lap(h) + c = - div(u@grad(u) + 2*Omega*zcross(u))")
+problem.add_equation("ave(h) = 0")
+problem.build_solver().solve()
+```
+
+`ave`, `lap`, `div`, `grad` resolve from Dedalus's default parser namespace even
+when an explicit `namespace=` dict is passed — the dict is *added* to the
+defaults, not substituted for them. Confirmed by the shipped shallow-water
+example, which passes `namespace=locals()` and never defines `ave`.
+
+## 15. An IVP may evolve a subset of its fields
+
+Williamson case 1 needs a prescribed wind advecting a tracer, not a shallow-water
+solve. Listing only `h` as a problem variable while `u` appears in the equation
+does exactly that — `u` is treated as data and keeps whatever the initial
+condition wrote into it:
+
+```python
+problem = d3.IVP([h], namespace=...)     # u is data, not a variable
+problem.add_equation("dt(h) + nu*hyper(h) = -u@grad(h)")
+```
+
+Confirmed to build and step. This is the only place the project departs from the
+full shallow-water system, and it does so because the source defines the case
+that way.

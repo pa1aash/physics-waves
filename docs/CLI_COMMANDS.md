@@ -10,6 +10,8 @@ tool.
 
 | Command | `make` target | Status (this session) | Completed by |
 |---------|---------------|-----------------------|--------------|
+| — | `make run` | **Fully implemented** (Session L5) | — |
+| — | `make configs` | **Fully implemented** (Session L5) | — |
 | `/verify` | `make verify` | **Fully implemented** | — |
 | `/refcheck` | `make refcheck` | **Partially implemented** (works now; full power once a real `.bib` exists) | Session L4 |
 | `/manuscript` | `make manuscript` | **Partially implemented** (compiles whatever LaTeX exists now; full build with the Springer manuscript) | Session L11 |
@@ -77,9 +79,44 @@ rather than nine sessions later. Without the flag it prints the standard
 **Expected output shape:** with `--style-preview`, a saved preview-PNG path and
 exit 0; without it, the "implemented in Session L10" message and a non-zero exit.
 
+## `make run CONFIG=<path>` → `src/solver/harness.py` — fully implemented
+
+Integrates one run from one config and writes `runs/<RUN_ID>/`. There is no
+default `CONFIG`: a run has to be named deliberately, because "configs are the
+single source of truth" means nothing if the config is chosen by accident.
+
+Refuses to start if the config still carries a `TBD_SESSION_L5` placeholder, or
+if the run directory already records a completed run of that ID. Warns — on
+stderr, and into the provenance record — when the config's `physical.H` does not
+describe its own initial condition, when `stop_sim_time` runs past a case's
+validity window, or when a rotation multiplier disagrees with `physical.Omega`.
+
+Useful arguments, passed through `ARGS`: `--dry-run` builds everything and writes
+provenance without integrating; `--update-registry` advances the run's Status cell
+in `configs/RUN_REGISTRY.md`; `--output-root` writes somewhere other than `runs/`.
+
+**Expected output shape:** a `[harness] <ID>: completed -> <dir>` line and a
+second line giving iterations, simulated days and wall seconds; any warnings
+appear first, prefixed `[harness] WARNING:`.
+
+The two eigenvalue campaigns are their own entry points, since they have no
+timestep: `python -m src.solver.evp_hough` and
+`python -m src.solver.evp_stability`.
+
+## `make configs` → `scripts/resolve_configs.py` — fully implemented
+
+Re-derives every solver-dependent config value from the policy stated in the
+script's own docstring, and rewrites the YAML. Idempotent. `ARGS=--check` reports
+what would change and exits non-zero if anything would, which is what the audit
+uses to catch a hand-edited config drifting away from the policy.
+
+**Expected output shape:** one `[resolve-configs] updated <path>` line per changed
+file, then a count.
+
 ## `make sweep` → Makefile stub — explicit NotImplemented
 
-Prints that the run-configuration system and harness arrive in Session L5 and the
-pod sweep generator in Session L7, then exits non-zero. No hidden behaviour.
+Prints that single runs work now via `make run` and that the multi-run pod sweep
+generator arrives in Session L7, then exits non-zero. No hidden behaviour.
 
-**Expected output shape:** the two-line "NOT YET IMPLEMENTED" message and exit 1.
+**Expected output shape:** the three-line "NOT YET IMPLEMENTED" message and
+exit 1.

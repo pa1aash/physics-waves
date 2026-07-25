@@ -11,12 +11,24 @@ a prerequisite for every run below, not a run itself, so it carries no run ID: i
 validates that Dedalus correctly solves the rotating shallow-water instability on
 the sphere before any project run consumes compute.
 
+**Solver core (Session L5).** Every config's solver-dependent values are now
+resolved — the policy behind each is stated in `scripts/resolve_configs.py`. Four
+verification rows had their `physical.H` corrected: Williamson cases 2, 5 and 6
+and the Läuter case carry mean depths of their own (2363, 4765, 9523 and
+13176 m), not the 10 km the stubs assumed, and `H` is the depth the implicit term
+linearises about.
+
+A run marked **L5 proof run** executed as a demonstration that the harness,
+equations and initial condition work end to end. It is *not* a campaign result:
+its resolution row is not complete and no verification gate has been claimed on
+it. A run marked **complete** ran the full sweep its config declares.
+
 Sub-questions (blueprint section 3.2): **SQ1** dispersion-relation theory · **SQ2** verification and convergence · **SQ3** phase speed vs wavenumber and rotation · **SQ4** meridional structure and observational comparison · **SQ5** jet instability.
 
 | Run ID | Campaign | Purpose | Initial condition | Resolution | Varies | Measured | Sub-question | Status |
 |--------|----------|---------|-------------------|------------|--------|----------|--------------|--------|
 | V-01 | verification | Advection accuracy — Williamson case 1 (cosine-bell advection across the poles) | williamson_1 | L0 | Resolution | l2, l-inf vs analytic | SQ2 | not started |
-| V-02 | verification | Steady-state accuracy — Williamson case 2 (steady nonlinear geostrophic flow) | williamson_2 | L0 | Resolution | l2, l-inf vs analytic | SQ2 | not started |
+| V-02 | verification | Steady-state accuracy — Williamson case 2 (steady nonlinear geostrophic flow) | williamson_2 | L0 | Resolution | l2, l-inf vs analytic | SQ2 | L5 proof run 2026-07-25 (L0) |
 | V-03 | verification | Topographic forcing — Williamson case 5 (zonal flow over an isolated mountain) | williamson_5 | L1 | Resolution | l2, l-inf vs L3 reference | SQ2 | not started |
 | V-04 | verification | Reference generation — Williamson case 5 at L3 | williamson_5 | L3 | — | Case-5 reference fields | SQ2 | not started |
 | V-05 | verification | Rossby-Haurwitz fidelity — Williamson case 6 | williamson_6 | L1 | Resolution | l2, l-inf vs L3 reference | SQ2 | not started |
@@ -40,9 +52,9 @@ Sub-questions (blueprint section 3.2): **SQ1** dispersion-relation theory · **S
 | P-14 | phase_speed | Linearity check — degree n=4, initial-amplitude step 2 of 3 | single_harmonic | L1 | Initial amplitude A0 | c, departure from linear | SQ3 | not started |
 | P-15 | phase_speed | Linearity check — degree n=4, initial-amplitude step 3 of 3 | single_harmonic | L1 | Initial amplitude A0 | c, departure from linear | SQ3 | not started |
 | P-16 | phase_speed | Meridional structure — degree n=4 | single_harmonic | L2 | — | A(phi), turning latitude | SQ4 | not started |
-| P-17 | phase_speed | Resolution robustness — degree n=4 | single_harmonic | L0 | Resolution | c convergence | SQ3 | not started |
+| P-17 | phase_speed | Resolution robustness — degree n=4 | single_harmonic | L0 | Resolution | c convergence | SQ3 | L5 proof run 2026-07-25 (L0) |
 | P-18 | phase_speed | Hyperdiffusion sensitivity — degree n=4 | single_harmonic | L1 | Hyperdiffusion nu | c sensitivity | SQ3 | not started |
-| I-00 | instability | Galewsky, Scott & Polvani (2004) barotropic-instability anchor | galewsky | L1 | — | sigma, m*, onset (anchor case) | SQ5 | not started |
+| I-00 | instability | Galewsky, Scott & Polvani (2004) barotropic-instability anchor | galewsky | L1 | — | sigma, m*, onset (anchor case) | SQ5 | L5 proof run 2026-07-25 (L1) |
 | I-01 | instability | Shear threshold — idealised zonal jet, shear step 1 of 5 | jet | L1 | Shear parameter S | sigma, m*, Rayleigh-Kuo diagnostic | SQ5 | not started |
 | I-02 | instability | Shear threshold — idealised zonal jet, shear step 2 of 5 | jet | L1 | Shear parameter S | sigma, m*, Rayleigh-Kuo diagnostic | SQ5 | not started |
 | I-03 | instability | Shear threshold — idealised zonal jet, shear step 3 of 5 | jet | L1 | Shear parameter S | sigma, m*, Rayleigh-Kuo diagnostic | SQ5 | not started |
@@ -55,8 +67,8 @@ Sub-questions (blueprint section 3.2): **SQ1** dispersion-relation theory · **S
 | I-10 | instability | Observationally seeded — reanalysis-derived zonal-mean jet u-bar(phi) | jet | L1 | — | sigma, m* vs observed wavenumber | SQ5 / SQ4 | not started |
 | I-11 | instability | Resolution robustness — supercritical idealised jet | jet | L1 | Resolution | sigma convergence | SQ5 | not started |
 | I-12 | instability | Perturbation-seed robustness — supercritical idealised jet | jet | L1 | Random seed | sigma spread across seeds | SQ5 | not started |
-| EVP-hough | evp | Hough-mode eigenfrequencies of the divergent shallow-water system, swept over Lamb's parameter and azimuthal order (authorised extension B) | — | L1 | Lamb's parameter, azimuthal order | Hough eigenfrequencies | SQ1 / SQ3 | not started |
-| EVP-jet-stability | evp | Linear stability eigenvalues about each zonal base state u-bar(phi) (authorised extension C). **Nondivergent by decision** (Session L4b, Option B) — see `docs/literature/DIVERGENT_STABILITY_DECISION.md` | jet | L1 | Base state, azimuthal order | Nondivergent modal growth rates sigma(m), eigenmodes | SQ5 | not started |
+| EVP-hough | evp | Hough-mode eigenfrequencies of the divergent shallow-water system, swept over Lamb's parameter and azimuthal order (authorised extension B) | — | L1 | Lamb's parameter, azimuthal order | Hough eigenfrequencies | SQ1 / SQ3 | complete 2026-07-25 |
+| EVP-jet-stability | evp | Linear stability eigenvalues about each zonal base state u-bar(phi) (authorised extension C). **Nondivergent by decision** (Session L4b, Option B) — see `docs/literature/DIVERGENT_STABILITY_DECISION.md` | jet | L1 | Base state, azimuthal order | Nondivergent modal growth rates sigma(m), eigenmodes | SQ5 | complete 2026-07-25 |
 
 ## Observational datasets (D1–D4)
 

@@ -255,6 +255,65 @@ or description.
 No parameter is ever set by editing a script. Every run is fully specified by
 one YAML file under `configs/`, validated against `configs/_schema.yaml`.
 
+The harness enforces this rather than requesting it: `src/solver/harness.py`
+contains no physical constant and no default a run could inherit silently, and it
+refuses to start while any `TBD_SESSION_L5` placeholder survives anywhere in the
+config. The values themselves were chosen in Session L5 by
+`scripts/resolve_configs.py`, which is tracked so that the *policy* — why V-02
+runs five days, why every run shares one hyperdiffusion coefficient — is readable
+next to the numbers. `make configs ARGS=--check` reports drift without writing.
+
+## Solver core
+
+**Height convention.** The prognostic `h` is the free surface measured from the
+mean depth `H`, so the fluid column is `H + h` (or `H + h − h_b` over topography)
+and the pressure gradient is `g ∇h`. A published case giving a total depth enters
+as `h = h_case − H`. Adding a constant to `h` is *not* harmless: it changes the
+mass the continuity equation carries even though it changes no gradient.
+
+**`physical.H` must describe the case.** Every initial condition reports its own
+area-mean free surface, and the harness warns when that differs from `H` by more
+than 5%. The equations stay exact either way; what breaks is the split between the
+implicit `H div(u)` term and the explicit mass flux, and with it the timestep
+restriction the timestepper was chosen for.
+
+**Every formula comes from the source that defines it**, cited by equation number
+in the module docstring, and where the source is ambiguous the ambiguity is
+recorded and resolved by a check the tests re-run — see `initial_conditions/
+lauter.py`, whose signs were fixed by requiring the reduction the paper itself
+asserts, after the archived PDF's text layer was found to drop minus signs.
+
+**The nondivergent scope of `evp_stability.py` is a Session L4b decision**, not an
+omission, and the one-signed bias it implies (nondivergent overestimates growth
+rates) travels with every number the module produces.
+
+## Run provenance
+
+Every run writes `runs/<RUN_ID>/provenance.json`. The bulk HDF5 beside it is
+gitignored and reproducible; the record is tracked, because it is what makes it
+reproducible. Fields:
+
+| Field | Content |
+|-------|---------|
+| `run_id`, `campaign`, `description` | identity, copied from the config |
+| `started_utc`, `outcome.finished_utc` | wall-clock bounds |
+| `config` | the full resolved config, inline |
+| `config_path`, `config_sha256` | which file, and its exact bytes |
+| `git.commit`, `git.branch`, `git.dirty`, `git.dirty_paths` | the code that ran, and whether the tree was clean |
+| `environment` | Python, platform, hostname, Dedalus/numpy/scipy versions, MPI size, thread count |
+| `resolution_shape`, `units` | the grid and the length/time scaling |
+| `initial_condition_metadata` | what the case reported about itself: mean depth, steadiness, analytic solution, validity window, predicted phase speed |
+| `warnings` | every physics inconsistency the harness raised |
+| `outcome` | status, iterations, final simulated time, wall seconds, error string if it failed |
+| `outputs` | every HDF5 file with its size and SHA-256 |
+
+The record is **written before the run starts** and rewritten when it ends,
+whether it ended by finishing or by raising — a record written only on success
+describes exactly the runs that need explaining least. It is then made read-only:
+not security, a tripwire, so that anything later trying to rewrite a run's
+provenance fails at the point of the mistake. A run directory that already carries
+a completed record is not reopened; run IDs are immutable.
+
 ## Raw data is immutable
 
 Raw simulation output is immutable once written. Reprocessing writes to
