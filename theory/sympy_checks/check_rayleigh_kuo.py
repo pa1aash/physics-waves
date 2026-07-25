@@ -332,24 +332,36 @@ def numeric_arm(lines):
     ok = ok and lats.size > 0
 
     best = (None, -np.inf)
+    resolved: dict[int, float] = {}
     lines.append("       m   growth m*Im(c_a) [1/s]   e-fold [days]   N-doubling change")
     for m in range(1, 13):
-        growth, rel, resolved = max_growth(m, 240, galewsky_profile)
+        growth, rel, is_resolved = max_growth(m, 240, galewsky_profile)
         tau = 1.0 / growth / 86400.0 if growth > 0 else float("nan")
-        flag = "resolved" if resolved else "UNRESOLVED"
+        flag = "resolved" if is_resolved else "UNRESOLVED"
         lines.append(f"      {m:2d}   {growth:.6e}          {tau:8.3f}       " f"{rel:.2e}  {flag}")
-        if resolved and growth > best[1]:
-            best = (m, growth)
+        if is_resolved:
+            resolved[m] = growth
+            if growth > best[1]:
+                best = (m, growth)
     lines.append(f"      resolution: N = 240, doubled to 480; tolerance {PERSIST_RTOL:.0e}")
     lines.append("")
     if best[0] is None or best[1] <= 0:
         lines.append("      no resolved growing mode found -- MISMATCH against Phase-0")
         ok = False
     else:
+        # Report the plateau, not just the argmax: several wavenumbers sit
+        # within a per cent of the peak, which is far inside any physical
+        # uncertainty in the base state, so naming a single m* would overstate
+        # the resolution of the calculation.
+        plateau = sorted(k for k, g in resolved.items() if g >= 0.99 * best[1])
         lines.append(
-            f"      most unstable zonal wavenumber m* = {best[0]}, "
-            f"growth rate {best[1]:.4e} 1/s "
+            f"      peak growth {best[1]:.4e} 1/s at m = {best[0]} "
             f"(e-folding {1.0 / best[1] / 86400.0:.2f} days)"
+        )
+        lines.append(f"      within 1% of the peak: m = " f"{', '.join(str(k) for k in plateau)}")
+        lines.append(
+            f"      -> report m* ~ {best[0]} on a plateau spanning "
+            f"m = {plateau[0]}-{plateau[-1]}, not a sharp single value."
         )
         lines.append("      The Phase-0 gate observed roll-up over days 4-6; with a")
         lines.append("      120 m initial height bump that is several e-foldings at this")

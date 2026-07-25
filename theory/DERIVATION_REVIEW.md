@@ -239,181 +239,191 @@ Galewsky jet (`dQ/dφ` changes sign at 32.20°, 39.79°, 49.82°, 58.16°N):
 
 ## 3. Modelling choices and assumptions requiring conscious approval
 
-These are the places where judgement was exercised. A physicist reviewing this
-work should approve each deliberately rather than discover it later.
+Session L3 raised ten judgement items here. Every one now carries an explicit
+disposition — **Resolved (no issue found)**, **Resolved (fixed)**, or **Accepted
+as a stated limitation**. None is left in a bare "flagged" state.
+
+| # | Item | Disposition | Evidence |
+|---|------|-------------|----------|
+| (a) | The two-interface CRW model does not predict `m*` for a smooth jet: toy model gives `m* ≈ 1.8`, solved EVP gives `m* ≈ 6` | **Accepted as a stated limitation** | Detail below |
+| (b) | Numerical tolerances chosen in the verification suite | **Accepted as a stated limitation** | Table below; all eight named in-script |
+| (c) | Spurious-mode filter: an earlier `N=48`/`1e-4` setting reported the Galewsky jet stable | **Resolved (fixed)** | `N=240/480`, tol `1e-3`; commit `e4fd533` |
+| (d) | Where the sphere was asserted to behave like the flat plane | **Resolved (no issue found)** | `check_rayleigh_kuo.py` arm 2 verifies the integration-by-parts identity symbolically; the one genuine distinction is stated below |
+| (e) | `m*=6` and `m*=7` differ by 0.07%, so naming a single `m*` overstates resolution | **Resolved (fixed)** | `check_rayleigh_kuo.py` now reports the plateau; §9 and §12 of `derivations.tex` updated |
+| (f) | The Rhines scale carries a factor-of-√2 convention ambiguity | **Accepted as a stated limitation** | Both conventions stated in §7; nothing depends on the constant |
+| (g) | The `(m=2, n=2)` entry of the H5 table departs from the trend | **Resolved (no issue found — explained)** | Not an anomaly: *every* sectoral mode behaves this way, for a structural reason demonstrated causally. `check_hough_epsilon_limit.py` arm 5 |
+| (h) | The model represents the barotropic response only, not baroclinic conversion | **Accepted as a stated limitation** | Stated in §1 and inherited by every later claim |
+| (i) | §6 solves the vorticity–divergence–height form, not the classical second-order tidal equation | **Accepted as a stated limitation** | Equivalent formulation, better conditioned; validated by the `ε→0` limit |
+| (j) | Branch continuation, not nearest-frequency matching, at large `ε` | **Resolved (fixed)** | Nearest matching gave a demonstrably wrong table; continuation used; commit `e4fd533` |
+
+The four items accepted as limitations, and the three whose resolution needs
+detail, are set out below.
 
 ### (a) The two-interface CRW model does not predict `m*` for a smooth jet
+**Accepted as a stated limitation.**
 
-**This is the largest single caveat in the document.** §10's toy model is an
-*exact* reduction for piecewise-constant potential vorticity — it reproduces the
-published Rayleigh dispersion relation and its numbers (`K_c = 1.2785` against a
-published 1.28, `K_m = 0.7968` against 0.8, peak growth `0.2012` against 0.20).
-But mapping it to a spherical zonal wavenumber requires an effective interface
-half-separation `b_eff` that the model itself does not supply for a jet whose PV
-gradient reverses smoothly over a band rather than jumping at a line.
+The toy model of §10 is an *exact* reduction for piecewise-constant potential
+vorticity — it reproduces the dispersion relation and the three benchmark
+constants of Heifetz, Bishop & Alpert (1999) to three or four figures. But
+mapping it to a spherical zonal wavenumber requires an effective interface
+half-separation `b_eff` that the model does not supply for a jet whose PV
+gradient reverses smoothly over a band rather than jumping at a line. The most
+natural choice (`b_eff = 1001 km`, half the separation between the centres of the
+two reversed-gradient bands) gives `m* ≈ 1.8` against the solved eigenvalue
+problem's `m* ≈ 6`. **They disagree by a factor of about three, and this was not
+tuned away.** Two physical reasons are identified: concentrating each gradient
+into a delta function maximises the long-range reach of the inverted flow and so
+biases the optimum toward longer waves; and the Galewsky jet has *three* gradient
+regions, not two, so a two-interface reduction omits an interacting wave.
 
-Taking the most natural choice — half the separation between the centres of the
-two reversed-gradient bands, `b_eff = 1001 km` — gives `m* ≈ 1.8`, against the
-`m* = 6` the solved eigenvalue problem returns. **They disagree by a factor of
-about three.** This was not tuned away. Two physical reasons are identified in
-both the text and the check output: concentrating each gradient into a delta
-function maximises the long-range reach of the inverted flow and so biases the
-optimum toward longer waves; and the Galewsky jet has *three* gradient regions,
-not two, so a two-interface reduction omits an interacting wave entirely.
+**What is being accepted:** §10 claims the mechanism, the opposite-sign
+requirement, both cutoffs, and the *scaling* `m* ∝ cos φ_j / b_eff` — and claims
+nothing about the absolute value of `m*`, which §9 supplies. Anywhere §10's
+result is later used in the manuscript it must be stated exactly that carefully.
 
-**What is claimed** is the mechanism, the opposite-sign requirement, both
-cutoffs, and the *scaling* `m* ∝ cos φ_j / b_eff`. **What is not claimed** is the
-absolute value of `m*` from the toy model. §9 supplies that.
+### (b) Numerical tolerances
+**Accepted as a stated limitation.** Every tolerance is a named constant at the
+top of its script.
 
-*Operator decision required:* is presenting the toy model with this stated
-limitation acceptable, or should §10 drop the `m*` mapping entirely and confine
-itself to mechanism?
+| Constant | Value | Where | Meaning |
+|----------|-------|-------|---------|
+| `NUMERIC_RTOL` | 1e-9 | Laplacian | Residual normalised by the largest single term |
+| `MATRIX_ATOL` | 1e-12 | Hough arm 1 | Machine-precision claim for the Legendre matrix elements |
+| `TRUNCATION_RTOL` | 1e-10 | Hough arm 2 | Relative movement in σ on doubling the truncation |
+| `RATE_WINDOW` | (0.90, 1.10) | Hough arm 3 | Admits only first order; excludes half and second. Observed 1.0000 |
+| `SMALLEST_EPS_RTOL` | 1e-5 | Hough arm 3 | Stops a clean power law through uniformly large errors passing on rate alone |
+| `STABLE_IMAG_RTOL` | 1e-8 | Rayleigh–Kuo 4a | Imaginary parts scaled by the spread of real parts. Observed exactly 0 |
+| `PERSIST_RTOL` | 1e-3 | Rayleigh–Kuo 4b | Resolution-doubling filter — see (c) |
+| `PUBLISHED_TOL` | 0.01/0.05/0.01 | CRW | Agreement with HBA99 p. 2838, at the precision that page states |
 
-### (b) Numerical tolerances chosen in the verification suite
+Only `RATE_WINDOW` and `PERSIST_RTOL` carry real judgement; the rest are
+machine-precision claims that either hold or do not.
 
-Every tolerance is a named constant at the top of its script. They are:
+### (c) The spurious-mode filter
+**Resolved (fixed), Session L3, commit `e4fd533`.**
 
-| Constant | Value | Where | What it means |
-|----------|-------|-------|---------------|
-| `NUMERIC_RTOL` | 1e-9 | Laplacian check | Residual normalised by the largest single term, so it is genuinely relative |
-| `MATRIX_ATOL` | 1e-12 | Hough check, arm 1 | Machine-precision claim for the Legendre matrix elements |
-| `TRUNCATION_RTOL` | 1e-10 | Hough check, arm 2 | Relative movement in σ on doubling the truncation |
-| `RATE_WINDOW` | (0.90, 1.10) | Hough check, arm 3 | Window for the fitted convergence rate. Chosen to admit only first order and exclude both half order and second; observed 1.0000 |
-| `SMALLEST_EPS_RTOL` | 1e-5 | Hough check, arm 3 | Guards against a clean power law drawn through uniformly large errors passing on rate alone |
-| `STABLE_IMAG_RTOL` | 1e-8 | Rayleigh-Kuo, arm 4a | Imaginary parts scaled by the spread of real parts; observed exactly 0 |
-| `PERSIST_RTOL` | 1e-3 | Rayleigh-Kuo, arm 4b | Resolution-doubling filter — see item (c) |
-| `PUBLISHED_TOL` | 0.01 / 0.05 / 0.01 | CRW check | Agreement with published `K_c`, `K_m`, peak growth, at the precision the source states them |
+Worth recording because the earlier choice gave a **materially wrong answer**. A
+first pass used `N = 48` doubled to 96 with tolerance `1e-4` on the full complex
+eigenvalue. That rejected *every* unstable mode and reported the Galewsky jet
+stable — contradicting the Phase-0 gate, where roll-up was observed. The cause
+was insufficient resolution, not absent physics: at `N = 48` the unstable
+eigenvalue had not converged, so it failed its own persistence test. At
+`N = 240/480` growth rates for `m ≤ 8` are stable to between `3.6e-08` and
+`2.0e-04`, while `m ≥ 9` move by `2e-03` or more — a clean two-decade gap with
+the threshold inside it.
 
-*Operator decision required:* `RATE_WINDOW` and `PERSIST_RTOL` are the two that
-carry real judgement. The rest are machine-precision claims that either hold or
-do not.
-
-### (c) The spurious-mode filter, and an earlier value that was wrong
-
-The resolution-doubling filter in §9 retains only growth rates that move by less
-than `PERSIST_RTOL = 1e-3` when the truncation is doubled from `N = 240` to 480.
-
-This value was arrived at by investigation, not by assumption, and the process
-is worth recording because an earlier choice gave a **materially wrong answer**.
-A first pass used `N = 48` doubled to 96 with a tolerance of `1e-4` applied to
-the full complex eigenvalue. That combination rejected *every* unstable mode and
-reported the Galewsky jet as stable — which would have contradicted the Phase-0
-gate, where roll-up was observed. The cause was insufficient resolution, not
-absent physics: at `N = 48` the unstable eigenvalue had not converged, so it
-failed its own persistence test. At `N = 240/480` the growth rates for `m ≤ 8`
-are stable to between `3.6e-08` and `2.0e-04`, while `m ≥ 9` move by `2e-03` or
-more, giving a clean two-decade separation that the threshold sits inside.
-
-*Operator note:* the separation is clean, but the threshold is still a choice
-placed inside a gap rather than derived. If a later session changes the base
-state, the gap must be re-inspected rather than the threshold reused.
+*Standing caution:* the threshold is a choice placed inside a gap, not derived.
+A later session that changes the base state must re-inspect the gap rather than
+reuse the number.
 
 ### (d) Where the sphere was asserted to behave like the flat plane
-
-§8 needs an honest accounting of this, and it is given in two parts rather than
-waved through:
+**Resolved (no issue found).** The accounting is in two parts.
 
 - **The background PV gradient is *not* the flat-plane expression.** On a plane
-  `dQ/dy = β − d²ū/dy²`; on the sphere the `cos φ` factors from the metric
-  survive and the curvature term is not a bare second derivative. §8 writes the
-  spherical form explicitly. This changes *where* the criterion is met.
-- **The structure of the argument *is* unchanged, and this was checked rather
-  than asserted.** The argument needs the operator `L_m` to be self-adjoint and
-  negative-definite under the sphere's own measure `cos φ dφ`, and needs the
-  boundary term to vanish. `check_rayleigh_kuo.py` arm 2 verifies the
-  integration-by-parts identity symbolically and confirms the two quadratic
-  terms are real and non-negative. Regularity at the poles is what kills the
-  boundary term — the role walls play in the flat-channel argument.
+  `dQ/dy = β − d²ū/dy²`; on the sphere the `cos φ` factors survive and the
+  curvature term is not a bare second derivative. §8 writes the spherical form
+  explicitly. This changes *where* the criterion is met.
+- **The structure of the argument *is* unchanged, and this was checked, not
+  assumed.** `check_rayleigh_kuo.py` arm 2 verifies the integration-by-parts
+  identity symbolically and confirms both quadratic terms are real and
+  non-negative. Regularity at the poles kills the boundary term — the role walls
+  play in the flat-channel argument.
 
-**The one place a genuine physical distinction arises** is the phase speed. On
-the sphere the natural eigenvalue is the *angular* phase speed `c_a`, and the
+**One genuine physical distinction remains, and it must propagate to Session
+L5:** on the sphere the eigenvalue is the *angular* phase speed `c_a`, and the
 critical layer is where `ū_a(φ) = c_r` — where the base flow's angular velocity
-matches the mode's, not where `ū = c` in metres per second. Session L5 must not
-carry over a flat-plane critical-layer criterion in linear units.
+matches the mode's, not where `ū = c` in metres per second. `evp_stability.py`
+must not carry over a flat-plane critical-layer criterion in linear units.
 
-*Operator decision required:* confirm that this treatment of the spherical
-critical layer is what should propagate into `evp_stability.py`.
+### (e) The growth-rate plateau
+**Resolved (fixed), this session.** Growth rates are `2.0748e-05` at `m = 6` and
+`2.0734e-05` at `m = 7` — 0.07% apart, far below any physical uncertainty in the
+base state. `check_rayleigh_kuo.py` now reports the plateau explicitly ("within
+1% of the peak: m = 6, 7"), and §9 and §12 of `derivations.tex` state
+`m* ≈ 6`, on a plateau spanning `m = 6–7`, rather than a sharp `m* = 6`.
 
-### (e) `m* = 6` and `m* = 7` are within 0.1% of each other
+### (f) The Rhines-scale constant
+**Accepted as a stated limitation.** §7 derives `L_R ~ √(U/β)` from a scaling
+balance, which fixes the form but not the constant. Rhines' own arrest
+wavenumber is `k_β = (β/2U)^{1/2}`, i.e. `L_R = (2U/β)^{1/2}`, a factor √2
+larger. §7 states both. Vallis & Maltrud reach the same `O(√(U/β))` scale by a
+different route and note the particular form is not crucial to their argument.
 
-The Galewsky growth rates are `2.0748e-05` at `m = 6` and `2.0734e-05` at
-`m = 7` — a separation of 0.07%, far smaller than any physical uncertainty in
-the base state. Reporting `m* = 6` as *the* most unstable wavenumber overstates
-the resolution of the calculation. The honest statement is that the instability
-peaks over a broad plateau spanning `m = 5–7`.
+**What is being accepted:** any quantitative comparison of a measured jet spacing
+against `L_R` in the discussion must state its convention. Nothing in this
+document depends on the constant, and the `Ω^{-1/2}` scaling the campaign
+actually tests is convention-independent.
 
-*Operator decision required:* should §9 and §12 report `m* = 6`, or `m* ≈ 6`
-with the plateau stated? The current text says `m* = 6`.
+### (g) The sectoral-mode entry in the H5 table
+**Resolved (no issue found — explained), this session.** Session L3 left this as
+an unexplained outlier. It is neither an outlier nor numerical.
 
-### (f) The Rhines scale carries a factor-of-two ambiguity
+*It is not numerical.* The value is invariant to the continuation ladder length
+(30 → 1500 steps), to the matching method (eigenvalue proximity vs eigenvector
+overlap), and to the spectral truncation (`N` = 30, 60, 120) — identical to eight
+decimal places in every case.
 
-§7 derives `L_R ~ √(U/β)` from a scaling balance, which fixes the form but not
-the constant. Rhines' own arrest wavenumber is `k_β = (β/2U)^{1/2}`, i.e.
-`L_R = (2U/β)^{1/2}` — a factor `√2` larger than the bare `√(U/β)`. §7 states
-both. Vallis & Maltrud reach the same `O(√(U/β))` transition scale by a
-different route (weakly nonlinear Rossby-wave interaction) and note that the
-particular form is not crucial to their argument, which is consistent with the
-constant being convention-dependent.
+*It is not an outlier.* **Every** sectoral mode `n = m` behaves this way, for
+`m = 1…6` without exception; the sectoral mode is always less slowed than its
+`n = m + 1` neighbour. Session L3's table simply happened to start its `m = 2`
+row at the sectoral minimum and its `m = 1` row at the non-sectoral maximum.
 
-*Operator note:* any quantitative claim in the discussion section that compares a
-measured jet spacing against `L_R` must state which convention it uses. Nothing
-in this document depends on the factor; the `Ω^{-1/2}` scaling that the campaign
-actually tests does not.
+*The cause, demonstrated causally.* The Coriolis coupling matrix is tridiagonal —
+it connects degree `n` only to `n ± 1`. A sectoral mode sits at the bottom of the
+degree ladder (`n ≥ m`), so it has only **one** neighbour to couple through
+instead of two: half the channels by which its rotational flow can be converted
+into divergence and surface displacement. The test: take a non-sectoral mode and
+delete its lower neighbour from the basis, leaving its latitudinal structure
+untouched. Its slowing collapses to sectoral values.
 
-### (g) One entry in the H5 readout departs from the expected trend
+| m | n | full basis | lower partner removed | true sectoral (n=m) |
+|---|---|-----------|----------------------|---------------------|
+| 1 | 2 | −40.38% | −10.90% | −15.78% |
+| 2 | 3 | −19.80% | −6.44% | −7.51% |
+| 3 | 4 | −10.45% | −3.98% | −4.00% |
 
-At `m = 2`, the `n = 2` sectoral mode is slowed by 7.5% while `n = 3` is slowed
-by 19.8% — breaking the otherwise monotone fall of fractional slowing with
-increasing `n`. The `m = 1` sequence is monotone (40.4%, 27.8%, 13.3%, 5.9%).
+A secondary effect is also present and consistent: slowing correlates with the
+*local* Burger parameter `ε⟨sin²φ⟩/n(n+1)` — the squared ratio of the mode's
+scale to the deformation radius `√(gH)/|f|` at its characteristic latitude
+(Pearson r = 0.74 over 30 modes). Sectoral modes, being equatorially confined,
+sit where that local deformation radius is largest. Both effects push the same
+way. Recorded in `check_hough_epsilon_limit.py` arm 5 and in §6 of the
+derivation.
 
-This is not a numerical failure: the arm-3 convergence test passes at `1.0000`
-for exactly this `(m, n) = (2, 2)` combination, so the branch is correctly
-identified. The sectoral mode `n = m` has no meridional nodes and a different
-structure from the tesseral modes, so a different sensitivity to the free
-surface is plausible. **It has not been independently explained**, and it is
-recorded here rather than smoothed over.
+### (h) Model scope
+**Accepted as a stated limitation.** The shallow-water system models the
+**barotropic** response of a stratified layer. One vertical degree of freedom
+means no baroclinic conversion. §1 says so explicitly.
 
-*Operator decision required:* is a plausibility argument sufficient at this
-stage, or should this be resolved before Session L5 consumes §6?
+**What is being accepted:** every later claim about the atmosphere inherits this
+limit, including the observational comparison — which matters because the
+observed 500 hPa wave field contains eastward-moving baroclinic disturbances the
+system does not describe. The Doppler-correction protocol in
+`docs/CONVENTIONS.md` already handles the consequence.
 
-### (h) The model's scope, stated once and inherited
+### (i) The form of the §6 eigenvalue problem
+**Accepted as a stated limitation.** §6 deliberately does not solve the classical
+second-order Laplace tidal equation for `N(μ)`: that form is nonlinear in the
+frequency and carries a coordinate singularity wherever `μ² = σ²`. §6 poses the
+system in vorticity–divergence–height variables, where it is linear in the
+frequency and regular everywhere.
 
-The shallow-water system models the **barotropic** response of a stratified
-layer. It has one degree of freedom in the vertical, so it cannot represent
-baroclinic conversion. §1 says so explicitly. Every later claim about the
-atmosphere inherits that limit, including the observational comparison — a point
-that matters because the observed 500 hPa wave field contains eastward-moving
-baroclinic disturbances that this system does not describe (the Doppler-correction
-protocol in `docs/CONVENTIONS.md` already addresses the consequence).
+**What is being accepted:** this is a better-conditioned formulation of the same
+problem, not a different problem, and the `ε → 0` check validates the one
+actually used — but the project's intermediate quantities will not look like
+those of Longuet-Higgins or Swarztrauber & Kasahara.
 
-### (i) The eigenvalue problem of §6 is not the classical tidal equation
+### (j) Branch continuation at large ε
+**Resolved (fixed), Session L3, commit `e4fd533`.** Nearest-frequency matching at
+the target `ε` **produced a wrong answer**: it assigned one eigenvalue to both
+`n = 2` and `n = 3` at `m = 1`, and reported `n = 3` as 19% *faster* than
+nondivergent. By Earth's `ε` the Rossby frequencies of neighbouring degrees are
+too close for bare nearest matching to be a valid labelling. Continuation from
+`ε = 1e-6` is used instead. Independently re-confirmed this session against
+eigenvector-overlap tracking, which agrees to eight decimal places.
 
-§6 deliberately does **not** solve the classical second-order Laplace tidal
-equation for `N(μ)`. That form is a nonlinear eigenvalue problem in the
-frequency and carries a coordinate singularity wherever `μ² = σ²`. §6 instead
-poses the system in vorticity–divergence–height variables, where it is linear in
-the frequency and regular everywhere. The two are equivalent formulations of the
-same physics, and the `ε → 0` check validates the one actually used.
-
-*Operator note:* this is a departure from how Longuet-Higgins and Swarztrauber &
-Kasahara present the problem. It is a better-conditioned formulation of it, not
-a different problem, but it does mean the project's intermediate quantities will
-not look like theirs.
-
-### (j) Branch continuation, not nearest-frequency matching, at large ε
-
-The H5 readout at `ε ≈ 8.8` follows each Rossby branch by continuation from
-`ε = 1e-6`. A first pass used nearest-frequency matching at the target `ε`
-directly, and **produced a wrong answer**: it assigned the same eigenvalue to
-both `n = 2` and `n = 3` at `m = 1`, and reported `n = 3` as 19% *faster* than
-nondivergent. By Earth's `ε` the Rossby frequencies of neighbouring degrees have
-moved close enough together that bare nearest matching is not a valid labelling.
-Continuation is used instead, and the corrected table shows every mode slowed.
-
-*Operator note:* Session L5 must use continuation, not nearest matching, when it
-labels Hough modes by degree at finite `ε`.
-
----
+*Standing caution:* Session L5 must use continuation, not nearest matching, when
+labelling Hough modes by degree at finite `ε`.
 
 ## 4. Citations attributed by DOI rather than direct reading
 
