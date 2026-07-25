@@ -179,3 +179,11 @@ all** — which is not the same as saying the flow is unstable, even where it is
   meaning**, from a 10 km ocean to the depth each case actually specifies. The
   equations were exact either way; the split between implicit and explicit terms
   was not.
+- **P-18 is now one point of a two-point hyperdiffusion sensitivity**, at ten
+  times the standard coefficient, paired against P-03. A single config could not
+  measure a sensitivity, and leaving it identical to P-03 would have been a run
+  that did nothing. The wider bracket belongs to Session L7's sweep generator.
+- **The mean-depth warning is not wired to a failure.** A config whose `H` does
+  not describe its case still runs; the harness says so on stderr and in the
+  provenance record. That is deliberate — the run is well posed — but it means a
+  reader has to look at `warnings` rather than at the exit code.

@@ -16,7 +16,7 @@ numerics:
   dt: 600.0
   dealias: 1.5
   hyperdiffusion_order: 4
-  hyperdiffusion_coefficient: 3964110000000000.0
+  hyperdiffusion_coefficient: 3.96411e+16
   stop_sim_time: 1728000.0
 outputs:
   snapshot_cadence: 86400.0
