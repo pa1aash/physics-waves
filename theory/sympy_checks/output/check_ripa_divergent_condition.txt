@@ -1,0 +1,90 @@
+check_ripa_divergent_condition
+========================================================================
+Claim: Ripa's (1983) divergent stability conditions reduce to the
+classical nondivergent condition, and the extra divergent condition
+is not binding for this project's jet at any rotation rate it runs.
+
+SOURCE STATUS: Ripa (1983) is ABSTRACT-VERIFIED, not read. The two
+conditions below are this project's reading of an abstract that
+states them in words. See docs/literature/MISSING.md.
+
+Arm 1 - does Ripa's condition reduce to Rayleigh-Kuo as the surface
+        becomes rigid?
+------------------------------------------------------------------------
+  Condition (i)  : (dQ/dy)(c0 - ubar) >= 0 everywhere.
+                   This is the Fjortoft-strengthened form of the
+                   classical criterion: it still requires dQ/dy to
+                   change sign if it is to fail, since a monotone
+                   dQ/dy admits a c0 outside the range of ubar.
+  Condition (ii) : |c0 - ubar| <= sqrt(gH), the long-gravity-wave speed.
+
+  The nondivergent limit is the rigid-lid limit, in which the free
+  surface cannot deflect and long gravity waves become infinitely
+  fast. Formally: eps = 4 Omega^2 R^2/(gH) -> 0 means gH -> infinity
+  at fixed Omega and R, hence sqrt(gH) -> infinity.
+
+    Earth, H = 10 km    sqrt(gH) =      313.1 m/s   eps =    8.8044
+    gH x 100            sqrt(gH) =     3131.5 m/s   eps =    0.0880
+    gH x 10^4           sqrt(gH) =    31314.8 m/s   eps =    0.0009
+
+  As eps -> 0, sqrt(gH) -> infinity and condition (ii) is satisfied by
+  ANY bounded zonal flow. It therefore drops out, leaving condition (i)
+  alone -- the classical criterion.
+
+  VERDICT: Ripa's condition REDUCES CLEANLY to the nondivergent one.
+  The divergent case does not modify the classical condition; it ADDS
+  a second, independent condition that has no nondivergent analogue.
+
+Arm 2 - is the extra divergent condition binding for this project?
+------------------------------------------------------------------------
+  Galewsky jet: u_max = 80.0 m/s, u_min = 0.0 m/s
+  long-gravity-wave speed sqrt(gH)   =   313.15 m/s
+  best-case c0 = (u_max + u_min)/2   =    40.00 m/s
+  max |c0 - ubar|                    =    40.00 m/s
+  margin sqrt(gH) / max|c0 - ubar|   =     7.83x
+  Froude-like ratio u_max/sqrt(gH)   =   0.2555
+
+  Even the least favourable admissible c0 -- one at the edge of the
+  jet's velocity range rather than its midpoint -- only doubles
+  max|c0 - ubar| to 80 m/s, still 3.9x below sqrt(gH).
+  The conclusion does not depend on how c0 is chosen.
+
+  condition (ii) binding at margin < 2.0x: NO
+
+Arm 3 - can the project's rotation sweep (P-08 ... P-12) activate it?
+------------------------------------------------------------------------
+   Omega     eps      sqrt(gH)   max|c0-u|   margin   (ii) holds
+   0.25x      0.55      313.1       40.0     7.83x   yes
+   0.50x      2.20      313.1       40.0     7.83x   yes
+   1.00x      8.80      313.1       40.0     7.83x   yes
+   2.00x     35.22      313.1       40.0     7.83x   yes
+   4.00x    140.87      313.1       40.0     7.83x   yes
+
+  Condition (ii) contains sqrt(gH) and ubar and NO rotation rate, so
+  sweeping Omega cannot activate it. Lamb's parameter eps rises from
+  0.55 to 141 across the sweep -- the system becomes far more divergent
+  in the sense that matters for WAVE dispersion (section 6) -- while the
+  divergent STABILITY condition is untouched. Those are two different
+  senses of 'divergent', and conflating them is the trap this check
+  exists to avoid.
+
+Arm 4 - the regime where the extra condition does bite
+------------------------------------------------------------------------
+  Hayashi & Young (1987), abstract, verbatim: they consider 'the
+  instabilities of rotating, shallow-water, shear flows on an
+  EQUATORIAL beta-plane', and show that 'when the basic state has no
+  potential vorticity gradients an unstable wave has zero wave
+  energy'. So instability without a PV-gradient sign change is real --
+  but it is an equatorial result.
+
+  Why the equator is different, and why this project is not there:
+  the mechanism is that with a free surface the energy density is cubic
+  in the field variables, so wave energy is not positive definite and a
+  negative-energy wave can grow by GIVING energy to the mean flow. That
+  requires the flow to be comparable to the gravity-wave speed. At the
+  equator f -> 0 and nothing limits ubar; here Fr = 0.255 << 1.
+
+  This project's jet is midlatitude, geostrophically balanced, and
+  strongly subcritical. The counterexample does not reach it.
+
+VERDICT: VERIFIED
