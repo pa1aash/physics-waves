@@ -21,14 +21,31 @@ actually read, or says plainly that no external source is involved.
 ## The rule this enforces
 
 A claim of the form "matches published", "agrees with", "cf.", "standard",
-"classical" is acceptable only if it resolves to one of:
+"classical" is acceptable only if it resolves to one of five categories. The
+first three were defined in Session L3-PATCH; the last two were added in Session
+PRE-L5, when Session L4b's findings were merged into this ledger.
 
-- **READ** — a specific page or equation of a PDF held in `docs/literature/` and
-  actually opened;
-- **DOI-ATTRIBUTED** — a source not held, cited for historical attribution only,
-  where nothing in the derivation depends on its contents;
-- **INTERNAL** — no external source at all; the result is derived and verified
-  within the project, and the wording says so.
+| Category | What it means | What it licenses |
+|----------|---------------|------------------|
+| **READ** | A PDF held in `docs/literature/` was opened and the specific passage located | Page- and equation-precise claims |
+| **ABSTRACT-VERIFIED** | The publisher's own abstract was read directly; the full text was **not** obtained | Only claims the abstract itself makes, in its own words. **No page or equation pointer.** |
+| **TITLE-ONLY** | Neither full text nor abstract was obtained; only the title and bibliographic record | Essentially nothing beyond existence and, where the title names it, the governing equation. Must be flagged wherever used |
+| **DOI-ATTRIBUTED** | Not held, cited for historical attribution only, and nothing in the derivation depends on its contents | Attribution alone |
+| **INTERNAL** | No external source at all; derived and verified within the project | Whatever the internal check establishes |
+
+**Why ABSTRACT-VERIFIED needed its own row rather than being folded into
+DOI-ATTRIBUTED.** They are materially different evidentiary standards. A
+DOI-attributed citation is a name in a reference list. An abstract read from the
+publisher is a statement the authors wrote about their own result, and it can
+legitimately support a claim about *what the paper found* — but it cannot support
+a claim about *how they found it*, or any number that appears only in the body.
+Session L4b's central finding rests on two such abstracts, so conflating the two
+categories would have hidden exactly the distinction that matters.
+
+**Why TITLE-ONLY is worth recording at all.** Because the alternative is silence,
+and silence reads as a stronger claim than it is. Two Skiba papers are cited on
+their titles alone; one of them names its governing equation in the title, which
+is genuinely informative, and the other does not, which is genuinely not.
 
 "Recalled from familiarity" is not on the list.
 
@@ -102,3 +119,40 @@ Any new check that compares a computed number against an external value must add
 a row here naming the page or equation. Audit check 31 enforces that every
 external-match claim in `theory/sympy_checks/output/*.txt` has a corresponding
 row in this table.
+
+---
+
+## Session L4b and PRE-L5 additions — the divergent-stability literature
+
+Merged here in Session PRE-L5 so that **one file answers "how do we know this
+citation says what we say it says"** for the whole project. These rows previously
+lived in `docs/literature/RIPA_HAYASHI_YOUNG_NOTES.md` and
+`SKIBA_PROGRAMME_NOTES.md` with their own ad hoc labels; those documents remain as
+the detailed working notes, but this table is the ledger.
+
+| Citation | DOI | Category | What is claimed from it | Basis |
+|----------|-----|----------|-------------------------|-------|
+| **Ripa (1983)**, *JFM* 126, 463–489 | `10.1017/S0022112083000270` | **ABSTRACT-VERIFIED** | The two sufficient stability conditions for a one-layer zonal flow, and that they reduce to the classical criterion in the nondivergent limit | Publisher abstract, obtained verbatim. It states both conditions **in words**; their translation into inequalities in `check_ripa_divergent_condition.py` is the project's reading, flagged there |
+| **Hayashi & Young (1987)**, *JFM* 184, 477–504 | `10.1017/S0022112087002982` | **ABSTRACT-VERIFIED** | That shallow-water shear instability occurs with no potential-vorticity gradient at all, on an **equatorial** β-plane, by a negative-energy mechanism | Publisher abstract, obtained verbatim |
+| **Paldor, Shamir & Garfinkel (2020)**, *GAFD* 115(1), 15–34 | `10.1080/03091929.2020.1724996` | **ABSTRACT-VERIFIED** | That nondivergent growth rates exceed shallow-water ones, by >50% at depths of 5–10 km, converging above 30 km; jets studied are polar and equatorial | **Published** abstract, obtained in Session PRE-L5 via OpenAlex. Upgrades L4b, which relied on the authors' EGU2020 conference abstract. Journal PDF remains unobtainable (bronze OA, blocked to scripted retrieval) |
+| **White & Staniforth (2009)**, *QJRMS* 135(640), 961–971 | `10.1002/qj.504` | **ABSTRACT-VERIFIED** | That Ripa's criteria extend to the sphere with orography, in the stated context of testing discretised numerical models | Publisher abstract, obtained verbatim |
+| **Staniforth & White (2008)**, *QJRMS* | `10.1002/qj.240` | **ABSTRACT-VERIFIED** | That Ripa-class conditions are used to choose test-case parameters so that evolution in a model is of numerical origin | Publisher abstract |
+| **Skiba & Pérez-García (2004)** | `10.1002/num.20042` | **ABSTRACT-VERIFIED** | That the paper works in the **nondivergent** barotropic vorticity equation, and supplies a necessary condition for exponential instability plus a maximum-growth-rate estimate | Publisher abstract, which names the governing equation |
+| **Skiba (2008)** | `10.1007/s10958-008-0091-3` | **TITLE-ONLY** | **Nothing.** Listed for completeness of the programme; no claim rests on it | No abstract available in Crossref or OpenAlex |
+| **Skiba (2024)** | `10.4310/dpde.2024.v21.n3.a1` | **TITLE-ONLY** | That it treats the barotropic vorticity equation on a sphere — from the title, which names the equation | Title only; flagged as such |
+| **Constantin & Germain (2022)**, *ARMA* 245, 587–644 | `10.1007/s00205-022-01791-3` | **ABSTRACT-VERIFIED** | That it works in **Euler's equation** on a rotating sphere, i.e. nondivergent, and proves an Arnold-type stability criterion | Publisher abstract |
+| **Cao, Wang & Zuo (2023)** | `10.48550/arXiv.2305.03279` | **ABSTRACT-VERIFIED** | That it works in the **incompressible Euler equation** on a 2-D rotating sphere, i.e. nondivergent | arXiv abstract (open access) |
+
+### The one conclusion these rows jointly support
+
+That the Skiba/Constantin–Germain/Cao–Wang programme is uniformly **nondivergent**
+— which is what narrows fragment b1 and what shows that the *divergent* territory
+is occupied by Ripa, White & Staniforth and Paldor et al. instead. Every row above
+that carries weight in that conclusion is ABSTRACT-VERIFIED at worst, and the two
+TITLE-ONLY rows are not load-bearing for it.
+
+### Citations added to `theory/derivations.tex` in Session PRE-L5
+
+Four, all ABSTRACT-VERIFIED, each carrying its status in its own bibliography
+entry so a reader of the theory document sees it without opening this file:
+`ripa1983`, `hayashi1987`, `paldor2020`, `white2009`.
