@@ -566,5 +566,69 @@ else
   bad "44. $sig missing or lacks the exact closing statement"
 fi
 
+
+# 45. No config still carries the Session-00 placeholder, and every config agrees
+#     with the resolution policy in scripts/resolve_configs.py. A hand-edited
+#     value that drifts from the policy is the failure mode this catches: the
+#     config would still validate and still run, but the reason behind its
+#     numbers would silently no longer be the reason recorded in the script.
+if grep -rqF "TBD_SESSION_L5" configs/*/*.yaml 2>/dev/null; then
+  bad "45. configs still carry the TBD_SESSION_L5 placeholder"
+elif python scripts/resolve_configs.py --check >/dev/null 2>&1; then
+  pass "45. every config resolved and consistent with the stated policy"
+else
+  bad "45. a config has drifted from resolve_configs.py's policy (make configs ARGS=--check)"
+fi
+
+# 46. The initial-condition dispatcher and the config schema name the same cases.
+#     A mismatch is a config that validates and then fails at run time, which is
+#     the most expensive place to find out.
+check46='import sys, yaml; sys.path.insert(0, "."); from src.solver.initial_conditions import CONSTRUCTORS; schema = yaml.safe_load(open("configs/_schema.yaml")); sys.exit(0 if set(schema["properties"]["initial_condition"]["enum"]) == set(CONSTRUCTORS) else 1)'
+if python -c "$check46" >/dev/null 2>&1; then
+  pass "46. initial-condition dispatcher matches the schema enum"
+else
+  bad "46. initial-condition dispatcher and configs/_schema.yaml disagree"
+fi
+
+# 47. Every module in the solver core states the physics before the mechanism.
+#     The project's standing rule is that a docstring says what the code is doing
+#     physically before it says how; "Physics first." is the marker that the rule
+#     was applied rather than assumed.
+miss47=""
+for f in src/solver/equations.py src/solver/harness.py \
+         src/solver/evp_hough.py src/solver/evp_stability.py \
+         src/solver/initial_conditions/common.py \
+         src/solver/initial_conditions/williamson.py \
+         src/solver/initial_conditions/galewsky.py \
+         src/solver/initial_conditions/lauter.py \
+         src/solver/initial_conditions/single_harmonic.py \
+         src/solver/initial_conditions/jet_family.py; do
+  if [ ! -f "$f" ]; then
+    miss47="$miss47 [missing:$f]"
+  elif ! grep -qF "Physics first" "$f"; then
+    miss47="$miss47 [$f]"
+  fi
+done
+if [ -z "$miss47" ]; then
+  pass "47. every solver-core module states the physics before the mechanism"
+else
+  bad "47. solver-core modules without a physics-first docstring:$miss47"
+fi
+
+# 48. The nondivergent scope of the stability EVP, and its one-signed bias, are
+#     stated in the module that produces the numbers -- not only in the decision
+#     memo. A growth rate escaping into a figure without that qualification is
+#     the specific failure Session L4b set out to prevent.
+ev="src/solver/evp_stability.py"
+if [ -f "$ev" ] \
+   && grep -qF "NONDIVERGENT" "$ev" \
+   && grep -qi "overestimat" "$ev" \
+   && grep -qF "DIVERGENT_STABILITY_DECISION.md" "$ev" \
+   && grep -qi "non-normal" "$ev"; then
+  pass "48. stability EVP carries its scope, its bias direction and the decision reference"
+else
+  bad "48. $ev missing the nondivergent-scope / bias / non-normality statement"
+fi
+
 echo "== $( [ "$fail" -eq 0 ] && echo "AUDIT PASSED" || echo "AUDIT FAILED ($fail check(s))" ) =="
 exit "$fail"
