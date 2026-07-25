@@ -174,3 +174,81 @@ field/operator to be written (with an optional `name=`).
 Everything else in the hypothesis (the `Distributor(coords, dtype=…)` shape, the
 `VectorField`/`Field` factories, `local_grids`, and the
 `zcross = MulCosine(skew(·))` Coriolis idiom) was confirmed as sketched.
+
+---
+
+# Eigenvalue problems (appended by Session L5)
+
+Session L1's introspection above covered the **initial-value** path only. Sessions
+L5 onward need the eigenvalue path for extensions B (Hough modes) and C (jet
+stability), so it was introspected the same way — signatures from the installed
+package, then a live micro-example whose answer is known analytically.
+
+## 9. `EVP` construction
+
+```python
+EVP(variables, eigenvalue, **kw)          # class: EigenvalueProblem
+```
+
+From its docstring: the class supports problems of the form `λ*M.X + L.X = 0`.
+The left-hand side must be **linear in the variables and affine in the
+eigenvalue**; the right-hand side must be zero. The eigenvalue is itself a
+`Field` (a bare one, with no basis), not a symbol or a string.
+
+```python
+coords = d3.S2Coordinates('phi', 'theta')
+dist   = d3.Distributor(coords, dtype=np.complex128)   # complex dtype REQUIRED
+basis  = d3.SphereBasis(coords, (Nphi, Ntheta), radius=R, dtype=np.complex128)
+psi    = dist.Field(name='psi', bases=basis)
+sigma  = dist.Field(name='sigma')                       # the eigenvalue
+problem = d3.EVP([psi], eigenvalue=sigma, namespace=locals())
+problem.add_equation("sigma*psi + lap(psi) = 0")
+solver  = problem.build_solver()                        # class: EigenvalueSolver
+```
+
+**`dtype=np.complex128` is required** on both the distributor and the basis. The
+`float64` used for the IVP path will not carry complex eigenvalues, which is the
+whole point of a stability calculation.
+
+## 10. Subproblems: the sphere decomposes by azimuthal wavenumber
+
+The sphere basis block-diagonalises by azimuthal wavenumber `m`, and Dedalus
+exposes each block as a *subproblem*. This is exactly the structure the theory
+wants — `theory/derivations.tex` §6 and §9 both pose their eigenvalue problems
+per-`m` — so no reshaping is needed.
+
+```python
+solver.subproblems                    # list; each has .group == (m, None)
+solver.subproblems_by_group[(m, None)]   # direct lookup by azimuthal wavenumber
+```
+
+For a `(2N, N)` sphere basis the groups run over both signs of `m`. Solve one
+block at a time:
+
+```python
+sp = solver.subproblems_by_group[(m, None)]
+solver.solve_dense(sp)                # signature: (subproblem, rebuild_matrices=False,
+                                      #             left=False, normalize_left=True, **kw)
+eigvals = solver.eigenvalues          # ndarray, complex; may contain inf/nan
+eigvecs = solver.eigenvectors         # ndarray, (n_modes, n_modes)
+```
+
+`solve_sparse` also exists, for when only a few eigenvalues near a target are
+wanted.
+
+**Spurious entries are normal and must be filtered.** `solver.eigenvalues`
+contains non-finite values corresponding to constraint rows; filter with
+`np.isfinite` before use. This is not an error condition.
+
+## 11. Live confirmation against a known spectrum
+
+The Laplace–Beltrami operator on the unit sphere has eigenvalues `−n(n+1)`, so
+`sigma*psi + lap(psi) = 0` must return `sigma = n(n+1)` exactly. At `m = 2` on a
+`(32, 16)` basis the solver returned, after filtering non-finite values:
+
+```
+6, 12, 20, 30, 42, 56   for n = 2, 3, 4, 5, 6, 7
+```
+
+matching `n(n+1)` to all printed digits. The API translation above is therefore
+confirmed, not assumed — the same standard Session L1 applied to the IVP path.
