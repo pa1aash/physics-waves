@@ -1,0 +1,97 @@
+{
+  "run_id": "V-02",
+  "campaign": "verification",
+  "description": "Steady-state accuracy \u2014 Williamson case 2 (steady nonlinear geostrophic flow).",
+  "started_utc": "2026-07-25T16:59:31+00:00",
+  "config": {
+    "run_id": "V-02",
+    "campaign": "verification",
+    "description": "Steady-state accuracy \u2014 Williamson case 2 (steady nonlinear geostrophic flow).",
+    "resolution": "L0",
+    "initial_condition": "williamson_2",
+    "case": 2,
+    "physical": {
+      "R": 6371220.0,
+      "Omega": 7.292e-05,
+      "g": 9.80616,
+      "H": 2363.021
+    },
+    "numerics": {
+      "timestepper": "RK222",
+      "dt": 2400.0,
+      "dealias": 1.5,
+      "hyperdiffusion_order": 4,
+      "hyperdiffusion_coefficient": 3964110000000000.0,
+      "stop_sim_time": 432000.0
+    },
+    "outputs": {
+      "snapshot_cadence": 86400.0,
+      "slice_cadence": 21600.0,
+      "spectra_cadence": 3600.0,
+      "write_full_fields": true
+    },
+    "notes": "Resolution ladder L0-L3. Primary accuracy test."
+  },
+  "config_path": "configs/verification/V-02.yaml",
+  "config_sha256": "f5f0f5c262cc89aeb9da1413d8126500f852f1a661d266d34aef465a7a594dce",
+  "git": {
+    "commit": "b4871c7e4f19b8ff3e05d7d7a1279a694451ba4a",
+    "branch": "main",
+    "dirty": true,
+    "dirty_paths": [
+      "M src/solver/harness.py"
+    ]
+  },
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS-26.3.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "hostname": "Palaashs-MacBook-Air.local",
+    "dedalus": "3.0.5",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "mpi_size": 1,
+    "omp_num_threads": "1"
+  },
+  "resolution_shape": [
+    64,
+    32
+  ],
+  "units": {
+    "meter": 1.5695581066106648e-07,
+    "hour": 1.0
+  },
+  "initial_condition_metadata": {
+    "kind": "shallow_water",
+    "mean_depth_m": 2363.021308361002,
+    "steady": true,
+    "analytic": "initial condition, unchanged, for all time",
+    "initial_condition": "williamson_2"
+  },
+  "warnings": [],
+  "outcome": {
+    "status": "completed",
+    "error": null,
+    "iterations": 180,
+    "final_sim_time_s": 432000.00000000105,
+    "wall_seconds": 2.9,
+    "finished_utc": "2026-07-25T16:59:34+00:00"
+  },
+  "outputs": [
+    {
+      "path": "slices/slices_s1.h5",
+      "bytes": 104648,
+      "sha256": "7f88df09aed731fb78f1d57a065aaee314a82922447bd13fc051915d3377cf2e"
+    },
+    {
+      "path": "snapshots/snapshots_s1.h5",
+      "bytes": 491600,
+      "sha256": "46246028ebb468fa835f8ce9d454959977cf0c74258a7314c39d561e08273309"
+    },
+    {
+      "path": "spectra/spectra_s1.h5",
+      "bytes": 103440,
+      "sha256": "12fdeb9f2a6ac6dd4221fb85fc9d84a0eb581bd96e30d8175687f87212781cbb"
+    }
+  ]
+}

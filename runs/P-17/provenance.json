@@ -1,0 +1,109 @@
+{
+  "run_id": "P-17",
+  "campaign": "phase_speed",
+  "description": "Resolution robustness \u2014 degree n=4.",
+  "started_utc": "2026-07-25T17:00:17+00:00",
+  "config": {
+    "run_id": "P-17",
+    "campaign": "phase_speed",
+    "description": "Resolution robustness \u2014 degree n=4.",
+    "resolution": "L0",
+    "initial_condition": "single_harmonic",
+    "physical": {
+      "R": 6371220.0,
+      "Omega": 7.292e-05,
+      "g": 9.80616,
+      "H": 10000.0
+    },
+    "numerics": {
+      "timestepper": "RK222",
+      "dt": 2400.0,
+      "dealias": 1.5,
+      "hyperdiffusion_order": 4,
+      "hyperdiffusion_coefficient": 3964110000000000.0,
+      "stop_sim_time": 1728000.0
+    },
+    "outputs": {
+      "snapshot_cadence": 86400.0,
+      "slice_cadence": 3600.0,
+      "spectra_cadence": 3600.0,
+      "write_full_fields": false
+    },
+    "initial_condition_params": {
+      "degree_n": 4,
+      "order_m": 2,
+      "amplitude": 1.0
+    },
+    "notes": "Resolution ladder L0, L1, L2; phase-speed convergence."
+  },
+  "config_path": "configs/phase_speed/P-17.yaml",
+  "config_sha256": "0d620ba72a930728b932138ce7592d3d517ec2a734c7cb06d948a67a3eba1219",
+  "git": {
+    "commit": "b4871c7e4f19b8ff3e05d7d7a1279a694451ba4a",
+    "branch": "main",
+    "dirty": true,
+    "dirty_paths": [
+      "M src/solver/harness.py",
+      "?? runs/"
+    ]
+  },
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS-26.3.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "hostname": "Palaashs-MacBook-Air.local",
+    "dedalus": "3.0.5",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "mpi_size": 1,
+    "omp_num_threads": "1"
+  },
+  "resolution_shape": [
+    64,
+    32
+  ],
+  "units": {
+    "meter": 1.5695581066106648e-07,
+    "hour": 1.0
+  },
+  "initial_condition_metadata": {
+    "kind": "shallow_water",
+    "mean_depth_m": 10000.0,
+    "steady": false,
+    "degree_n": 4,
+    "order_m": 2,
+    "sectoral": false,
+    "amplitude_m_s": 1.0,
+    "predicted_angular_phase_speed_rad_s": -7.292e-06,
+    "predicted_equatorial_phase_speed_m_s": -46.45893624,
+    "lambs_parameter": 8.8043954271698,
+    "westward_period_s": 430827.2975301417,
+    "initial_condition": "single_harmonic"
+  },
+  "warnings": [],
+  "outcome": {
+    "status": "completed",
+    "error": null,
+    "iterations": 720,
+    "final_sim_time_s": 1728000.0000000177,
+    "wall_seconds": 11.206,
+    "finished_utc": "2026-07-25T17:00:28+00:00"
+  },
+  "outputs": [
+    {
+      "path": "slices/slices_s1.h5",
+      "bytes": 871752,
+      "sha256": "cafba31a126e231c1f167a8e4e40cb076664d608fadd10244c47dd9953b416ca"
+    },
+    {
+      "path": "snapshots/snapshots_s1.h5",
+      "bytes": 1060736,
+      "sha256": "a5b0fdbab9d3f7d5705a72b47c3fa1aa1dce40e98903c97b82344131cae3103f"
+    },
+    {
+      "path": "spectra/spectra_s1.h5",
+      "bytes": 192104,
+      "sha256": "001f73f0dd885453dcfa526a7648d85dc8e43835a26d4f7ff887c406d0c8d8ea"
+    }
+  ]
+}

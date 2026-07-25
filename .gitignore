@@ -84,3 +84,8 @@ manuscript/main.pdf
 runs/**
 !runs/*/
 !runs/*/provenance.json
+# The eigenvalue campaigns produce no HDF5 at all -- their entire result is a
+# small JSON table, so it is the analogue of a provenance record rather than of
+# bulk output, and is tracked.
+!runs/*/hough_modes.json
+!runs/*/growth_rates.json

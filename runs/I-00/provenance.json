@@ -1,0 +1,116 @@
+{
+  "run_id": "I-00",
+  "campaign": "instability",
+  "description": "Galewsky, Scott & Polvani (2004) barotropic-instability anchor.",
+  "started_utc": "2026-07-25T17:00:16+00:00",
+  "config": {
+    "run_id": "I-00",
+    "campaign": "instability",
+    "description": "Galewsky, Scott & Polvani (2004) barotropic-instability anchor.",
+    "resolution": "L1",
+    "initial_condition": "galewsky",
+    "physical": {
+      "R": 6371220.0,
+      "Omega": 7.292e-05,
+      "g": 9.80616,
+      "H": 10000.0
+    },
+    "numerics": {
+      "timestepper": "RK222",
+      "dt": 600.0,
+      "dealias": 1.5,
+      "hyperdiffusion_order": 4,
+      "hyperdiffusion_coefficient": 3964110000000000.0,
+      "stop_sim_time": 1296000.0
+    },
+    "outputs": {
+      "snapshot_cadence": 21600.0,
+      "slice_cadence": 3600.0,
+      "spectra_cadence": 3600.0,
+      "write_full_fields": true
+    },
+    "initial_condition_params": {
+      "profile": "galewsky_2004",
+      "perturbation": {
+        "h_hat": 120.0,
+        "phi2": 0.7853981633974483,
+        "alpha": 0.3333333333333333,
+        "beta": 0.06666666666666667
+      }
+    },
+    "notes": "Resolution L1, L2. Canonical instability benchmark (authorised extension A)."
+  },
+  "config_path": "configs/instability/I-00.yaml",
+  "config_sha256": "b567bd7e2c8b36e9dbd17d51cc802d3d1c819c7b6108848ec4ea9402f24bd708",
+  "git": {
+    "commit": "b4871c7e4f19b8ff3e05d7d7a1279a694451ba4a",
+    "branch": "main",
+    "dirty": true,
+    "dirty_paths": [
+      "M src/solver/harness.py",
+      "?? runs/"
+    ]
+  },
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS-26.3.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "hostname": "Palaashs-MacBook-Air.local",
+    "dedalus": "3.0.5",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "mpi_size": 1,
+    "omp_num_threads": "1"
+  },
+  "resolution_shape": [
+    256,
+    128
+  ],
+  "units": {
+    "meter": 1.5695581066106648e-07,
+    "hour": 1.0
+  },
+  "initial_condition_metadata": {
+    "kind": "shallow_water",
+    "mean_depth_m": 10000.333333333077,
+    "steady": false,
+    "perturbed": true,
+    "jet_umax_m_s": 80.0,
+    "jet_support_lat_rad": [
+      0.4487989505128276,
+      1.121997376282069
+    ],
+    "initial_condition": "galewsky"
+  },
+  "warnings": [],
+  "outcome": {
+    "status": "completed",
+    "error": null,
+    "iterations": 2160,
+    "final_sim_time_s": 1296000.0000000214,
+    "wall_seconds": 163.406,
+    "finished_utc": "2026-07-25T17:03:01+00:00"
+  },
+  "outputs": [
+    {
+      "path": "slices/slices_s1.h5",
+      "bytes": 2332272,
+      "sha256": "4ac1485813bb0a22ad0f65f0724c4b24251c7edc1114878030fd282ee5f50aac"
+    },
+    {
+      "path": "snapshots/snapshots_s1.h5",
+      "bytes": 65985712,
+      "sha256": "ac1051ddac118e74e4f0bd51deb91aee472bfaa84cd61594cae02eeb86c25666"
+    },
+    {
+      "path": "snapshots/snapshots_s2.h5",
+      "bytes": 13269504,
+      "sha256": "2bfccafbb8502db46b91009d4eaa9665b6de5d8b46bc2c0a222560edce32b3e7"
+    },
+    {
+      "path": "spectra/spectra_s1.h5",
+      "bytes": 166360,
+      "sha256": "849bff45219c4f9e69aa1cceea3ca2da1e7953f27aaf45f31fc909d539eb9916"
+    }
+  ]
+}

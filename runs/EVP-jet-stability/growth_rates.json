@@ -1,0 +1,847 @@
+{
+  "run_id": "EVP-jet-stability",
+  "formulation": "nondivergent barotropic (Session L4b scope decision, Option B)",
+  "bias": "Nondivergent modal growth rates overestimate the divergent ones; the bias is one-signed. See docs/literature/DIVERGENT_STABILITY_DECISION.md.",
+  "truncation": [
+    240,
+    480
+  ],
+  "persist_rtol": 0.001,
+  "base_states": [
+    {
+      "run_id": "I-00",
+      "umax_m_s": 80.0,
+      "physical": {
+        "R": 6371220.0,
+        "Omega": 7.292e-05,
+        "g": 9.80616,
+        "H": 10000.0
+      },
+      "modes": [
+        {
+          "m": 1,
+          "growth_rate_s": 2.9880517145042194e-06,
+          "c_angular_real_rad_s": 1.3791480769579025e-05,
+          "c_angular_imag_rad_s": 2.9880517145042194e-06,
+          "e_folding_days": 3.873451727054348,
+          "truncation_movement": 2.745735176877027e-05,
+          "resolved": true
+        },
+        {
+          "m": 2,
+          "growth_rate_s": 5.710230227466537e-06,
+          "c_angular_real_rad_s": 1.2624623149381537e-05,
+          "c_angular_imag_rad_s": 2.8551151137332684e-06,
+          "e_folding_days": 2.0269014756011257,
+          "truncation_movement": 7.792216231203804e-05,
+          "resolved": true
+        },
+        {
+          "m": 3,
+          "growth_rate_s": 7.550865018723718e-06,
+          "c_angular_real_rad_s": 1.1733677054153823e-05,
+          "c_angular_imag_rad_s": 2.516955006241239e-06,
+          "e_folding_days": 1.532814325957899,
+          "truncation_movement": 0.0002911207114920136,
+          "resolved": true
+        },
+        {
+          "m": 4,
+          "growth_rate_s": 1.4832428696982889e-05,
+          "c_angular_real_rad_s": 3.2269847828943243e-06,
+          "c_angular_imag_rad_s": 3.7081071742457222e-06,
+          "e_folding_days": 0.7803222459736748,
+          "truncation_movement": 3.5563427255490355e-08,
+          "resolved": true
+        },
+        {
+          "m": 5,
+          "growth_rate_s": 1.8891128686311464e-05,
+          "c_angular_real_rad_s": 4.620351811962432e-06,
+          "c_angular_imag_rad_s": 3.7782257372622924e-06,
+          "e_folding_days": 0.6126724488654118,
+          "truncation_movement": 2.6281015690011366e-08,
+          "resolved": true
+        },
+        {
+          "m": 6,
+          "growth_rate_s": 2.07484092455962e-05,
+          "c_angular_real_rad_s": 5.614342237418822e-06,
+          "c_angular_imag_rad_s": 3.458068207599367e-06,
+          "e_folding_days": 0.5578294671689418,
+          "truncation_movement": 4.836588293575562e-07,
+          "resolved": true
+        },
+        {
+          "m": 7,
+          "growth_rate_s": 2.073386282601708e-05,
+          "c_angular_real_rad_s": 6.369673254097411e-06,
+          "c_angular_imag_rad_s": 2.9619804037167258e-06,
+          "e_folding_days": 0.5582208279853572,
+          "truncation_movement": 1.4735585549332236e-05,
+          "resolved": true
+        },
+        {
+          "m": 8,
+          "growth_rate_s": 1.890542914261132e-05,
+          "c_angular_real_rad_s": 6.97747230309422e-06,
+          "c_angular_imag_rad_s": 2.363178642826415e-06,
+          "e_folding_days": 0.6122090107961126,
+          "truncation_movement": 0.00019631615402519267,
+          "resolved": true
+        },
+        {
+          "m": 9,
+          "growth_rate_s": 1.5164132508927582e-05,
+          "c_angular_real_rad_s": 7.496334890374033e-06,
+          "c_angular_imag_rad_s": 1.6849036121030646e-06,
+          "e_folding_days": 0.7632532930756223,
+          "truncation_movement": 0.0019691851631144126,
+          "resolved": false
+        },
+        {
+          "m": 10,
+          "growth_rate_s": 9.24705150719294e-06,
+          "c_angular_real_rad_s": 7.973701755819836e-06,
+          "c_angular_imag_rad_s": 9.24705150719294e-07,
+          "e_folding_days": 1.2516502222433852,
+          "truncation_movement": 0.09914464246523448,
+          "resolved": false
+        },
+        {
+          "m": 11,
+          "growth_rate_s": 2.5189690577381357e-06,
+          "c_angular_real_rad_s": 8.74041180102881e-06,
+          "c_angular_imag_rad_s": 2.2899718706710326e-07,
+          "e_folding_days": 4.594766274924715,
+          "truncation_movement": 0.4052831818723921,
+          "resolved": false
+        },
+        {
+          "m": 12,
+          "growth_rate_s": 4.884458287645839e-07,
+          "c_angular_real_rad_s": 1.252009428931812e-05,
+          "c_angular_imag_rad_s": 4.0703819063715324e-08,
+          "e_folding_days": 23.69571688911367,
+          "truncation_movement": 0.34562696160507506,
+          "resolved": false
+        }
+      ],
+      "m_star": 6,
+      "sigma_max_s": 2.07484092455962e-05,
+      "e_folding_days": 0.5578294671689418,
+      "ripa": {
+        "c0_m_s": 39.999999999220954,
+        "c0_choice": "midpoint (condition (i) already failed)",
+        "gravity_wave_speed_m_s": 313.1478883850249,
+        "max_abs_c0_minus_ubar_m_s": 39.999999999220954,
+        "criticality_margin": 7.828697209778095,
+        "pv_gradient_sign_change": true,
+        "condition_i_pv_gradient": false,
+        "condition_ii_criticality": true,
+        "certifies_stable": false,
+        "note": "Sufficient, not necessary. Failure certifies nothing; only the conjunction of both conditions certifies stability."
+      }
+    },
+    {
+      "run_id": "I-01",
+      "umax_m_s": 4.0,
+      "physical": {
+        "R": 6371220.0,
+        "Omega": 7.292e-05,
+        "g": 9.80616,
+        "H": 10000.0
+      },
+      "modes": [
+        {
+          "m": 1,
+          "growth_rate_s": 1.8002647797961638e-09,
+          "c_angular_real_rad_s": 2.438261764139483e-07,
+          "c_angular_imag_rad_s": 1.8002647797961638e-09,
+          "e_folding_days": 6429.095433053219,
+          "truncation_movement": 0.6139661183637367,
+          "resolved": false
+        },
+        {
+          "m": 2,
+          "growth_rate_s": 1.8085215660837886e-10,
+          "c_angular_real_rad_s": 3.773558976736345e-08,
+          "c_angular_imag_rad_s": 9.042607830418943e-11,
+          "e_folding_days": 63997.4346512042,
+          "truncation_movement": 37.05466105224656,
+          "resolved": false
+        },
+        {
+          "m": 3,
+          "growth_rate_s": 5.302510414315415e-09,
+          "c_angular_real_rad_s": 2.444413286664126e-07,
+          "c_angular_imag_rad_s": 1.7675034714384717e-09,
+          "e_folding_days": 2182.7536713227473,
+          "truncation_movement": 0.6817612735452874,
+          "resolved": false
+        },
+        {
+          "m": 4,
+          "growth_rate_s": 0.0,
+          "c_angular_real_rad_s": -7.265336332836219e-06,
+          "c_angular_imag_rad_s": 0.0,
+          "e_folding_days": null,
+          "truncation_movement": 3.534128522656523e+21,
+          "resolved": false
+        },
+        {
+          "m": 5,
+          "growth_rate_s": 8.256176855461982e-09,
+          "c_angular_real_rad_s": 2.854439175392164e-07,
+          "c_angular_imag_rad_s": 1.6512353710923965e-09,
+          "e_folding_days": 1401.868476983641,
+          "truncation_movement": 0.7662101011644767,
+          "resolved": false
+        },
+        {
+          "m": 6,
+          "growth_rate_s": 5.330989545359738e-09,
+          "c_angular_real_rad_s": 2.0975664920451151e-07,
+          "c_angular_imag_rad_s": 8.884982575599564e-10,
+          "e_folding_days": 2171.0929979497923,
+          "truncation_movement": 2.623817672091623,
+          "resolved": false
+        },
+        {
+          "m": 7,
+          "growth_rate_s": 9.06291920490881e-09,
+          "c_angular_real_rad_s": 3.294240715533044e-07,
+          "c_angular_imag_rad_s": 1.2947027435584014e-09,
+          "e_folding_days": 1277.080134158664,
+          "truncation_movement": 0.3375599749359762,
+          "resolved": false
+        },
+        {
+          "m": 8,
+          "growth_rate_s": 1.0354571356652577e-08,
+          "c_angular_real_rad_s": 2.4909325843976646e-07,
+          "c_angular_imag_rad_s": 1.2943214195815722e-09,
+          "e_folding_days": 1117.7743312993825,
+          "truncation_movement": 0.8156213089805701,
+          "resolved": false
+        },
+        {
+          "m": 9,
+          "growth_rate_s": 6.039776770480342e-09,
+          "c_angular_real_rad_s": 4.2114975069282004e-07,
+          "c_angular_imag_rad_s": 6.710863078311491e-10,
+          "e_folding_days": 1916.3082534180467,
+          "truncation_movement": 1.6448141530480993,
+          "resolved": false
+        },
+        {
+          "m": 10,
+          "growth_rate_s": 1.4124355441214609e-08,
+          "c_angular_real_rad_s": 2.9180630805019974e-07,
+          "c_angular_imag_rad_s": 1.4124355441214608e-09,
+          "e_folding_days": 819.440867390036,
+          "truncation_movement": 0.3830130533426591,
+          "resolved": false
+        },
+        {
+          "m": 11,
+          "growth_rate_s": 0.0,
+          "c_angular_real_rad_s": -1.1042485475174151e-06,
+          "c_angular_imag_rad_s": 0.0,
+          "e_folding_days": null,
+          "truncation_movement": 2.439702429325271e+21,
+          "resolved": false
+        },
+        {
+          "m": 12,
+          "growth_rate_s": 1.6977042145186077e-08,
+          "c_angular_real_rad_s": 3.8076966947484006e-07,
+          "c_angular_imag_rad_s": 1.4147535120988397e-09,
+          "e_folding_days": 681.7485622697803,
+          "truncation_movement": 1.0,
+          "resolved": false
+        }
+      ],
+      "m_star": null,
+      "sigma_max_s": null,
+      "e_folding_days": null,
+      "ripa": {
+        "c0_m_s": 3.9999999999220957,
+        "c0_choice": "max(ubar)",
+        "gravity_wave_speed_m_s": 313.1478883850249,
+        "max_abs_c0_minus_ubar_m_s": 3.9999999999220957,
+        "criticality_margin": 78.28697209778095,
+        "pv_gradient_sign_change": false,
+        "condition_i_pv_gradient": true,
+        "condition_ii_criticality": true,
+        "certifies_stable": true,
+        "note": "Sufficient, not necessary. Failure certifies nothing; only the conjunction of both conditions certifies stability."
+      }
+    },
+    {
+      "run_id": "I-02",
+      "umax_m_s": 8.0,
+      "physical": {
+        "R": 6371220.0,
+        "Omega": 7.292e-05,
+        "g": 9.80616,
+        "H": 10000.0
+      },
+      "modes": [
+        {
+          "m": 1,
+          "growth_rate_s": 5.263095930531036e-08,
+          "c_angular_real_rad_s": 4.950118052501585e-07,
+          "c_angular_imag_rad_s": 5.263095930531036e-08,
+          "e_folding_days": 219.9099964515804,
+          "truncation_movement": 0.10920709263517908,
+          "resolved": false
+        },
+        {
+          "m": 2,
+          "growth_rate_s": 8.804045071397326e-08,
+          "c_angular_real_rad_s": 5.016024277857824e-07,
+          "c_angular_imag_rad_s": 4.402022535698663e-08,
+          "e_folding_days": 131.46313972966865,
+          "truncation_movement": 0.24075593512161453,
+          "resolved": false
+        },
+        {
+          "m": 3,
+          "growth_rate_s": 1.0023215960210128e-07,
+          "c_angular_real_rad_s": 5.155670507472367e-07,
+          "c_angular_imag_rad_s": 3.341071986736709e-08,
+          "e_folding_days": 115.47265987304371,
+          "truncation_movement": 0.12488240785965012,
+          "resolved": false
+        },
+        {
+          "m": 4,
+          "growth_rate_s": 5.500779059095458e-08,
+          "c_angular_real_rad_s": 5.241763165447237e-07,
+          "c_angular_imag_rad_s": 1.3751947647738646e-08,
+          "e_folding_days": 210.4079067661609,
+          "truncation_movement": 1.3820829913164123,
+          "resolved": false
+        },
+        {
+          "m": 5,
+          "growth_rate_s": 7.650406771546133e-08,
+          "c_angular_real_rad_s": 5.928003657416427e-07,
+          "c_angular_imag_rad_s": 1.5300813543092266e-08,
+          "e_folding_days": 151.2870415873975,
+          "truncation_movement": 0.20320875836435073,
+          "resolved": false
+        },
+        {
+          "m": 6,
+          "growth_rate_s": 4.84222613338049e-08,
+          "c_angular_real_rad_s": 5.994509705554689e-07,
+          "c_angular_imag_rad_s": 8.070376888967483e-09,
+          "e_folding_days": 239.0238240689907,
+          "truncation_movement": 1.6138018650905293,
+          "resolved": false
+        },
+        {
+          "m": 7,
+          "growth_rate_s": 5.0610850223708364e-08,
+          "c_angular_real_rad_s": 6.820425049737365e-07,
+          "c_angular_imag_rad_s": 7.230121460529767e-09,
+          "e_folding_days": 228.68760400022416,
+          "truncation_movement": 0.17722485736479499,
+          "resolved": false
+        },
+        {
+          "m": 8,
+          "growth_rate_s": 4.27112760731042e-08,
+          "c_angular_real_rad_s": 7.709010140981585e-07,
+          "c_angular_imag_rad_s": 5.338909509138025e-09,
+          "e_folding_days": 270.9840383664493,
+          "truncation_movement": 0.9279138723685664,
+          "resolved": false
+        },
+        {
+          "m": 9,
+          "growth_rate_s": 1.1448365820101209e-07,
+          "c_angular_real_rad_s": 2.0304564203675522e-07,
+          "c_angular_imag_rad_s": 1.2720406466779121e-08,
+          "e_folding_days": 101.09804539746752,
+          "truncation_movement": 0.4412905289352017,
+          "resolved": false
+        },
+        {
+          "m": 10,
+          "growth_rate_s": 7.30465403736703e-08,
+          "c_angular_real_rad_s": 3.1655149818790213e-07,
+          "c_angular_imag_rad_s": 7.30465403736703e-09,
+          "e_folding_days": 158.4479431177272,
+          "truncation_movement": 0.3633787925529575,
+          "resolved": false
+        },
+        {
+          "m": 11,
+          "growth_rate_s": 1.3864862916463754e-08,
+          "c_angular_real_rad_s": 1.2309688290623806e-06,
+          "c_angular_imag_rad_s": 1.2604420833148868e-09,
+          "e_folding_days": 834.7773897086645,
+          "truncation_movement": 4.223895205973891,
+          "resolved": false
+        },
+        {
+          "m": 12,
+          "growth_rate_s": 4.4247380938305645e-08,
+          "c_angular_real_rad_s": 9.650854035099866e-07,
+          "c_angular_imag_rad_s": 3.687281744858804e-09,
+          "e_folding_days": 261.57647816967665,
+          "truncation_movement": 0.5994709798432024,
+          "resolved": false
+        }
+      ],
+      "m_star": null,
+      "sigma_max_s": null,
+      "e_folding_days": null,
+      "ripa": {
+        "c0_m_s": 3.9999999999220957,
+        "c0_choice": "midpoint (condition (i) already failed)",
+        "gravity_wave_speed_m_s": 313.1478883850249,
+        "max_abs_c0_minus_ubar_m_s": 3.9999999999220957,
+        "criticality_margin": 78.28697209778095,
+        "pv_gradient_sign_change": true,
+        "condition_i_pv_gradient": false,
+        "condition_ii_criticality": true,
+        "certifies_stable": false,
+        "note": "Sufficient, not necessary. Failure certifies nothing; only the conjunction of both conditions certifies stability."
+      }
+    },
+    {
+      "run_id": "I-03",
+      "umax_m_s": 20.0,
+      "physical": {
+        "R": 6371220.0,
+        "Omega": 7.292e-05,
+        "g": 9.80616,
+        "H": 10000.0
+      },
+      "modes": [
+        {
+          "m": 1,
+          "growth_rate_s": 7.086841724504352e-07,
+          "c_angular_real_rad_s": 2.3525870479606347e-06,
+          "c_angular_imag_rad_s": 7.086841724504352e-07,
+          "e_folding_days": 16.331780113070828,
+          "truncation_movement": 0.00016245830969790237,
+          "resolved": true
+        },
+        {
+          "m": 2,
+          "growth_rate_s": 1.2575752806540258e-06,
+          "c_angular_real_rad_s": 2.308182220977085e-06,
+          "c_angular_imag_rad_s": 6.287876403270129e-07,
+          "e_folding_days": 9.203484079342557,
+          "truncation_movement": 0.00027860477200609046,
+          "resolved": true
+        },
+        {
+          "m": 3,
+          "growth_rate_s": 1.5690151351153575e-06,
+          "c_angular_real_rad_s": 2.2565688941518156e-06,
+          "c_angular_imag_rad_s": 5.230050450384525e-07,
+          "e_folding_days": 7.376649093460224,
+          "truncation_movement": 0.00043717312537710086,
+          "resolved": true
+        },
+        {
+          "m": 4,
+          "growth_rate_s": 1.6177419313223748e-06,
+          "c_angular_real_rad_s": 2.2107482950903816e-06,
+          "c_angular_imag_rad_s": 4.044354828305937e-07,
+          "e_folding_days": 7.154462556715206,
+          "truncation_movement": 0.004424088372427339,
+          "resolved": false
+        },
+        {
+          "m": 5,
+          "growth_rate_s": 1.398653267062339e-06,
+          "c_angular_real_rad_s": 2.176086182279162e-06,
+          "c_angular_imag_rad_s": 2.797306534124678e-07,
+          "e_folding_days": 8.275156070942213,
+          "truncation_movement": 0.028464427552271684,
+          "resolved": false
+        },
+        {
+          "m": 6,
+          "growth_rate_s": 2.7267737217276116e-06,
+          "c_angular_real_rad_s": 5.756624049389856e-07,
+          "c_angular_imag_rad_s": 4.5446228695460194e-07,
+          "e_folding_days": 4.244603790130795,
+          "truncation_movement": 3.201949202322143e-05,
+          "resolved": true
+        },
+        {
+          "m": 7,
+          "growth_rate_s": 3.5220803876315865e-06,
+          "c_angular_real_rad_s": 9.276858110075965e-07,
+          "c_angular_imag_rad_s": 5.031543410902267e-07,
+          "e_folding_days": 3.286147049544496,
+          "truncation_movement": 0.00011397679231015376,
+          "resolved": true
+        },
+        {
+          "m": 8,
+          "growth_rate_s": 3.5148750775600363e-06,
+          "c_angular_real_rad_s": 1.1964803391022788e-06,
+          "c_angular_imag_rad_s": 4.3935938469500454e-07,
+          "e_folding_days": 3.2928834791217074,
+          "truncation_movement": 0.00030295892917518637,
+          "resolved": true
+        },
+        {
+          "m": 9,
+          "growth_rate_s": 2.864573418605539e-06,
+          "c_angular_real_rad_s": 1.4120487355879405e-06,
+          "c_angular_imag_rad_s": 3.1828593540061545e-07,
+          "e_folding_days": 4.040418024861893,
+          "truncation_movement": 0.007391716550941351,
+          "resolved": false
+        },
+        {
+          "m": 10,
+          "growth_rate_s": 1.588772974331822e-06,
+          "c_angular_real_rad_s": 1.59175025813856e-06,
+          "c_angular_imag_rad_s": 1.588772974331822e-07,
+          "e_folding_days": 7.284913742280701,
+          "truncation_movement": 0.10526526551912231,
+          "resolved": false
+        },
+        {
+          "m": 11,
+          "growth_rate_s": 5.100744112472366e-07,
+          "c_angular_real_rad_s": 1.7570236891082874e-06,
+          "c_angular_imag_rad_s": 4.637040102247605e-08,
+          "e_folding_days": 22.690952180434007,
+          "truncation_movement": 0.3614551168894777,
+          "resolved": false
+        },
+        {
+          "m": 12,
+          "growth_rate_s": 1.2088694535304482e-07,
+          "c_angular_real_rad_s": 2.8961976165238612e-06,
+          "c_angular_imag_rad_s": 1.0073912112753734e-08,
+          "e_folding_days": 95.74296083230921,
+          "truncation_movement": 0.4309154013800414,
+          "resolved": false
+        }
+      ],
+      "m_star": 7,
+      "sigma_max_s": 3.5220803876315865e-06,
+      "e_folding_days": 3.286147049544496,
+      "ripa": {
+        "c0_m_s": 9.999999999805238,
+        "c0_choice": "midpoint (condition (i) already failed)",
+        "gravity_wave_speed_m_s": 313.1478883850249,
+        "max_abs_c0_minus_ubar_m_s": 9.999999999805238,
+        "criticality_margin": 31.31478883911238,
+        "pv_gradient_sign_change": true,
+        "condition_i_pv_gradient": false,
+        "condition_ii_criticality": true,
+        "certifies_stable": false,
+        "note": "Sufficient, not necessary. Failure certifies nothing; only the conjunction of both conditions certifies stability."
+      }
+    },
+    {
+      "run_id": "I-04",
+      "umax_m_s": 40.0,
+      "physical": {
+        "R": 6371220.0,
+        "Omega": 7.292e-05,
+        "g": 9.80616,
+        "H": 10000.0
+      },
+      "modes": [
+        {
+          "m": 1,
+          "growth_rate_s": 1.6108685382873006e-06,
+          "c_angular_real_rad_s": 5.983107534213938e-06,
+          "c_angular_imag_rad_s": 1.6108685382873006e-06,
+          "e_folding_days": 7.184989835595028,
+          "truncation_movement": 1.8214466236709524e-05,
+          "resolved": true
+        },
+        {
+          "m": 2,
+          "growth_rate_s": 2.8819994326340954e-06,
+          "c_angular_real_rad_s": 5.667284184603675e-06,
+          "c_angular_imag_rad_s": 1.4409997163170477e-06,
+          "e_folding_days": 4.015987631023084,
+          "truncation_movement": 6.878870922278344e-05,
+          "resolved": true
+        },
+        {
+          "m": 3,
+          "growth_rate_s": 3.6731799733657238e-06,
+          "c_angular_real_rad_s": 5.375856268321061e-06,
+          "c_angular_imag_rad_s": 1.2243933244552413e-06,
+          "e_folding_days": 3.15096841374445,
+          "truncation_movement": 0.00038288961571124525,
+          "resolved": true
+        },
+        {
+          "m": 4,
+          "growth_rate_s": 3.9275348063666276e-06,
+          "c_angular_real_rad_s": 6.440434499977136e-07,
+          "c_angular_imag_rad_s": 9.818837015916569e-07,
+          "e_folding_days": 2.946905538637678,
+          "truncation_movement": 9.733419856222265e-08,
+          "resolved": true
+        },
+        {
+          "m": 5,
+          "growth_rate_s": 7.511307591758057e-06,
+          "c_angular_real_rad_s": 1.5794412408662872e-06,
+          "c_angular_imag_rad_s": 1.5022615183516114e-06,
+          "e_folding_days": 1.5408867141553324,
+          "truncation_movement": 2.2589735966794449e-07,
+          "resolved": true
+        },
+        {
+          "m": 6,
+          "growth_rate_s": 9.100011299733518e-06,
+          "c_angular_real_rad_s": 2.2434342243308206e-06,
+          "c_angular_imag_rad_s": 1.5166685499555863e-06,
+          "e_folding_days": 1.2718746925526352,
+          "truncation_movement": 2.112889671643513e-06,
+          "resolved": true
+        },
+        {
+          "m": 7,
+          "growth_rate_s": 9.44902989605484e-06,
+          "c_angular_real_rad_s": 2.7352720088066705e-06,
+          "c_angular_imag_rad_s": 1.34986141372212e-06,
+          "e_folding_days": 1.224895486774413,
+          "truncation_movement": 2.3488083872490637e-05,
+          "resolved": true
+        },
+        {
+          "m": 8,
+          "growth_rate_s": 8.751794837633724e-06,
+          "c_angular_real_rad_s": 3.1196508969557697e-06,
+          "c_angular_imag_rad_s": 1.0939743547042155e-06,
+          "e_folding_days": 1.3224800499554932,
+          "truncation_movement": 0.00030386183928017384,
+          "resolved": true
+        },
+        {
+          "m": 9,
+          "growth_rate_s": 7.02584855651871e-06,
+          "c_angular_real_rad_s": 3.43769504818028e-06,
+          "c_angular_imag_rad_s": 7.806498396131901e-07,
+          "e_folding_days": 1.6473560426143026,
+          "truncation_movement": 0.002300599264684102,
+          "resolved": false
+        },
+        {
+          "m": 10,
+          "growth_rate_s": 4.1379773791241964e-06,
+          "c_angular_real_rad_s": 3.7174322722004774e-06,
+          "c_angular_imag_rad_s": 4.1379773791241967e-07,
+          "e_folding_days": 2.79703657455076,
+          "truncation_movement": 0.06671596243454571,
+          "resolved": false
+        },
+        {
+          "m": 11,
+          "growth_rate_s": 1.3802034572131633e-06,
+          "c_angular_real_rad_s": 3.981521280646985e-06,
+          "c_angular_imag_rad_s": 1.2547304156483303e-07,
+          "e_folding_days": 8.385773860792854,
+          "truncation_movement": 0.06061919961257994,
+          "resolved": false
+        },
+        {
+          "m": 12,
+          "growth_rate_s": 2.506791891592037e-07,
+          "c_angular_real_rad_s": 5.8207233366109886e-06,
+          "c_angular_imag_rad_s": 2.088993242993364e-08,
+          "e_folding_days": 46.17086130242548,
+          "truncation_movement": 0.3901164132260918,
+          "resolved": false
+        }
+      ],
+      "m_star": 7,
+      "sigma_max_s": 9.44902989605484e-06,
+      "e_folding_days": 1.224895486774413,
+      "ripa": {
+        "c0_m_s": 19.999999999610477,
+        "c0_choice": "midpoint (condition (i) already failed)",
+        "gravity_wave_speed_m_s": 313.1478883850249,
+        "max_abs_c0_minus_ubar_m_s": 19.999999999610477,
+        "criticality_margin": 15.65739441955619,
+        "pv_gradient_sign_change": true,
+        "condition_i_pv_gradient": false,
+        "condition_ii_criticality": true,
+        "certifies_stable": false,
+        "note": "Sufficient, not necessary. Failure certifies nothing; only the conjunction of both conditions certifies stability."
+      }
+    },
+    {
+      "run_id": "I-05",
+      "umax_m_s": 80.0,
+      "physical": {
+        "R": 6371220.0,
+        "Omega": 7.292e-05,
+        "g": 9.80616,
+        "H": 10000.0
+      },
+      "modes": [
+        {
+          "m": 1,
+          "growth_rate_s": 2.9880517145042194e-06,
+          "c_angular_real_rad_s": 1.3791480769579025e-05,
+          "c_angular_imag_rad_s": 2.9880517145042194e-06,
+          "e_folding_days": 3.873451727054348,
+          "truncation_movement": 2.745735176877027e-05,
+          "resolved": true
+        },
+        {
+          "m": 2,
+          "growth_rate_s": 5.710230227466537e-06,
+          "c_angular_real_rad_s": 1.2624623149381537e-05,
+          "c_angular_imag_rad_s": 2.8551151137332684e-06,
+          "e_folding_days": 2.0269014756011257,
+          "truncation_movement": 7.792216231203804e-05,
+          "resolved": true
+        },
+        {
+          "m": 3,
+          "growth_rate_s": 7.550865018723718e-06,
+          "c_angular_real_rad_s": 1.1733677054153823e-05,
+          "c_angular_imag_rad_s": 2.516955006241239e-06,
+          "e_folding_days": 1.532814325957899,
+          "truncation_movement": 0.0002911207114920136,
+          "resolved": true
+        },
+        {
+          "m": 4,
+          "growth_rate_s": 1.4832428696982889e-05,
+          "c_angular_real_rad_s": 3.2269847828943243e-06,
+          "c_angular_imag_rad_s": 3.7081071742457222e-06,
+          "e_folding_days": 0.7803222459736748,
+          "truncation_movement": 3.5563427255490355e-08,
+          "resolved": true
+        },
+        {
+          "m": 5,
+          "growth_rate_s": 1.8891128686311464e-05,
+          "c_angular_real_rad_s": 4.620351811962432e-06,
+          "c_angular_imag_rad_s": 3.7782257372622924e-06,
+          "e_folding_days": 0.6126724488654118,
+          "truncation_movement": 2.6281015690011366e-08,
+          "resolved": true
+        },
+        {
+          "m": 6,
+          "growth_rate_s": 2.07484092455962e-05,
+          "c_angular_real_rad_s": 5.614342237418822e-06,
+          "c_angular_imag_rad_s": 3.458068207599367e-06,
+          "e_folding_days": 0.5578294671689418,
+          "truncation_movement": 4.836588293575562e-07,
+          "resolved": true
+        },
+        {
+          "m": 7,
+          "growth_rate_s": 2.073386282601708e-05,
+          "c_angular_real_rad_s": 6.369673254097411e-06,
+          "c_angular_imag_rad_s": 2.9619804037167258e-06,
+          "e_folding_days": 0.5582208279853572,
+          "truncation_movement": 1.4735585549332236e-05,
+          "resolved": true
+        },
+        {
+          "m": 8,
+          "growth_rate_s": 1.890542914261132e-05,
+          "c_angular_real_rad_s": 6.97747230309422e-06,
+          "c_angular_imag_rad_s": 2.363178642826415e-06,
+          "e_folding_days": 0.6122090107961126,
+          "truncation_movement": 0.00019631615402519267,
+          "resolved": true
+        },
+        {
+          "m": 9,
+          "growth_rate_s": 1.5164132508927582e-05,
+          "c_angular_real_rad_s": 7.496334890374033e-06,
+          "c_angular_imag_rad_s": 1.6849036121030646e-06,
+          "e_folding_days": 0.7632532930756223,
+          "truncation_movement": 0.0019691851631144126,
+          "resolved": false
+        },
+        {
+          "m": 10,
+          "growth_rate_s": 9.24705150719294e-06,
+          "c_angular_real_rad_s": 7.973701755819836e-06,
+          "c_angular_imag_rad_s": 9.24705150719294e-07,
+          "e_folding_days": 1.2516502222433852,
+          "truncation_movement": 0.09914464246523448,
+          "resolved": false
+        },
+        {
+          "m": 11,
+          "growth_rate_s": 2.5189690577381357e-06,
+          "c_angular_real_rad_s": 8.74041180102881e-06,
+          "c_angular_imag_rad_s": 2.2899718706710326e-07,
+          "e_folding_days": 4.594766274924715,
+          "truncation_movement": 0.4052831818723921,
+          "resolved": false
+        },
+        {
+          "m": 12,
+          "growth_rate_s": 4.884458287645839e-07,
+          "c_angular_real_rad_s": 1.252009428931812e-05,
+          "c_angular_imag_rad_s": 4.0703819063715324e-08,
+          "e_folding_days": 23.69571688911367,
+          "truncation_movement": 0.34562696160507506,
+          "resolved": false
+        }
+      ],
+      "m_star": 6,
+      "sigma_max_s": 2.07484092455962e-05,
+      "e_folding_days": 0.5578294671689418,
+      "ripa": {
+        "c0_m_s": 39.999999999220954,
+        "c0_choice": "midpoint (condition (i) already failed)",
+        "gravity_wave_speed_m_s": 313.1478883850249,
+        "max_abs_c0_minus_ubar_m_s": 39.999999999220954,
+        "criticality_margin": 7.828697209778095,
+        "pv_gradient_sign_change": true,
+        "condition_i_pv_gradient": false,
+        "condition_ii_criticality": true,
+        "certifies_stable": false,
+        "note": "Sufficient, not necessary. Failure certifies nothing; only the conjunction of both conditions certifies stability."
+      }
+    }
+  ],
+  "git": {
+    "commit": "b4871c7e4f19b8ff3e05d7d7a1279a694451ba4a",
+    "branch": "main",
+    "dirty": true,
+    "dirty_paths": [
+      "M src/solver/evp_hough.py",
+      " M src/solver/evp_stability.py",
+      " M src/solver/harness.py",
+      " M src/solver/initial_conditions/galewsky.py",
+      "?? runs/"
+    ]
+  },
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS-26.3.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "hostname": "Palaashs-MacBook-Air.local",
+    "dedalus": "3.0.5",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "mpi_size": 1,
+    "omp_num_threads": null
+  },
+  "config_sha256": "7c18821190f9cd301867d3f846c2f7314b8777bcdb6dbb5211468161ffc31a01",
+  "finished_utc": "2026-07-25T17:16:40+00:00"
+}

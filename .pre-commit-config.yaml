@@ -34,8 +34,17 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
+      # A run's provenance record is written read-only on purpose (see
+      # docs/CONVENTIONS.md, "Run provenance"): anything that later rewrites it
+      # should fail loudly rather than quietly produce a record that no longer
+      # describes the data beside it. These two hooks open files read-write
+      # unconditionally, so they must not be pointed at those records. The
+      # generator already emits a trailing newline and no trailing whitespace, so
+      # nothing is being skipped -- only the write attempt is.
       - id: end-of-file-fixer
+        exclude: '^runs/'
       - id: trailing-whitespace
+        exclude: '^runs/'
       - id: check-yaml
       - id: check-added-large-files
         args: [--maxkb=2048]
