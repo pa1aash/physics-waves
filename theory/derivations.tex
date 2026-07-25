@@ -1100,21 +1100,34 @@ barotropic potential-vorticity equation, while the jet it describes lives in the
 divergent shallow-water system, whose external deformation radius
 $L_d = \sqrt{gH}/2\Omega \approx 3\times10^{6}\ \mathrm{m}$ is comparable to the
 jet's own width. That is not a detail. \citet{paldor2020} compare
-barotropic-instability growth rates for a zonal jet on a sphere across the
-nondivergent, quasi-geostrophic and full shallow-water formulations, and report
-that at mean depths of $5$--$10\ \mathrm{km}$ the shallow-water growth rates can
-be smaller than the nondivergent ones by more than $50\%$, the three
-formulations converging only above about $30\ \mathrm{km}$. This project uses
-$H = 10\ \mathrm{km}$, inside the band where that discrepancy is largest.
+barotropic-instability growth rates on a sphere across the nondivergent,
+quasi-geostrophic and full shallow-water formulations, and find that the layer
+depth is a controlling parameter for the growth rate whose influence is
+``completely lost in the ND equation''. The three formulations agree only for
+depths of $30\ \mathrm{km}$ or more; below that the shallow-water growth rates
+fall \emph{below} the nondivergent ones, and at depths between $5$ and
+$10\ \mathrm{km}$ they can be smaller by more than $50\%$. The direction matters
+as much as the size: a nondivergent calculation \emph{overestimates}. This
+project uses $H = 10\ \mathrm{km}$, at the edge of the band where they report the
+largest discrepancy.
+
+Two honest qualifications on transferring that number here. Their jets are
+\emph{polar and equatorial}, whereas the jet of Section~\ref{sec:galewsky} is
+mid-latitude and centred near $45^\circ$; and their paper is cited from its
+published abstract, the full text having proved unobtainable (see
+\file{theory/PROVENANCE_AUDIT.md}). The figure is therefore taken as an
+order-of-magnitude indication that the bias is large and one-signed, not as a
+calibration constant for this configuration.
 
 Two consequences follow, and they govern how \eqref{eq:galewskygrowth} may be
 read. First, $\sigma$ is a \emph{nondivergent modal} growth rate, and carries a
 formulation-level bias of order tens of per cent relative to the shallow-water
-system the nonlinear runs integrate. Second, and because of the first, the
-apparent resolution of the calculation is illusory below that bias: the raw
-values at $m = 6$ and $m = 7$ differ by about $0.07\%$, but discriminating two
-wavenumbers at sub-per-cent separation inside a bias two orders of magnitude
-larger is not a physical claim. It is arithmetic on a biased operator.
+system the nonlinear runs integrate, and one that is expected to be an
+\emph{over}-estimate. Second, and because of the first, the apparent resolution
+of the calculation is illusory below that bias: the raw values at $m = 6$ and
+$m = 7$ differ by about $0.07\%$, but discriminating two wavenumbers at
+sub-per-cent separation inside a bias two orders of magnitude larger is not a
+physical claim. It is arithmetic on a biased operator.
 
 What survives is coarser and genuinely robust: growth is resolved for
 $1 \le m \le 8$, the peak sits on a broad \emph{plateau} spanning $m = 6$--$7$,

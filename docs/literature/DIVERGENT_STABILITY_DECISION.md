@@ -68,17 +68,25 @@ sphere, linear stability, growth rates compared across the nondivergent barotrop
 vorticity equation, the quasi-geostrophic equation and the full shallow-water
 equations. That is fragment e1's sentence, rearranged.
 
-From the authors' own EGU2020 conference abstract of the same work — **the journal
-paper is bronze open-access but blocked to scripted retrieval, so these numbers
-are attributed to the conference abstract, not to the journal text**: for mean
-depths between 5 and 10 km, growth rates from the shallow-water equations "can be
-smaller by more than 50%" than the nondivergent and quasi-geostrophic predictions;
-the three formulations converge only for depths of 30 km or more; and layer depth
-controls growth rates in a way "completely lost in the ND equation and is overly
-weak in the QG system."
+**Provenance upgraded in Session PRE-L5.** The journal PDF remains unobtainable
+(bronze open-access, blocked to scripted retrieval), but the **published
+abstract** was obtained, superseding L4b's reliance on the authors' conference
+abstract. Verbatim from it: layer depth is "a crucial parameter in controlling the
+growth rate" and this dependence "is completely lost in the ND equation and is
+overly weak in the QG system"; "Only for depths of 30 km or more are the growth
+rates predicted by the ND and QG systems a good approximation to those of the
+SWEs"; and "for depths of between 5 and 10 km they can be smaller by more than
+50%."
 
-**This project uses H = 10 km.** It is inside the band where the discrepancy is
-largest.
+**This project uses H = 10 km**, and the bias is one-signed: the nondivergent
+calculation **overestimates** growth rates.
+
+**Two qualifications the abstract also makes plain.** Their jets are **polar and
+equatorial**, not mid-latitude like the Galewsky jet; and they report regime
+boundaries specific to those jets (polar jets ill-defined below 2 km depth,
+equatorial jets stable below 3–4 km in the SWEs but unstable to 1 km under ND and
+QG). The >50% figure is therefore an order-of-magnitude indication that the bias
+is large and one-signed — not a calibration constant for this configuration.
 
 **(b) Applying Ripa's conditions to guide numerical test cases is also published,
 twice.** White & Staniforth (2009), *QJRMS*, `10.1002/qj.504`, extend Ripa's

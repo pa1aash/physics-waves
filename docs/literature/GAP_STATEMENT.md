@@ -105,13 +105,21 @@ to the jet's own width.
 
 This is not merely a scoping choice. Paldor, Shamir & Garfinkel (2020), *Geophys.
 Astrophys. Fluid Dyn.* **115**(1), 15–34, compare barotropic-instability growth
-rates for a zonal jet on the sphere across the nondivergent, quasi-geostrophic and
-full shallow-water formulations. Per the authors' own EGU2020 abstract of that
-work, shallow-water growth rates "can be smaller by more than 50%" than the
-nondivergent prediction at mean depths of 5–10 km, with the formulations
-converging only above 30 km, and layer depth controlling growth in a way
-"completely lost in the ND equation". **This project uses `H = 10 km`, inside the
-band where the discrepancy is largest.**
+rates on a sphere across the nondivergent, quasi-geostrophic and full
+shallow-water formulations. From the **published abstract**, obtained in Session
+PRE-L5 (an upgrade on L4b's conference-abstract source): layer depth is "a
+crucial parameter in controlling the growth rate" whose dependence "is completely
+lost in the ND equation"; the formulations agree only "for depths of 30 km or
+more"; and below that "the growth rates predicted by the SWEs become smaller than
+those of the ND and QG systems and for depths of between 5 and 10 km they can be
+smaller by more than 50%". **The nondivergent calculation overestimates**, and
+this project uses `H = 10 km`.
+
+Two qualifications on transferring that number. Their jets are **polar and
+equatorial**; this project's is mid-latitude, centred near 45°. And the paper is
+cited from its abstract, the full text being unobtainable. The figure is an
+order-of-magnitude indication that the bias is large and one-signed, not a
+calibration constant for this configuration.
 
 Two consequences the paper must carry. Growth rates are reported as *nondivergent
 modal* growth rates, with the formulation bias named and cited. And the reported
