@@ -12,16 +12,23 @@ Arm 1 - against the closed forms written in section 2
 ------------------------------------------------------------
   section-2 forms: all 8 components agree
 
-Arm 2 - against published 2-sphere values (colatitude, transported)
+Arm 2 - independent recomputation in the colatitude chart, transported
 ------------------------------------------------------------
-  published values: all 8 components agree
+  colatitude recomputation: all 8 components agree
 
-Arm 3 - physical payoff: divergence in physical components
+Arm 3 - Gaussian curvature implied by the connection
+------------------------------------------------------------
+  Ricci scalar from the computed connection: 2/R**2
+  Gaussian curvature K = R_scalar/2 = R**(-2), expected 1/R^2: agrees
+  A wrong connection could not reproduce the curvature of a sphere of
+  radius R, so this confirms the symbols with no source quoted.
+
+Arm 4 - physical payoff: divergence in physical components
 ------------------------------------------------------------
   sqrt(g) form vs section-3 divergence: exact zero
   contracted-Gamma form vs section-3 divergence: exact zero
 
-Arm 4 - physical payoff: momentum-equation metric terms
+Arm 5 - physical payoff: momentum-equation metric terms
 ------------------------------------------------------------
   zonal metric term  -u v tan(phi)/R: exact zero
   merid. metric term +u^2 tan(phi)/R: exact zero

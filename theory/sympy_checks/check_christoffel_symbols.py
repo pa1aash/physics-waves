@@ -21,15 +21,19 @@ What is checked.
 
    with all remaining components identically zero.
 
-2. The same symbols against the standard published values for the 2-sphere in
-   the colatitude convention (``Gamma^theta_{varphi varphi} = -sin theta cos
-   theta``, ``Gamma^varphi_{theta varphi} = cot theta``, e.g. any text on
-   Riemannian geometry), transported to the latitude convention by
-   ``phi = pi/2 - theta``. This is the independent cross-check: the latitude
-   forms above are re-derived from the published colatitude forms rather than
-   simply asserted alongside them.
+2. The same symbols against an *independent recomputation* in the colatitude
+   chart. The colatitude metric ``ds^2 = R^2 dtheta^2 + R^2 sin^2(theta)
+   dvarphi^2`` is built from scratch, the same Christoffel formula is run on it,
+   and the result is transported into the latitude chart by the tensor
+   transformation law under ``theta = pi/2 - phi``. Two independent computations
+   in two charts must agree afterwards. Nothing is quoted from any source.
 
-3. The physical payoff, verified rather than asserted: that the covariant
+3. The Gaussian curvature implied by the computed connection, which must be
+   ``1/R^2`` for a sphere of radius ``R``. A wrong connection cannot reproduce
+   the curvature of the manifold it is supposed to describe, so this closes the
+   loop internally rather than against a publication.
+
+4. The physical payoff, verified rather than asserted: that the covariant
    divergence ``(1/sqrt(g)) d_i(sqrt(g) V^i)`` reproduces the spherical
    divergence in physical (orthonormal) components used throughout section 3,
 
@@ -91,32 +95,96 @@ def expected_latitude():
     return E
 
 
-def published_colatitude_transported():
-    """Published 2-sphere values in colatitude, transported to latitude.
+def colatitude_recomputed_and_transported():
+    """Recompute in colatitude from its own metric, then transport to latitude.
 
-    In colatitude ``theta`` with azimuth ``varphi``, the standard non-zero
-    components are ``Gamma^theta_{varphi varphi} = -sin theta cos theta`` and
-    ``Gamma^varphi_{theta varphi} = Gamma^varphi_{varphi theta} = cot theta``.
-    Under the substitution ``theta = pi/2 - phi`` (so ``d/dtheta = -d/dphi``),
-    each index carried by ``theta`` contributes a factor ``dtheta/dphi = -1``
-    for a lower index and ``dphi/dtheta = -1`` for an upper index.
+    This arm quotes nothing. It builds the colatitude metric
+    ``ds^2 = R^2 dtheta^2 + R^2 sin^2(theta) dvarphi^2`` independently, runs the
+    same Christoffel formula on it, and then transports the result into the
+    latitude chart by the tensor transformation law under ``theta = pi/2 - phi``.
+    Two independent computations in two different charts must agree after the
+    transformation, so this is a genuine consistency check on the connection and
+    on the handling of the convention, with no external source involved.
+
+    (An earlier version of this script instead compared against colatitude values
+    written down from general familiarity and labelled "published values". That
+    was an unattributed claim of the kind this project's provenance rule exists
+    to prevent, and it has been replaced by the computation above. See
+    theory/PROVENANCE_AUDIT.md.)
     """
-    theta = sp.Symbol("theta", real=True)
-    lat = sp.pi / 2 - phi  # theta in terms of phi
+    theta, varphi = sp.symbols("theta varphi", real=True)
+    g_co = sp.Matrix([[R**2, 0], [0, R**2 * sp.sin(theta) ** 2]])
+    G_co = christoffel(g_co, (theta, varphi))  # indices ordered (theta, varphi)
 
-    g_theta_pp = sp.simplify((-sp.sin(theta) * sp.cos(theta)).subs(theta, lat))
-    g_phi_tp = sp.simplify(sp.cot(theta).subs(theta, lat))
+    # Transport to (lambda, phi) with lambda = varphi, phi = pi/2 - theta. The
+    # Jacobian is diagonal and constant: d(theta)/d(phi) = -1, d(varphi)/d(lambda) = 1.
+    # With coordinate order (lambda, phi) here and (theta, varphi) there, the
+    # index map is 0 <-> varphi(1), 1 <-> theta(0), with a sign on every theta index.
+    idx = {0: 1, 1: 0}  # latitude-chart index -> colatitude-chart index
+    sgn = {0: 1, 1: -1}  # sign carried by that index under the transformation
 
     n = 2
     E = [[[sp.S.Zero] * n for _ in range(n)] for _ in range(n)]
-    # Gamma^phi_{lambda lambda}: upper index theta -> phi gives one factor (-1);
-    # lower indices are both azimuthal, so unchanged.
-    E[1][0][0] = sp.simplify(-g_theta_pp)
-    # Gamma^lambda_{lambda phi}: upper index azimuthal (unchanged); one lower
-    # index theta -> phi gives one factor (-1).
-    E[0][0][1] = sp.simplify(-g_phi_tp)
-    E[0][1][0] = E[0][0][1]
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                # Upper index transforms with dx^k/dy, lower indices with dy/dx.
+                factor = sgn[k] * sgn[i] * sgn[j]
+                val = G_co[idx[k]][idx[i]][idx[j]]
+                E[k][i][j] = sp.simplify((factor * val).subs(theta, sp.pi / 2 - phi))
     return E
+
+
+def curvature_check(Gamma, lines):
+    """Independent confirmation: the connection must give Gaussian curvature 1/R^2.
+
+    A wrong connection would not reproduce the curvature of a sphere of radius R,
+    so this closes the loop without appealing to any external source at all.
+    """
+    n = 2
+    # Riemann tensor R^rho_{sigma mu nu} from the Christoffel symbols.
+    Riem = [[[[sp.S.Zero] * n for _ in range(n)] for _ in range(n)] for _ in range(n)]
+    for r in range(n):
+        for s in range(n):
+            for mu in range(n):
+                for nu in range(n):
+                    expr = sp.diff(Gamma[r][nu][s], COORDS[mu]) - sp.diff(
+                        Gamma[r][mu][s], COORDS[nu]
+                    )
+                    for lm in range(n):
+                        expr += (
+                            Gamma[r][mu][lm] * Gamma[lm][nu][s]
+                            - Gamma[r][nu][lm] * Gamma[lm][mu][s]
+                        )
+                    Riem[r][s][mu][nu] = sp.simplify(expr)
+
+    g = metric()
+    ginv = g.inv()
+    # Ricci scalar, then Gaussian curvature K = Ricci/2 in two dimensions.
+    ricci = [[sp.S.Zero] * n for _ in range(n)]
+    for s in range(n):
+        for nu in range(n):
+            ricci[s][nu] = sp.simplify(sum(Riem[r][s][r][nu] for r in range(n)))
+    scalar = sum(ginv[s, nu] * ricci[s][nu] for s in range(n) for nu in range(n))
+
+    # Rewrite tan as sin/cos before simplifying: sympy's simplify does not
+    # reduce (sin(2p)tan(p) + 3cos(2p) + 1)/(4cos^2 p) to 1 while the tangent
+    # is still present, and would otherwise leave a true identity looking false.
+    def _tidy(expr):
+        expr = expr.subs(sp.tan(phi), sp.sin(phi) / sp.cos(phi))
+        return sp.simplify(sp.trigsimp(sp.expand_trig(expr)))
+
+    scalar = _tidy(scalar)
+    K = _tidy(scalar / 2)
+    ok = _tidy(K - 1 / R**2) == 0
+    lines.append(f"  Ricci scalar from the computed connection: {scalar}")
+    lines.append(
+        f"  Gaussian curvature K = R_scalar/2 = {K}, expected 1/R^2: "
+        f"{'agrees' if ok else 'DISAGREES'}"
+    )
+    lines.append("  A wrong connection could not reproduce the curvature of a sphere of")
+    lines.append("  radius R, so this confirms the symbols with no source quoted.")
+    return ok
 
 
 def compare(computed, expected, label, lines):
@@ -252,21 +320,26 @@ def main() -> int:
     ok1 = compare(Gamma, expected_latitude(), "section-2 forms", lines)
 
     lines.append("")
-    lines.append("Arm 2 - against published 2-sphere values (colatitude, transported)")
+    lines.append("Arm 2 - independent recomputation in the colatitude chart, transported")
     lines.append("-" * 60)
-    ok2 = compare(Gamma, published_colatitude_transported(), "published values", lines)
+    ok2 = compare(Gamma, colatitude_recomputed_and_transported(), "colatitude recomputation", lines)
 
     lines.append("")
-    lines.append("Arm 3 - physical payoff: divergence in physical components")
+    lines.append("Arm 3 - Gaussian curvature implied by the connection")
     lines.append("-" * 60)
-    ok3 = divergence_check(Gamma, lines)
+    ok3 = curvature_check(Gamma, lines)
 
     lines.append("")
-    lines.append("Arm 4 - physical payoff: momentum-equation metric terms")
+    lines.append("Arm 4 - physical payoff: divergence in physical components")
     lines.append("-" * 60)
-    ok4 = metric_terms_check(Gamma, lines)
+    ok4 = divergence_check(Gamma, lines)
 
-    ok = ok1 and ok2 and ok3 and ok4
+    lines.append("")
+    lines.append("Arm 5 - physical payoff: momentum-equation metric terms")
+    lines.append("-" * 60)
+    ok5 = metric_terms_check(Gamma, lines)
+
+    ok = ok1 and ok2 and ok3 and ok4 and ok5
     lines.append("")
     lines.append(f"VERDICT: {'VERIFIED' if ok else 'MISMATCH'}")
 

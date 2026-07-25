@@ -209,10 +209,14 @@ $\Gamma^k_{\;ij} = \tfrac12 g^{kl}(\partial_i g_{jl} + \partial_j g_{il} -
 \label{eq:christoffel}
 \end{equation}
 %
-all others vanishing. These are the standard values for the $2$-sphere, written
-in latitude rather than colatitude; \file{check_christoffel_symbols.py}
-derives them from \eqref{eq:metric} and independently reproduces them by
-transporting the published colatitude forms through $\varphi = \pi/2 - \theta$.
+all others vanishing. These are the connection coefficients of the $2$-sphere,
+written in latitude rather than colatitude. They are not quoted from anywhere:
+\file{check_christoffel_symbols.py} derives them from \eqref{eq:metric} by the
+standard formula, then confirms them two further ways that need no external
+source at all --- by recomputing the connection independently in the colatitude
+chart and transporting it through $\varphi = \pi/2 - \theta$, and by checking
+that the Gaussian curvature it implies is $1/R^2$, which a wrong connection
+could not reproduce.
 
 \subsection{What the symbols do}
 
@@ -1215,12 +1219,13 @@ diverge as $k\to0$. Very long waves counter-propagate too fast to be held at a
 fixed relative phase by the coupling.
 \end{itemize}
 
-For Rayleigh's strip, \eqref{eq:crw} reduces exactly to the published
-nondimensional dispersion relation
+For Rayleigh's strip, \eqref{eq:crw} reduces exactly to the nondimensional
+dispersion relation of \citet[Eq.~(6), p.~2838]{heifetz1999},
 $C = \pm(2K)^{-1}\sqrt{(K-1)^2 - e^{-2K}}$ with $K = 2kb$, and returns the
-published numbers: a cutoff at $K_c = 1.2785$ where $K_c - 1 = e^{-K_c}$, an
-optimum at $K_m = 0.7968$, and a peak growth rate equal to $0.2012$ times the
-shear. This is the external validation of the model --- it is an exact reduction
+numbers stated on that same page: a cutoff at $K_c = 1.2785$ where
+$K_c - 1 = e^{-K_c}$ (against their $\approx 1.28$), an
+optimum at $K_m = 0.7968$ (their $\approx 0.8$), and a peak growth rate equal to
+$0.2012$ times the shear (their ``about $20\%$''). This is the external validation of the model --- it is an exact reduction
 for piecewise-constant potential vorticity, not a cartoon fitted after the fact.
 
 \subsection{What the toy model does and does not predict}
