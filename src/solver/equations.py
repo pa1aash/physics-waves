@@ -178,7 +178,9 @@ def build_domain(config: dict, dtype=np.float64):
     return coords, dist, basis, units, params, shape
 
 
-def build_problem(config: dict, *, topography=None, dtype=np.float64) -> ShallowWaterProblem:
+def build_problem(
+    config: dict, *, topography=None, advection: bool = False, dtype=np.float64
+) -> ShallowWaterProblem:
     """Assemble the shallow-water IVP for one validated config.
 
     Parameters
@@ -186,11 +188,28 @@ def build_problem(config: dict, *, topography=None, dtype=np.float64) -> Shallow
     config
         A configuration dict already validated against ``configs/_schema.yaml``.
     topography
-        Optional bottom-topography field ``h_b`` in working units, on the same
-        basis. Required by Williamson case 5 (flow over an isolated mountain) and
-        unused by every other case. When present the fluid column depth becomes
-        ``H + h - h_b``, so the topography enters the mass flux while ``h``
-        remains the free-surface elevation that drives the pressure gradient.
+        Optional bottom topography ``h_b`` in working units, given as a grid
+        array (or an existing field on this basis). Required by Williamson case 5
+        (flow over an isolated mountain) and by the Läuter case, whose source does
+        not absorb the centrifugal potential into gravity; unused by every other
+        case. When present the fluid column depth becomes ``H + h - h_b``, so the
+        topography enters the mass flux while ``h`` remains the free-surface
+        elevation that drives the pressure gradient. A grid array is accepted, and
+        preferred, because the basis it must live on is created inside this
+        function — a caller cannot build the field before the domain exists.
+    advection
+        Build the *advection-only* problem instead: a prescribed, non-evolving
+        velocity transporting ``h`` as a passive tracer,
+
+            dt(h) + nu*L^p(h) = -u@grad(h) .
+
+        This is not a degenerate shallow-water problem, it is a different one, and
+        it exists because Williamson et al. define their case 1 that way — "the
+        only case of the suite that does not deal with the complete shallow water
+        equations. It tests the advective component in isolation." Running case 1
+        through the full system would let the height field push the wind around
+        and would no longer be that test. Nothing else in the project uses this
+        path.
     """
     coords, dist, basis, units, params, shape = build_domain(config, dtype=dtype)
 
@@ -219,6 +238,11 @@ def build_problem(config: dict, *, topography=None, dtype=np.float64) -> Shallow
     u = dist.VectorField(coords, name="u", bases=basis)
     h = dist.Field(name="h", bases=basis)
 
+    if topography is not None and not hasattr(topography, "change_scales"):
+        grid = np.asarray(topography)
+        topography = dist.Field(name="hb", bases=basis)
+        topography["g"] = grid
+
     zcross = lambda A: d3.MulCosine(d3.skew(A))  # noqa: E731
 
     def hyper(field):
@@ -242,6 +266,24 @@ def build_problem(config: dict, *, topography=None, dtype=np.float64) -> Shallow
         lap=d3.lap,
         skew=d3.skew,
     )
+    if advection:
+        # The wind is data, not a variable: only h is evolved, and the velocity
+        # field keeps whatever an initial condition wrote into it.
+        problem = d3.IVP([h], namespace=namespace)
+        problem.add_equation("dt(h) + nu*hyper(h) = -u@grad(h)")
+        return ShallowWaterProblem(
+            coords=coords,
+            dist=dist,
+            basis=basis,
+            u=u,
+            h=h,
+            problem=problem,
+            units=units,
+            params=params,
+            shape=shape,
+            topography=topography,
+        )
+
     problem = d3.IVP([u, h], namespace=namespace)
 
     # Momentum: pressure gradient, Coriolis and hyperdiffusion are linear and go
