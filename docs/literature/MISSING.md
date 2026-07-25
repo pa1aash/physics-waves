@@ -1,4 +1,39 @@
-# Unobtainable references and their mitigation
+# References not held, and their mitigation
+
+Sources fall into two categories, and the distinction matters: some are
+genuinely unobtainable to this project, and one is simply blocked to automated
+retrieval and needs a single human click.
+
+## Blocked to scripts, obtainable by the operator
+
+| Suggested filename | Full citation | Where |
+|--------------------|---------------|-------|
+| `haurwitz_1940b_spherical_rossby_haurwitz_waves.pdf` | Haurwitz, B. (1940b). The motion of atmospheric disturbances on the spherical Earth. *Journal of Marine Research*, 3(3), 254–267. | [EliScholar record](https://elischolar.library.yale.edu/journal_of_marine_research/575/) |
+
+**Status.** Free, open access, and a stable URL — but the bepress platform
+hosting it answers scripted requests with HTTP 403, so Session L3-PATCH could not
+download it (three retrieval routes tried: `curl` with browser headers and a
+cookie jar, the project's `hyperresearch fetch`, and a direct `HEAD`). It needs
+an operator to open the link and save the PDF. **One click, not a research task.**
+
+**Why the project is not blocked.** This is the paper containing the spherical
+Rossby–Haurwitz result `c_ang = −2Ω/[n(n+1)]`, but nothing depends on reading it:
+§5 of `theory/derivations.tex` derives that result from first principles and
+`theory/sympy_checks/check_rh_dispersion.py` verifies it symbolically for nine
+`(n, m)` pairs. The citation is bibliographic attribution, not evidence.
+
+**Citation grounding already achieved.** Volume, issue and year (3(3), 1940) are
+confirmed live from the publisher's own landing page. The page range 254–267 is
+confirmed from the reference list of Thuburn & Li (2000), a PDF this project
+holds and has read — not from recollection.
+
+*Note.* The file previously named
+`haurwitz_1940_motion_of_atmospheric_disturbances.pdf` is **not** this paper. It
+is Haurwitz (1940a), *J. Mar. Res.* 3(1), 35–50, the beta-plane extension of
+Rossby (1939), whose own text defers the spherical case to a later paper. It was
+renamed `haurwitz_1940a_beta_plane_extension.pdf` in Session L3-PATCH.
+
+## Genuinely unobtainable
 
 Two sources associated with **extension B** (the divergent shallow-water
 eigenmodes — Hough functions / Laplace's tidal equations) could not be obtained
