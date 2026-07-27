@@ -12,4 +12,7 @@ export MKL_NUM_THREADS=1
 export NUMEXPR_NUM_THREADS=1
 export VECLIB_MAXIMUM_THREADS=1
 export HDF5_USE_FILE_LOCKING=FALSE
-export PYTHONPATH="$(git rev-parse --show-toplevel):${PYTHONPATH}"
+# The :- default matters: this file is sourced by scripts running under
+# `set -euo pipefail`, where an unset PYTHONPATH would abort the launcher before
+# it reached the solver.
+export PYTHONPATH="$(git rev-parse --show-toplevel):${PYTHONPATH:-}"
