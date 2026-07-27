@@ -87,7 +87,11 @@ sweep: ## plan a campaign: `make sweep CAMPAIGN=phase_speed [ARGS=--dry-run]`
 	python scripts/sweep.py $(CAMPAIGN) $(ARGS)
 
 sync: ## mirror the working tree to the compute pod
-	bash scripts/sync_pod.sh
+	bash scripts/sync_pod.sh push
+
+sync-pull: ## bring one run's output back from the pod: `make sync-pull RUN=P-12`
+	@test -n "$(RUN)" || (echo "usage: make sync-pull RUN=<RUN_ID>" && exit 2)
+	bash scripts/sync_pod.sh pull $(RUN)
 
 clean: ## remove Python caches and scratch
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
