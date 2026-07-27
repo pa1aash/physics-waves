@@ -46,10 +46,16 @@ spacing), so full sweeps run at L1 and L3 is reserved for the two reference runs
 
 | Label | Nφ × Nθ | Use | Measured wall time |
 |-------|---------|-----|--------------------|
-| L0 | 128 × 64 | Rapid iteration, debugging (local) | 37 s (Phase-0 example, n=4; below) |
+| L0 | 64 × 32 | Rapid iteration, debugging (local) | see cost tracking below |
 | L1 | 256 × 128 | Production baseline (pod) | 110 s (Phase-0 example, n=4; below) |
 | L2 | 512 × 256 | Convergence rung (pod) | TBD — Session R1 |
 | L3 | 1024 × 512 | Reference-solution generation (pod) | TBD — Session R1 |
+
+The grid shapes are `RESOLUTIONS` in `src/solver/equations.py`, which is what
+the solver actually uses and therefore authoritative. **This table previously
+gave L0 as 128 × 64**, which was never the project's L0 — it was the grid the
+Phase-0 example ran on, and the two were conflated. Corrected in Session L7a;
+the Phase-0 row below is left as measured and is labelled accordingly.
 
 ## Phase-0 gate — first measured local timings (Session L1)
 
@@ -63,10 +69,13 @@ calibration, not a final budget.
 - **MPI correctness.** `n = 1, 2, 4` agree to ≈ 10⁻¹⁵ relative (machine
   precision) — automatic MPI domain decomposition is sound here.
 
-| Resolution | Procs | Wall-clock | Core-hours (procs·wall/3600) |
-|------------|-------|-----------|------------------------------|
-| L0 (128 × 64) | 4 | 37 s | 0.041 |
-| L1 (256 × 128) | 4 | 110 s | 0.122 |
+These are the *example's* grids, not this project's rungs: 128 × 64 is not L0
+(see the correction above), though 256 × 128 does coincide with L1.
+
+| Example grid | Procs | Wall-clock | Core-hours (procs·wall/3600) |
+|--------------|-------|-----------|------------------------------|
+| 128 × 64 | 4 | 37 s | 0.041 |
+| 256 × 128 (= L1) | 4 | 110 s | 0.122 |
 
 Halving each grid dimension gives ≈ 3× speedup. Extrapolating naively (transform
 cost grows faster than `N²` and the stable timestep shrinks with grid spacing),

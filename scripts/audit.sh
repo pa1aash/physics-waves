@@ -250,10 +250,15 @@ else
 fi
 
 # 29. The operational commands run without an unhandled exception (a graceful
-#     message is a pass; a Python traceback is not); `make sweep` fails on
-#     purpose. `make verify` is excluded here — it calls `make audit`, so running
-#     it inside this audit would recurse; instead its script is syntax-checked,
-#     and its constituents (this audit, pytest, the gate record) are each checked.
+#     message is a pass; a Python traceback is not). `make verify` is excluded
+#     here — it calls `make audit`, so running it inside this audit would recurse;
+#     instead its script is syntax-checked, and its constituents (this audit,
+#     pytest, the gate record) are each checked.
+#
+#     `make sweep` was a deliberate stub until Session L7a and this check used to
+#     assert it said so. It is now implemented, so what is asserted instead is the
+#     contract it actually has: no campaign named is a usage error, and a named
+#     campaign plans without executing.
 cmd29=1; why=""
 if command -v make >/dev/null 2>&1; then
   for t in refcheck manuscript; do
@@ -262,9 +267,15 @@ if command -v make >/dev/null 2>&1; then
   done
   make figure ARGS=--style-preview >/tmp/pw_cmd29_figure.log 2>&1 || true
   grep -qiE 'Traceback \(most recent call last\)' /tmp/pw_cmd29_figure.log && { cmd29=0; why="$why figure:traceback"; }
-  if make sweep >/tmp/pw_cmd29_sweep.log 2>&1; then cmd29=0; why="$why sweep:exited-0"; fi
-  grep -qi 'NOT YET IMPLEMENTED' /tmp/pw_cmd29_sweep.log || { cmd29=0; why="$why sweep:no-message"; }
+  if make sweep >/tmp/pw_cmd29_sweep.log 2>&1; then cmd29=0; why="$why sweep:no-campaign-exited-0"; fi
+  grep -qi 'usage: make sweep' /tmp/pw_cmd29_sweep.log || { cmd29=0; why="$why sweep:no-usage"; }
+  make sweep CAMPAIGN=phase_speed ARGS=--dry-run >/tmp/pw_cmd29_sweepdry.log 2>&1 \
+    || { cmd29=0; why="$why sweep:dry-run-failed"; }
+  grep -qiE 'Traceback \(most recent call last\)' /tmp/pw_cmd29_sweepdry.log && { cmd29=0; why="$why sweep:traceback"; }
+  grep -q 'plan not written' /tmp/pw_cmd29_sweepdry.log || { cmd29=0; why="$why sweep:dry-run-wrote-a-plan"; }
   bash -n scripts/verify.sh 2>/dev/null || { cmd29=0; why="$why verify:syntax"; }
+  bash -n scripts/run_mpi.sh 2>/dev/null || { cmd29=0; why="$why run_mpi:syntax"; }
+  bash -n scripts/sync_pod.sh 2>/dev/null || { cmd29=0; why="$why sync_pod:syntax"; }
   if [ "$cmd29" -eq 1 ]; then
     pass "29. operational commands execute without unhandled exceptions"
   else
@@ -702,6 +713,62 @@ if python -m pytest tests/test_analysis_pipeline.py -q \
   pass "52. shear ladder and thresholds still reproduce Session L5"
 else
   bad "52. the stability sweep no longer reproduces Session L5's shear ladder"
+fi
+
+# 53. Output cadence scales with rotation rate, in both directions, and the
+#     scaling actually defeats the aliasing failure Session L6 found. This is the
+#     load-bearing check of Session L7a: an undersampled phase-speed run returns a
+#     confident answer of the wrong magnitude AND the wrong sign, while every
+#     indicator computable from its own output reads comfortable. The test
+#     fabricates that wave and confirms the fit recovers the truth at the scaled
+#     cadence and the alias at the stated one.
+if python -m pytest tests/test_sweep_cadence.py -q \
+     -k "scales_down or scales_up or holds_samples_per_period or unscaled_cadence_aliases or \
+         naive_margin_indicator or scaled_cadence_recovers or no_planned_cadence" \
+     >/dev/null 2>&1; then
+  pass "53. cadence scales with Omega in both directions and defeats the alias"
+else
+  bad "53. the Omega-dependent cadence scaling no longer holds"
+fi
+
+# 54. The resume-on-failure path identifies an interrupted run from a fabricated
+#     provenance record, without needing a real Dedalus run to die first. Session
+#     L7a chose clean-restart-from-archive over checkpoint-resume (docs/COMPUTE.md,
+#     "Resume on failure"), so what is checked is detection plus a non-destructive
+#     archive, never state reconstruction.
+if python -m pytest tests/test_resume_check.py -q \
+     -k "failed_run_is_identified or killed_run_is_identified or archiving_moves or \
+         archived_record_is_still_read_only or default_invocation_changes_nothing" \
+     >/dev/null 2>&1; then
+  pass "54. an incomplete run is detected and archived without losing anything"
+else
+  bad "54. resume_check no longer detects or safely archives an incomplete run"
+fi
+
+# 55. The pod sync's flags and exclusions are exercised against a throwaway local
+#     directory standing in for the pod, with no pod reachable. runs/ is
+#     gitignored, so this script is the only route run data has between machines,
+#     and a wrong exclusion pattern does not fail -- it silently moves the wrong
+#     thing, or silently omits the one file that mattered.
+if python -m pytest tests/test_sync_pod.py -q \
+     -k "dry_run_lists_the_expected_files or dry_run_excludes_caches or \
+         real_pull_brings_the_run or refuses_to_overwrite or never_carries_run_output" \
+     >/dev/null 2>&1; then
+  pass "55. sync dry-run produces the expected file list against the local stand-in"
+else
+  bad "55. the pod sync no longer transfers the expected files, or lost its guards"
+fi
+
+# 56. The harness runs on more than one MPI rank. Every run recorded before
+#     Session L7a was serial, and two bugs hid behind that: a rank-local area
+#     average that raised IndexError on every rank but one, and every rank racing
+#     to write the provenance record so the first set the read-only tripwire and
+#     the next tripped it. Neither could produce a wrong number -- both aborted
+#     before the physics started -- but both made the pod unusable.
+if python -m pytest tests/test_mpi_harness.py -q >/dev/null 2>&1; then
+  pass "56. the harness survives and agrees across MPI ranks"
+else
+  bad "56. the harness no longer runs correctly on more than one MPI rank"
 fi
 
 echo "== $( [ "$fail" -eq 0 ] && echo "AUDIT PASSED" || echo "AUDIT FAILED ($fail check(s))" ) =="
