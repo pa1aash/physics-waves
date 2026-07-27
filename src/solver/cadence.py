@@ -45,13 +45,25 @@ rotation sweep is then sampled at the same phase density, so a residual trend of
 measured speed against ``Omega`` is physics rather than a sampling artefact —
 which matters, because that trend *is* the campaign's result.
 
-**Two reasons a cadence gets overridden, and they are not the same.** Scaling to
-constant density will sometimes tighten a cadence that was never in danger of
-aliasing: ``slice_cadence: 3600`` at ``4 Omega_0`` sits at ``0.067 pi`` per
-sample, perfectly safe, and is still tightened to ``900`` so its sampling density
-matches the rest of the sweep. That is a methodological override, not a rescue.
-:class:`CadenceDecision` records ``aliased_as_stated`` separately from
-``overridden`` so the two never get confused in a plan file.
+**Rotation is not the only thing that makes a wave fast, so there are two
+bounds.** Eq. (cadscale) is a *relative* statement — it holds sampling constant
+against the Earth-rate member of the same sweep — and it therefore says nothing
+about the wavenumber sweep, where ``Omega`` is fixed and ``n`` varies instead.
+There it is ``1/[n(n+1)]`` that does the work: ``P-01`` at ``n = 2`` travels five
+times faster than ``P-07`` at ``n = 8``, and the shared Earth-rate snapshot
+cadence advances its phase by ``1.34 pi`` per sample. Aliased, at Earth rate,
+with no rotation factor available to rescue it. So :func:`nyquist_safe_cadence`
+supplies an absolute floor from the mode itself, eq. (cadsafe), and a plan
+applies whichever bound is tighter, recording which one bound it in
+``CadenceDecision.bound_by``.
+
+**Overridden is not the same as rescued.** Scaling to constant density will
+sometimes tighten a cadence that was never in danger: ``slice_cadence: 3600`` at
+``4 Omega_0`` sits at ``0.067 pi`` per sample, perfectly safe, and is still
+tightened to ``900`` so its sampling density matches the rest of the sweep. That
+is a methodological override. :class:`CadenceDecision` records
+``aliased_as_stated`` separately from ``overridden`` so a plan file never makes
+the two look alike.
 """
 
 from __future__ import annotations
@@ -76,6 +88,15 @@ CADENCE_KEYS: tuple[str, ...] = ("snapshot_cadence", "slice_cadence", "spectra_c
 #: aliased outright. Exactly 1.0 is the Nyquist limit; there is no tolerance to
 #: choose here, it is where unwrapping stops being invertible.
 NYQUIST_LIMIT_PI: float = 1.0
+
+#: The phase step the safety floor targets, as a fraction of ``pi``. Set at the
+#: boundary ``src/analysis/fit_phase_speed.py`` uses to stop calling a fit's
+#: aliasing risk "none", so a cadence this module applies is one that fitter will
+#: not complain about. Sitting just under the Nyquist limit would be resolved in
+#: principle and worthless in practice: a wave sampled twice per period has no
+#: margin for a mode whose speed differs from the prediction, which is precisely
+#: the departure this campaign is trying to measure.
+SAFE_PHASE_STEP_PI: float = 0.5
 
 #: Below this many samples across the whole integration a fit is reported as
 #: thin. Scaling *up* at low rotation rates is correct — the wave really is
@@ -133,6 +154,40 @@ def samples_per_period(cadence_s: float, degree_n: int, order_m: int, omega: flo
     return math.inf if step == 0 else 2.0 * math.pi / step
 
 
+def nyquist_safe_cadence(
+    degree_n: int,
+    order_m: int,
+    omega: float,
+    target_phase_step_pi: float = SAFE_PHASE_STEP_PI,
+) -> float:
+    """The longest interval that still resolves this mode, with margin.
+
+    Inverting ``m |c_ang| dt = target * pi`` gives
+
+        dt_safe = target * pi * n(n+1) / (2 m Omega)                eq. (cadsafe)
+
+    **This is a different constraint from eq. (cadscale), and it is needed because
+    rotation rate is not the only thing that sets how fast the wave moves.** The
+    density rule holds sampling constant *relative to the Earth-rate member of the
+    same sweep*, which is exactly right for the rotation sweep and says nothing at
+    all about the wavenumber sweep, where ``Omega`` is fixed and ``n`` varies.
+    Since ``c_ang`` goes as ``1/[n(n+1)]``, the low-degree end is the fast end:
+    ``P-01`` at ``n = 2`` travels five times faster than ``P-07`` at ``n = 8``, and
+    the single Earth-rate cadence every stub shares advances its phase by
+    ``1.34 pi`` per snapshot — past Nyquist, at Earth rate, with no rotation
+    scaling available to rescue it.
+
+    So a plan applies whichever of the two bounds is tighter. The density rule
+    makes the rotation sweep comparable; this floor makes every run measurable.
+    """
+    if omega <= 0:
+        raise ValueError(f"rotation rate must be positive, got {omega}")
+    speed = abs(angular_phase_speed(degree_n, omega))
+    if speed == 0:
+        return math.inf
+    return target_phase_step_pi * math.pi / (order_m * speed)
+
+
 @dataclass(frozen=True)
 class CadenceDecision:
     """What the plan does to one output cadence of one config, and why.
@@ -152,6 +207,11 @@ class CadenceDecision:
     reason: str
     omega: float
     omega_ratio: float
+    #: Which constraint set ``applied_s``: ``"stated"`` (the config was already
+    #: fine), ``"density"`` (eq. cadscale, sweep comparability) or ``"nyquist"``
+    #: (eq. cadsafe, the mode is simply too fast for the stated interval).
+    bound_by: str = "stated"
+    safe_s: float | None = None
     phase_step_stated_pi: float | None = None
     phase_step_applied_pi: float | None = None
     aliased_as_stated: bool = False
@@ -265,16 +325,33 @@ def plan_cadences(
         base = float((baseline or {}).get(key, stated))
         required = scale_cadence(base, omega, omega_reference)
 
-        # Tighten, never loosen. A config that already samples finer than the
-        # requirement is respected as written.
-        if stated <= required * (1.0 + 1e-9):
-            applied, overridden = stated, False
+        # The Nyquist floor, where the mode is known. This is independent of the
+        # density rule and binds where that rule cannot reach -- most visibly at
+        # the fast, low-degree end of the wavenumber sweep, where Omega is fixed
+        # at Earth rate and there is no scaling factor to apply.
+        safe = None
+        if degree_n is not None and order_m is not None:
+            safe = nyquist_safe_cadence(degree_n, order_m, omega)
+
+        # Tighten, never loosen: apply whichever bound is tightest, and record
+        # which one it was. A config that already samples finer than both is
+        # respected exactly as written.
+        target = required if safe is None else min(required, safe)
+        if stated <= target * (1.0 + 1e-9):
+            applied, overridden, bound_by = stated, False, "stated"
             reason = (
                 f"stated {stated:g} s already samples at least as finely as the "
-                f"{required:g} s required at Omega = {omega_ratio:g} Omega_0"
+                f"{target:g} s required at Omega = {omega_ratio:g} Omega_0"
+            )
+        elif safe is not None and safe < required:
+            applied, overridden, bound_by = safe, True, "nyquist"
+            reason = (
+                f"stated {stated:g} s advances the phase of the (n={degree_n}, m={order_m}) "
+                f"mode too far per sample; overridden to {safe:g} s, the longest interval "
+                f"that keeps the step at {SAFE_PHASE_STEP_PI:g} x pi, eq. (cadsafe)"
             )
         else:
-            applied, overridden = required, True
+            applied, overridden, bound_by = required, True, "density"
             reason = (
                 f"stated {stated:g} s is coarser than the {required:g} s required to hold "
                 f"sampling density constant at Omega = {omega_ratio:g} Omega_0 "
@@ -300,6 +377,8 @@ def plan_cadences(
             reason=reason,
             omega=omega,
             omega_ratio=omega_ratio,
+            bound_by=bound_by,
+            safe_s=safe,
             phase_step_stated_pi=step_stated,
             phase_step_applied_pi=step_applied,
             aliased_as_stated=aliased,

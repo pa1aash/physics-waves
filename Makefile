@@ -82,11 +82,9 @@ run: ## integrate one run: `make run CONFIG=configs/verification/V-02.yaml [ARGS
 configs: ## re-derive every solver-dependent config value from the stated policy
 	python scripts/resolve_configs.py $(ARGS)
 
-sweep:
-	@echo "NOT YET IMPLEMENTED."
-	@echo "One run at a time works now: make run CONFIG=configs/<campaign>/<ID>.yaml"
-	@echo "The multi-run pod sweep generator arrives in Session L7."
-	@exit 1
+sweep: ## plan a campaign: `make sweep CAMPAIGN=phase_speed [ARGS=--dry-run]`
+	@test -n "$(CAMPAIGN)" || (echo "usage: make sweep CAMPAIGN=verification|phase_speed|instability" && exit 2)
+	python scripts/sweep.py $(CAMPAIGN) $(ARGS)
 
 sync: ## mirror the working tree to the compute pod
 	bash scripts/sync_pod.sh

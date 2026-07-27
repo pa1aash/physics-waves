@@ -31,7 +31,9 @@ from src.analysis.fit_phase_speed import fit_phase_speed
 from src.analysis.hough import nondivergent_angular_phase_speed
 from src.solver.cadence import (
     EARTH_OMEGA,
+    SAFE_PHASE_STEP_PI,
     angular_phase_speed,
+    nyquist_safe_cadence,
     phase_step_rad,
     plan_cadences,
     samples_per_period,
@@ -337,6 +339,72 @@ def test_the_real_rotation_sweep_is_planned_correctly(run_id, omega_ratio):
     # Every applied cadence in the sweep must resolve the wave, whatever the
     # config said. This is the property the whole session turns on.
     assert snapshot.phase_step_applied_pi < 1.0
+
+
+# --------------------------------------------------------------------------
+# 6. The second bound: the wavenumber sweep, where Omega is fixed and it is the
+#    mode degree that makes the wave fast.
+# --------------------------------------------------------------------------
+
+
+def test_the_nyquist_floor_inverts_the_phase_step_exactly():
+    """``dt_safe`` is defined by ``m |c_ang| dt = 0.5 pi``, so it must return it."""
+    omega = EARTH_OMEGA
+    safe = nyquist_safe_cadence(DEGREE_N, ORDER_M, omega)
+    assert phase_step_rad(safe, DEGREE_N, ORDER_M, omega) / math.pi == pytest.approx(
+        SAFE_PHASE_STEP_PI, rel=1e-12
+    )
+
+
+def test_low_degree_modes_alias_at_earth_rate_on_the_stated_cadence():
+    """P-01's real problem: n=2 is the fast end of the wavenumber sweep.
+
+    ``c_ang`` goes as ``1/[n(n+1)]``, so degree 2 travels five times faster than
+    degree 8. The single Earth-rate cadence every P-* stub shares is past Nyquist
+    for it, and no rotation scaling applies because Omega/Omega_0 is exactly 1.
+    """
+    step_pi = phase_step_rad(BASELINE_SNAPSHOT_S, 2, ORDER_M, EARTH_OMEGA) / math.pi
+    assert step_pi == pytest.approx(1.337, abs=1e-3)
+    assert step_pi > 1.0
+
+
+def test_the_plan_rescues_a_low_degree_config_the_density_rule_cannot_reach():
+    config = config_at(1.0)
+    config["initial_condition_params"]["degree_n"] = 2
+    plan = plan_cadences(config)
+    snapshot = plan.decisions["snapshot_cadence"]
+
+    # The density rule alone would have changed nothing: this config is already
+    # at Earth rate, so its scaling factor is exactly one.
+    assert snapshot.required_s == pytest.approx(BASELINE_SNAPSHOT_S)
+    assert snapshot.aliased_as_stated is True
+
+    # The Nyquist floor is what saves it.
+    assert snapshot.bound_by == "nyquist"
+    assert snapshot.overridden is True
+    assert snapshot.phase_step_applied_pi == pytest.approx(SAFE_PHASE_STEP_PI, rel=1e-9)
+
+
+def test_the_density_rule_still_binds_where_it_is_the_tighter_of_the_two():
+    """At 4 Omega_0 with n=4 the sweep-parity requirement is the active bound."""
+    snapshot = plan_cadences(config_at(4.0)).decisions["snapshot_cadence"]
+    assert snapshot.bound_by == "density"
+    assert snapshot.applied_s == pytest.approx(BASELINE_SNAPSHOT_S / 4.0)
+
+
+@pytest.mark.parametrize("run_id", [f"P-{i:02d}" for i in range(1, 19)])
+def test_no_planned_cadence_in_the_whole_campaign_aliases(run_id):
+    """The property the session turns on, asserted over every committed P config."""
+    with open(f"{REPO_CONFIGS}/{run_id}.yaml", encoding="utf-8") as handle:
+        config = yaml.safe_load(handle)
+    plan = plan_cadences(config, baseline={"snapshot_cadence": BASELINE_SNAPSHOT_S})
+
+    for key, decision in plan.decisions.items():
+        assert decision.phase_step_applied_pi is not None, key
+        assert decision.phase_step_applied_pi < 1.0, (
+            f"{run_id} {key}: planned cadence still advances the phase "
+            f"{decision.phase_step_applied_pi:.2f} x pi per sample"
+        )
 
 
 def test_the_committed_rotation_sweep_contains_a_real_aliasing_bug():
