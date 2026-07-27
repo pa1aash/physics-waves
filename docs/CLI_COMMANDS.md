@@ -16,7 +16,7 @@ tool.
 | `/refcheck` | `make refcheck` | **Partially implemented** (works now; full power once a real `.bib` exists) | Session L4 |
 | `/manuscript` | `make manuscript` | **Partially implemented** (compiles whatever LaTeX exists now; full build with the Springer manuscript) | Session L11 |
 | `/figure` | `make figure` | **Stub** (a style-preview mode works now) | Session L10 |
-| `/sweep` | `make sweep` | **Stub — explicit NotImplemented** | Sessions L5 / L7 |
+| `/sweep` | `make sweep CAMPAIGN=<name>` | Plans a campaign: validates configs, scales cadences, writes a plan file | Session L7a |
 
 A stub is never a silent no-op: it prints which future session completes it and
 exits non-zero, so invoking it early produces an informative message rather than
@@ -113,10 +113,19 @@ uses to catch a hand-edited config drifting away from the policy.
 **Expected output shape:** one `[resolve-configs] updated <path>` line per changed
 file, then a count.
 
-## `make sweep` → Makefile stub — explicit NotImplemented
+## `make sweep CAMPAIGN=<name> [ARGS=--dry-run]` → `scripts/sweep.py`
 
-Prints that single runs work now via `make run` and that the multi-run pod sweep
-generator arrives in Session L7, then exits non-zero. No hidden behaviour.
+Plans one campaign (`verification`, `phase_speed` or `instability`). Validates
+every config against `configs/_schema.yaml`, rejects any surviving
+`TBD_SESSION_L5` placeholder, chooses MPI ranks from the resolution rung, and
+scales each output cadence to the config's rotation rate and mode — see
+`docs/CONVENTIONS.md`, "Sweep execution", for why the cadence is the point.
 
-**Expected output shape:** the three-line "NOT YET IMPLEMENTED" message and
-exit 1.
+**Executes nothing.** It writes `runs/_sweep_plans/<campaign>_<timestamp>.json`;
+`scripts/run_mpi.sh` runs one entry of it. `--dry-run` prints the plan without
+writing it.
+
+**Expected output shape:** one table row per run — ID, rung, ranks, `Ω/Ω₀` and
+the applied cadences, each marked `*` where the sweep-density rule tightened it
+and `!` where the mode's own Nyquist floor did — then any configs that would
+have aliased as written, then the plan path.

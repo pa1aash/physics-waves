@@ -324,6 +324,88 @@ debug a new tool on noisy real data). `src/analysis/aggregate_results.py` remain
 a stub until **Session L9** (a master CSV and Richardson extrapolation need many
 completed campaign runs, which do not exist yet).
 
+### Two Session L6 findings that outlive their modules
+
+Both were established in Session L6 and are load-bearing for everything
+downstream, but were left in module docstrings rather than recorded here. Session
+L7a backfilled them, because the second one silently determines whether a whole
+campaign's numbers mean anything.
+
+**Output cadence must scale with Ω, and aliasing cannot be detected after the
+fact.** The Rossby-Haurwitz angular phase speed `c_ang = −2Ω/[n(n+1)]` is linear
+in rotation rate, so a cadence chosen at Earth rate undersamples the fast members
+of a rotation sweep. When the pattern advances more than half a wavelength
+between samples, phase unwrapping picks the wrong branch and returns a confident,
+precise, **wrong-signed** answer. This cannot be checked on the output: unwrapping
+folds every increment into `(−π, π]`, so the fitted speed satisfies Nyquist *by
+construction* whether or not the true one does. A true step of `1.9π` presents as
+`0.1π` — a beautifully resolved slow wave, and a speed wrong by a factor of
+nineteen with the margin indicator reading comfortable. The only real safeguards
+are an external expectation at analysis time (`expected_c_angular` in
+`src/analysis/fit_phase_speed.py`) and a correct cadence at planning time
+(`src/solver/cadence.py`, wired into `scripts/sweep.py`). See "Sweep execution".
+
+**Mode degree is read off vorticity, never off height.** For a single-harmonic
+initial condition the streamfunction, and hence the vorticity, is exactly one
+degree — but the balanced height field is not. The nonlinear balance multiplies
+by `sin(latitude)`, and `μ P_n^m` couples only to `n ± 1`, so the height of a
+clean `n = 4` mode sits almost entirely in degrees 3 and 5 with almost nothing at
+4. Reading the degree off height gives the wrong answer while looking perfectly
+reasonable. `src/analysis/hough.py:dominant_degree` therefore defaults to
+`field="vorticity"`, and that default is physics, not preference.
+
+## Sweep execution
+
+Built in Session L7a. A campaign is **planned, then executed, then accounted
+for**, by three separate tools, and the separation is deliberate: a plan can be
+read, diffed and argued with before any compute is spent.
+
+| Step | Tool | Does |
+|------|------|------|
+| plan | `scripts/sweep.py` | validates every config against `configs/_schema.yaml`, rejects surviving `TBD_SESSION_L5` placeholders, decides ranks and cadences, writes `runs/_sweep_plans/<campaign>_<timestamp>.json` |
+| execute | `scripts/run_mpi.sh` | sources `scripts/env.sh`, picks ranks, runs `mpiexec -n <ranks> python -m src.solver.harness <config>` |
+| recover | `scripts/resume_check.py` | finds runs that did not finish and archives them so the ID is free |
+| account | `scripts/cost_log.py` | derives core-hours from provenance and updates `docs/COMPUTE.md` |
+
+**Runs execute sequentially**, one config at a time on several ranks. Running
+configs concurrently on one pod has them contend for the same cores and corrupts
+the wall-clock numbers Session R1 needs. This holds until there is a specific
+reason to parallelise across configs rather than within one.
+
+**Cadence scaling is where the Ω finding above is fixed once**, rather than
+trusted to whoever reads a config next. `src/solver/cadence.py` applies two
+independent bounds and records which one bound each cadence:
+
+- **Density**, `dt(Ω) = dt₀ · Ω₀/Ω` — holds samples per wave period constant
+  across a rotation sweep, so a residual trend of measured speed against `Ω` is
+  physics rather than a sampling artefact. This is the campaign's actual result,
+  so the comparability matters.
+- **Nyquist**, `dt_safe = 0.5π · n(n+1) / (2mΩ)` — an absolute floor from the
+  mode itself. Needed because rotation is not the only thing that makes a wave
+  fast: `c_ang ∝ 1/[n(n+1)]`, so at fixed Earth rate `P-01` (`n=2`) travels five
+  times faster than `P-07` (`n=8`), and the shared 86400 s snapshot cadence
+  aliases it at `1.34π` per sample with no rotation factor available to rescue it.
+
+The plan applies whichever is tighter and **never loosens** a cadence a config
+already states. Two committed configs alias as written — `P-01` (Nyquist-bound)
+and `P-12` at `4Ω₀` (density-bound); both are corrected in every generated plan,
+and `tests/test_sweep_cadence.py` asserts no planned cadence in the whole
+campaign exceeds Nyquist. It also fabricates the aliased wave and confirms the
+fit recovers `+7.19e-6` instead of the true `−2.92e-5` at the unscaled cadence,
+so the test fails if the fix is ever removed.
+
+**Overridden is not the same as rescued.** A `CadenceDecision` records
+`aliased_as_stated` separately from `overridden`, because density scaling often
+tightens a cadence that was never in danger, and a plan that conflated the two
+would make every override look like a near miss.
+
+**Sync fits at the ends.** `scripts/sync_pod.sh push` sends code out;
+`scripts/sync_pod.sh pull <RUN_ID>` brings one run's output back. `runs/` is
+gitignored, so this is the only route for run data between machines. `pull`
+refuses a run ID that already exists locally — the harness's immutability rule
+enforced at the machine boundary, since an overwrite would leave a provenance
+record describing one execution beside data from another.
+
 ## Run provenance
 
 Every run writes `runs/<RUN_ID>/provenance.json`. The bulk HDF5 beside it is
@@ -398,7 +480,8 @@ wrapped by a thin, gitignored editor slash command. The capability always lives
 in the Makefile target, never in the wrapper, so a plain `git clone` plus `make`
 reproduces every result without any editor or assistant. The targets are
 `make verify`, `make refcheck`, `make manuscript`, `make figure` and `make sweep`
-(the last two are stubs that fail informatively until Sessions L10 and L5/L7).
+(`make figure` is a stub that fails informatively until Session L10; `make sweep`
+was implemented in Session L7a and now plans a campaign — see "Sweep execution").
 Full contract: `docs/CLI_COMMANDS.md`.
 
 ## Uncertainty reporting
