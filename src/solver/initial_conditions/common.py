@@ -70,12 +70,34 @@ def area_average(swp, field) -> float:
     a plain arithmetic mean over grid points weights the poles far too heavily.
     The correct weight is the Gauss-Legendre quadrature weight in
     ``mu = cos(theta)``, uniform in azimuth.
+
+    **The result is collective.** Reducing a field to a scalar leaves that scalar
+    on exactly one rank; every other rank holds an array of shape ``(1, 0)``.
+    Indexing it there raises ``IndexError``, so on more than one rank this
+    function used to abort every initial condition in the project before the run
+    began — and every run to date has been serial, so nothing caught it. The
+    value is therefore gathered and returned identically on all ranks: an average
+    that differs between ranks would put them on different physical states, which
+    is worse than the crash.
     """
     scratch = swp.dist.Field(bases=swp.basis)
     scratch["g"] = field
     averaged = d3.Average(scratch, swp.coords).evaluate()
     averaged.change_scales(1)
-    return float(np.ravel(averaged["g"])[0])
+    local = np.ravel(averaged["g"])
+
+    comm = swp.dist.comm
+    if comm is None or comm.size == 1:
+        return float(local[0])
+
+    gathered = comm.allgather(float(local[0]) if local.size else None)
+    values = [value for value in gathered if value is not None]
+    if not values:
+        raise RuntimeError(
+            "the area average reduced to a scalar held by no rank; the distributor "
+            "layout is not what this function assumes"
+        )
+    return values[0]
 
 
 def set_free_surface(swp, surface_si) -> float:

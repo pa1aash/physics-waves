@@ -196,18 +196,28 @@ def git_record() -> dict:
     }
 
 
-def _write_provenance(path: Path, record: dict) -> None:
+def _write_provenance(path: Path, record: dict, comm=None) -> None:
     """Write the record and make it read-only.
 
     Read-only is not security; it is a tripwire. Anything that later tries to
     rewrite a run's provenance hits a permission error at the point of the
     mistake rather than silently producing a record that no longer describes the
     data beside it.
+
+    **One rank writes; all ranks wait.** The tripwire and MPI interact badly if
+    every rank writes: the first rank to arrive makes the file read-only and the
+    next one to arrive trips the tripwire it just set, killing a healthy run with
+    a permission error that looks exactly like the corruption the tripwire exists
+    to catch. Rank 0 owns the record, and the barrier afterwards keeps any rank
+    from running ahead of a record that is only half written.
     """
-    if path.exists():
-        path.chmod(stat.S_IWUSR | stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
-    path.write_text(json.dumps(record, indent=2, sort_keys=False) + "\n", encoding="utf-8")
-    path.chmod(stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+    if comm is None or comm.rank == 0:
+        if path.exists():
+            path.chmod(stat.S_IWUSR | stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+        path.write_text(json.dumps(record, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+        path.chmod(stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+    if comm is not None and comm.size > 1:
+        comm.Barrier()
 
 
 def _sha256_file(path: Path) -> str:
@@ -389,6 +399,8 @@ def run(config_path, *, output_root=None, force: bool = False, dry_run: bool = F
     output_dir.mkdir(parents=True, exist_ok=True)
 
     swp, metadata = build_run(config)
+    # Every provenance write below is collective: see _write_provenance.
+    comm = swp.dist.comm
     warnings_raised = check_physics_consistency(config, metadata)
     for message in warnings_raised:
         print(f"[harness] WARNING: {message}", file=sys.stderr)
@@ -410,11 +422,11 @@ def run(config_path, *, output_root=None, force: bool = False, dry_run: bool = F
         "warnings": warnings_raised,
         "outcome": {"status": "started"},
     }
-    _write_provenance(provenance_path, record)
+    _write_provenance(provenance_path, record, comm=comm)
 
     if dry_run:
         record["outcome"] = {"status": "dry_run", "note": "built and validated, not integrated"}
-        _write_provenance(provenance_path, record)
+        _write_provenance(provenance_path, record, comm=comm)
         return RunResult(run_id, output_dir, record)
 
     if metadata.get("kind") == "advection":
@@ -446,8 +458,12 @@ def run(config_path, *, output_root=None, force: bool = False, dry_run: bool = F
             "wall_seconds": round(time.time() - wall_start, 3),
             "finished_utc": datetime.now(UTC).isoformat(timespec="seconds"),
         }
+        # The output files are written by every rank; hashing one before its
+        # last write has landed would record the hash of a truncated file.
+        if comm is not None and comm.size > 1:
+            comm.Barrier()
         record["outputs"] = _output_manifest(output_dir)
-        _write_provenance(provenance_path, record)
+        _write_provenance(provenance_path, record, comm=comm)
 
     return RunResult(run_id, output_dir, record)
 
